@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report>
+  <findings>
+    <finding id="1" type="SQL Injection" severity="High" cwe="89" status="new">
+      <tool name="checkmarx"/>
+      <file path="src/db/dao.java" line="55"/>
+      <description>SQL injection vulnerability found in query builder.</description>
+      <result>
+        <dataflow>
+          <node file="src/db/dao.java" line="50">getUserInput()</node>
+          <node file="src/db/dao.java" line="55">buildQuery(input)</node>
+        </dataflow>
+      </result>
+    </finding>
+    <finding id="2" type="SQL Injection" severity="High" cwe="89" status="new">
+      <tool name="fortify"/>
+      <file path="src/db/dao.java" line="55"/>
+      <description>SQL injection detected by secondary scanner.</description>
+      <result/>
+    </finding>
+    <finding id="3" type="Cross-Site Scripting" severity="Medium" cwe="79" status="new">
+      <tool name="checkmarx"/>
+      <file path="src/web/view.jsp" line="33"/>
+      <description>Reflected XSS in search parameter.</description>
+      <result/>
+    </finding>
+  </findings>
+</report>

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "gnat_sas",
+          "version": "25.0",
+          "informationUri": "https://www.adacore.com",
+          "rules": [
+            {"id": "buffer_overflow", "shortDescription": {"text": "Buffer overflow"}, "properties": {"tags": ["CWE-120"]}}
+          ]
+        }
+      },
+      "results": [
+        {"ruleId": "buffer_overflow", "level": "error", "message": {"text": "Possible buffer overflow in array access"}, "locations": [{"physicalLocation": {"artifactLocation": {"uri": "src/comms.adb"}, "region": {"startLine": 142, "startColumn": 10}}}]},
+        {"ruleId": "range_check", "level": "warning", "message": {"text": "Range check might fail"}, "locations": [{"physicalLocation": {"artifactLocation": {"uri": "src/sensors.adb"}, "region": {"startLine": 88, "startColumn": 5}}}]}
+      ]
+    }
+  ]
+}

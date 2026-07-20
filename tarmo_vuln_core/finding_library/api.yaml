@@ -1,0 +1,292 @@
+- id: bola-idor
+  title: "Broken Object Level Authorization (BOLA / IDOR)"
+  severity: HIGH
+  cvss_score: 8.6
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 639
+  owasp_id: "A01:2025"
+  methodology_items: ["AUTHZ-04"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The API does not enforce authorization checks on object-level access.
+    An authenticated user can access or modify objects belonging to other
+    users by manipulating resource identifiers (IDs) in API requests. This
+    is the most common and impactful API vulnerability (OWASP API1).
+  impact: |
+    An attacker with a low-privileged account can access, modify, or delete
+    any other user's data by enumerating or predicting object IDs. This
+    results in unauthorized data exposure, account takeover, and integrity
+    violations across all user data in the system.
+  remediation: |
+    Implement server-side authorization checks for every object access
+    request, verifying the requesting user is authorized to access the
+    specific object. Never rely on client-supplied IDs alone — always
+    validate against the authenticated user's session. Use unpredictable,
+    non-sequential identifiers (UUIDs) as an additional defense-in-depth measure.
+  references:
+    - "https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/"
+    - "https://cwe.mitre.org/data/definitions/639.html"
+  steps:
+    - "Authenticate as User A and retrieve a resource with its ID (e.g., GET /api/users/123/profile)."
+    - "Authenticate as User B and attempt to access User A's resource using the same ID."
+    - "Confirm unauthorized access to User A's data."
+    - "Test create, update, and delete operations for the same BOLA pattern."
+    - "Document the endpoint, object ID, the requesting user, and the data accessed."
+
+- id: api-key-in-url
+  title: "API Key Exposed in URL"
+  severity: HIGH
+  cvss_score: 8.7
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 319
+  owasp_id: "A04:2025"
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application passes API keys as URL query parameters rather than in
+    HTTP headers or the request body. URLs are logged by web servers,
+    reverse proxies, CDNs, browser history, and shared in referer headers,
+    exposing the secret to unintended parties.
+  impact: |
+    API keys embedded in URLs may be disclosed through server logs, proxy
+    logs, browser history, browser referer headers sent to third-party sites,
+    and error messages. A stolen API key grants an attacker the same access
+    as the legitimate key holder.
+  remediation: |
+    Transmit API keys exclusively in HTTP request headers (e.g.,
+    Authorization: Bearer <key> or X-API-Key: <key>). Never embed secrets
+    in URLs. Rotate any API keys that have been transmitted via URL parameters.
+    Audit server and proxy logs for exposed keys.
+  references:
+    - "https://cwe.mitre.org/data/definitions/319.html"
+    - "https://owasp.org/API-Security/editions/2023/en/0xa2-broken-authentication/"
+  steps:
+    - "Proxy application traffic through Burp Suite and review all requests."
+    - "Search for API key patterns in URLs: ?api_key=, ?key=, ?token=, ?secret="
+    - "Check if the same key appears in server-side logs (if accessible)."
+    - "Confirm the key provides authenticated access when used in a fresh request."
+    - "Document the endpoint, exposed key (redacted), and the access it grants."
+
+- id: excessive-data-exposure
+  title: "Excessive Data Exposure in API Response"
+  severity: HIGH
+  cvss_score: 7.1
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 213
+  owasp_id: "A01:2025"
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The API returns more data than required for the client's use case,
+    relying on the client to filter sensitive fields. Sensitive data such
+    as password hashes, internal IDs, PII, or administrative fields is
+    included in API responses for unauthorized users.
+  impact: |
+    Sensitive user data including credentials, PII, internal system details,
+    and fields the user should not see are directly exposed in API responses.
+    An attacker can harvest this data by calling standard API endpoints
+    with a low-privileged account.
+  remediation: |
+    Implement response filtering at the API layer — return only the fields
+    required for each specific use case. Use API response schemas (e.g.,
+    Pydantic, JSON Schema) to enforce output data minimization. Never
+    serialize entire database objects to clients — use explicit DTOs.
+  references:
+    - "https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/"
+    - "https://cwe.mitre.org/data/definitions/213.html"
+  steps:
+    - "Authenticate with a standard user account and call common API endpoints."
+    - "Examine all fields in the response for sensitive data beyond what the UI displays."
+    - "Compare the API response to what is shown in the application's UI."
+    - "Look for hashed passwords, internal IDs, admin flags, financial data, or PII."
+    - "Document each sensitive field returned and its risk level."
+
+- id: missing-rate-limiting
+  title: "Missing API Rate Limiting"
+  severity: HIGH
+  cvss_score: 7.1
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 770
+  owasp_id: "A06:2025"
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The API does not implement rate limiting on resource-intensive or
+    sensitive endpoints. An attacker can send unlimited requests to exhaust
+    server resources, harvest data through enumeration, or perform automated
+    attacks such as brute-force or credential stuffing.
+  impact: |
+    An attacker can exhaust API server resources, causing denial of service
+    for legitimate users. Rate-limit-free endpoints also enable mass data
+    harvesting through automated enumeration and brute-force attacks on
+    authentication endpoints.
+  remediation: |
+    Implement rate limiting at the API gateway or load balancer layer.
+    Apply per-user, per-IP, and per-endpoint limits appropriate to the
+    expected usage pattern. Return HTTP 429 with Retry-After headers when
+    limits are exceeded. Implement exponential backoff on authentication endpoints.
+  references:
+    - "https://owasp.org/API-Security/editions/2023/en/0xa4-unrestricted-resource-consumption/"
+    - "https://cwe.mitre.org/data/definitions/770.html"
+  steps:
+    - "Send a high volume of requests (e.g., 1000) to a sensitive endpoint in rapid succession."
+    - "Observe whether rate limiting (HTTP 429) or throttling is applied."
+    - "Measure response times to detect soft throttling."
+    - "Test multiple endpoints including authentication, search, and data export endpoints."
+    - "Document the number of requests sent, responses received, and absence of rate limiting."
+
+- id: function-level-authz-bypass
+  title: "Broken Function Level Authorization"
+  severity: HIGH
+  cvss_score: 8.6
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 285
+  owasp_id: "A01:2025"
+  methodology_items: ["AUTHZ-02"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The API does not enforce authorization at the function/endpoint level,
+    allowing low-privileged users to access administrative or privileged
+    API functions by directly calling the endpoint. The API relies on the
+    UI to hide restricted functions rather than enforcing server-side access control.
+  impact: |
+    A standard user can perform administrative actions such as creating or
+    deleting users, accessing all customer data, modifying system configuration,
+    or escalating their own privileges by calling undocumented or restricted API endpoints.
+  remediation: |
+    Implement deny-by-default authorization at the API function level.
+    Use role-based access control (RBAC) or attribute-based access control (ABAC)
+    enforced server-side for every endpoint. Regularly audit API endpoints
+    against the role matrix. Never rely on security through obscurity.
+  references:
+    - "https://owasp.org/API-Security/editions/2023/en/0xa5-broken-function-level-authorization/"
+    - "https://cwe.mitre.org/data/definitions/285.html"
+  steps:
+    - "Identify administrative endpoints by reviewing JavaScript, API docs, or traffic from an admin session."
+    - "Authenticate as a low-privileged user."
+    - "Call identified admin endpoints (e.g., DELETE /api/admin/users/123, POST /api/admin/config)."
+    - "Confirm whether the server processes the request and returns a success response."
+    - "Document the endpoint, requesting user's role, action performed, and server response."
+
+- id: mass-assignment
+  title: "Mass Assignment / Auto-Binding Vulnerability"
+  severity: HIGH
+  cvss_score: 8.6
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 915
+  owasp_id: "A06:2025"
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The API allows clients to set object properties that should not be
+    user-modifiable. When the API binds request body fields directly to
+    internal data model properties without filtering, attackers can set
+    privileged fields such as is_admin, role, or balance.
+  impact: |
+    An attacker can escalate their own privileges, modify other users'
+    sensitive attributes, bypass business logic controls, or manipulate
+    financial or configuration data by including additional fields in API
+    request bodies.
+  remediation: |
+    Use an explicit allowlist of permitted fields when binding request
+    bodies to data models. Never pass raw request bodies directly to ORM
+    save functions. Use separate input DTOs that only expose safe, user-
+    modifiable fields. Audit all create and update endpoints for binding scope.
+  references:
+    - "https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/"
+    - "https://cwe.mitre.org/data/definitions/915.html"
+  steps:
+    - "Capture a user update request (e.g., PATCH /api/users/me)."
+    - "Add extra fields to the request body: 'is_admin': true, 'role': 'admin', 'credits': 10000"
+    - "Submit the modified request and observe the server response."
+    - "Retrieve the user profile and check if the injected fields were applied."
+    - "Document the endpoint, injected fields, and evidence of their acceptance."
+
+- id: graphql-introspection-enabled
+  title: "GraphQL Introspection Enabled in Production"
+  severity: MEDIUM
+  cvss_score: 6.9
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 200
+  owasp_id: "A02:2025"
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The GraphQL API has introspection enabled in a production environment.
+    Introspection allows any client to query the complete API schema,
+    enumerating all types, fields, mutations, and queries, significantly
+    aiding an attacker's reconnaissance.
+  impact: |
+    An attacker can fully map the GraphQL API schema without any
+    documentation, discovering hidden endpoints, sensitive field names,
+    internal types, and attack surface that would otherwise require
+    source code access to identify.
+  remediation: |
+    Disable GraphQL introspection in production environments. If introspection
+    is required for internal tooling, restrict it to authenticated internal
+    users or specific IP ranges. Use query depth limiting and query complexity
+    analysis to prevent abuse regardless of introspection status.
+  references:
+    - "https://owasp.org/API-Security/editions/2023/en/0xa7-server-side-request-forgery/"
+    - "https://cwe.mitre.org/data/definitions/200.html"
+    - "https://graphql.org/learn/introspection/"
+  steps:
+    - "Send the standard introspection query: { __schema { types { name } } }"
+    - "Confirm a full schema response is returned."
+    - "Use graphql-voyager or similar tools to visualize the API schema."
+    - "Identify sensitive types, mutations, and hidden fields in the schema."
+    - "Document the schema structure and any sensitive discovered endpoints."
+
+- id: api-broken-authentication
+  title: "API Broken Authentication"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 287
+  owasp_id: "A07:2025"
+  methodology_items: ["AUTHN-01"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The API has weaknesses in authentication implementation including weak
+    or absent token validation, tokens without expiry, missing signature
+    verification, or authentication that can be bypassed by modifying
+    token fields. Authentication is not enforced consistently across all endpoints.
+  impact: |
+    An attacker can authenticate as any user including administrators by
+    forging or replaying tokens, bypassing authentication on unprotected
+    endpoints, or exploiting validation weaknesses, leading to complete
+    application compromise.
+  remediation: |
+    Implement consistent authentication enforcement across all API endpoints.
+    Use proven authentication frameworks — avoid custom token implementations.
+    Validate token signatures, expiry, audience, and issuer on every request.
+    Implement short token lifetimes with refresh token rotation. Log and alert
+    on authentication anomalies.
+  references:
+    - "https://owasp.org/API-Security/editions/2023/en/0xa2-broken-authentication/"
+    - "https://cwe.mitre.org/data/definitions/287.html"
+  steps:
+    - "Identify API endpoints and attempt access without any authentication token."
+    - "Attempt access with a expired, malformed, or blank token."
+    - "Test all HTTP methods (GET, POST, PUT, DELETE) on authenticated endpoints without tokens."
+    - "Check if some endpoints lack authentication while related endpoints require it."
+    - "Document all endpoints that respond with data or success codes without valid authentication."

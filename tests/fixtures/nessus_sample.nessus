@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NessusClientData_v2>
+  <Policy>
+    <policyName>Basic Network Scan</policyName>
+  </Policy>
+  <Report name="pentest-scribe fixture scan">
+    <ReportHost name="10.0.0.1">
+      <HostProperties>
+        <tag name="host-ip">10.0.0.1</tag>
+        <tag name="host-fqdn">host1.example.com</tag>
+        <tag name="operating-system">Linux Kernel 5.x</tag>
+      </HostProperties>
+
+      <!-- Plugin 42873: SSL Medium Strength Cipher Suites Supported (SWEET32) -->
+      <ReportItem port="443" svc_name="https" protocol="tcp" severity="2"
+                  pluginID="42873" pluginName="SSL Medium Strength Cipher Suites Supported (SWEET32)">
+        <risk_factor>Medium</risk_factor>
+        <synopsis>The remote service supports the use of medium strength SSL ciphers.</synopsis>
+        <description>The remote host supports the use of SSL ciphers that offer medium
+strength encryption. Nessus regards medium strength as any encryption that uses key
+lengths at least 64 bits and less than 112 bits, or else that uses the 3DES
+encryption suite.
+
+Note that it is considerably easier to circumvent medium strength
+encryption if the attacker is on the same physical network.</description>
+        <solution>Reconfigure the affected application if possible to avoid use of medium
+strength ciphers.</solution>
+        <cvss_base_score>5.0</cvss_base_score>
+        <cvss_vector>CVSS2#AV:N/AC:L/Au:N/C:P/I:N/A:N</cvss_vector>
+        <cve>CVE-2016-2183</cve>
+      </ReportItem>
+
+      <!-- Plugin 65821: SSL RC4 Cipher Suites Supported (Bar Mitzvah) -->
+      <ReportItem port="443" svc_name="https" protocol="tcp" severity="2"
+                  pluginID="65821" pluginName="SSL RC4 Cipher Suites Supported (Bar Mitzvah)">
+        <risk_factor>Medium</risk_factor>
+        <synopsis>The remote service supports the use of the RC4 cipher.</synopsis>
+        <description>The remote host supports the use of RC4 in one or more cipher suites.
+The RC4 cipher is flawed in its generation of a pseudo-random stream of bytes so that
+a wide variety of small biases are introduced into the stream, decreasing its
+randomness.</description>
+        <solution>Reconfigure the affected application, if possible, to avoid use of RC4
+ciphers. Consider using TLS 1.2 with AES-GCM suites.</solution>
+        <cvss_base_score>4.3</cvss_base_score>
+        <cvss_vector>CVSS2#AV:N/AC:M/Au:N/C:P/I:N/A:N</cvss_vector>
+        <cve>CVE-2013-2566</cve>
+      </ReportItem>
+    </ReportHost>
+  </Report>
+</NessusClientData_v2>

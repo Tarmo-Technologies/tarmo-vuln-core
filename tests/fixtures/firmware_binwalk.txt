@@ -1,0 +1,11 @@
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+0             0x0             ELF, 32-bit LSB executable, ARM, version 1
+1024          0x400           Squashfs filesystem, little endian, version 4.0
+65536         0x10000         JFFS2 filesystem, little endian
+131072        0x20000         PEM certificate
+131200        0x20080         X.509 Certificate, CN=firmware.example.com
+132000        0x20400         RSA private key data
+262144        0x40000         ELF 32-bit debug section .debug_info
+524288        0x80000         gzip compressed data

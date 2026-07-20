@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'echo \"$CLAUDE_TOOL_INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); f=d.get(\\\"file_path\\\",\\\"\\\"); print(f)\" | grep -q \"\\.py$\" && FILE=$(echo \"$CLAUDE_TOOL_INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get(\\\"file_path\\\",\\\"\\\"))\") && ruff check --fix \"$FILE\" && ruff format \"$FILE\" || true'"
+          }
+        ]
+      }
+    ]
+  }
+}

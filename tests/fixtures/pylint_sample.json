@@ -1,0 +1,5 @@
+[
+  {"type": "error", "module": "myapp.views", "obj": "index", "line": 33, "column": 0, "path": "myapp/views.py", "symbol": "undefined-variable", "message": "Undefined variable 'request'", "message-id": "E0602"},
+  {"type": "warning", "module": "myapp.models", "obj": "User", "line": 10, "column": 0, "path": "myapp/models.py", "symbol": "unused-import", "message": "Unused import os", "message-id": "W0611"},
+  {"type": "convention", "module": "myapp.utils", "obj": "", "line": 1, "column": 0, "path": "myapp/utils.py", "symbol": "missing-module-docstring", "message": "Missing module docstring", "message-id": "C0114"}
+]

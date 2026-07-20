@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Hand-crafted OpenVAS sample fixture for unit tests.
+  4 <result> elements, 3 unique NVTs:
+    - NVT 100001: SSL/TLS TLSv1.0 (Medium, CVSS 4.3, CVE-2011-3389) — 2 hosts
+    - NVT 100002: OS End Of Life (High, CVSS 10.0, NOCVE)            — 1 host → CRITICAL
+    - NVT 100003: SSH Weak Encryption (Log, CVSS 0.0, NOCVE)         — 1 host → INFO
+-->
+<report id="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee" type="scan">
+  <report id="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee">
+    <results>
+      <!-- NVT 100001, host 1 -->
+      <result id="r1">
+        <host>192.168.1.100</host>
+        <port>443/tcp</port>
+        <nvt oid="1.3.6.1.4.1.25623.1.0.100001">
+          <name>SSL/TLS: Deprecated TLSv1.0 Protocol Detection</name>
+          <cvss_base>4.3</cvss_base>
+          <cve>CVE-2011-3389</cve>
+          <bid>NOBID</bid>
+          <tags>cvss_base_vector=AV:N/AC:M/Au:N/C:P/I:N/A:N|solution=Disable TLSv1.0 and enforce TLS 1.2 or later.|summary=The remote host supports TLSv1.0.</tags>
+        </nvt>
+        <threat>Medium</threat>
+        <severity>4.3</severity>
+        <description>The remote host supports the deprecated TLSv1.0 protocol.</description>
+      </result>
+      <!-- NVT 100001, host 2 — same OID, different host -->
+      <result id="r2">
+        <host>192.168.1.101</host>
+        <port>443/tcp</port>
+        <nvt oid="1.3.6.1.4.1.25623.1.0.100001">
+          <name>SSL/TLS: Deprecated TLSv1.0 Protocol Detection</name>
+          <cvss_base>4.3</cvss_base>
+          <cve>CVE-2011-3389</cve>
+          <bid>NOBID</bid>
+          <tags>cvss_base_vector=AV:N/AC:M/Au:N/C:P/I:N/A:N|solution=Disable TLSv1.0 and enforce TLS 1.2 or later.|summary=The remote host supports TLSv1.0.</tags>
+        </nvt>
+        <threat>Medium</threat>
+        <severity>4.3</severity>
+        <description>The remote host supports the deprecated TLSv1.0 protocol.</description>
+      </result>
+      <!-- NVT 100002: High + CVSS 10.0 → CRITICAL, NOCVE → raw_ref = OID -->
+      <result id="r3">
+        <host>192.168.1.100</host>
+        <port>general/tcp</port>
+        <nvt oid="1.3.6.1.4.1.25623.1.0.100002">
+          <name>OS End Of Life Detection</name>
+          <cvss_base>10.0</cvss_base>
+          <cve>NOCVE</cve>
+          <bid>NOBID</bid>
+          <tags>cvss_base_vector=AV:N/AC:L/Au:N/C:C/I:C/A:C|solution=Upgrade the operating system to a supported version.|summary=The remote OS has reached end of life.</tags>
+        </nvt>
+        <threat>High</threat>
+        <severity>10.0</severity>
+        <description>The operating system on the remote host has reached end of life.</description>
+      </result>
+      <!-- NVT 100003: Log + CVSS 0.0 → INFO, no solution in tags -->
+      <result id="r4">
+        <host>192.168.1.102</host>
+        <port>22/tcp</port>
+        <nvt oid="1.3.6.1.4.1.25623.1.0.100003">
+          <name>SSH Weak Encryption Algorithms Supported</name>
+          <cvss_base>0.0</cvss_base>
+          <cve>NOCVE</cve>
+          <bid>NOBID</bid>
+          <tags>summary=The remote SSH server supports weak encryption algorithms.</tags>
+        </nvt>
+        <threat>Log</threat>
+        <severity>0.0</severity>
+        <description>The remote SSH server supports weak encryption algorithms.</description>
+      </result>
+    </results>
+  </report>
+</report>

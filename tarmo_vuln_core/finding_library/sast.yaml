@@ -1,0 +1,575 @@
+- id: sql-injection-source
+  title: "SQL Injection (Source Code)"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 89
+  owasp_id: "A05:2025"
+  attack_ids: ["T1190"]
+  attack_tactics: ["Initial Access"]
+  methodology_items: ["INPV-05"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "python.lang.security.audit.formatted-sql-query"
+      - "python.django.security.injection.sql.sql-injection-using-raw"
+      - "java.lang.security.audit.sqli.tainted-sql-from-http-request"
+      - "javascript.lang.security.audit.detect-sql-injection"
+    bandit_test: ["B608"]
+    cwe: [89]
+  description: |
+    Static analysis identified code that constructs SQL queries using string
+    concatenation or formatting with user-controlled input, creating a SQL
+    injection vulnerability exploitable at runtime.
+  impact: |
+    An attacker can read sensitive data from the database (credentials,
+    PII, financial data), modify or delete records, execute administrative
+    operations, and in some configurations achieve OS-level command execution.
+  remediation: |
+    Use parameterized queries (prepared statements) for all database
+    interactions. Apply an ORM that enforces safe query construction.
+    Implement a web application firewall (WAF) as a defense-in-depth layer.
+  references:
+    - "https://owasp.org/www-community/attacks/SQL_Injection"
+    - "https://cwe.mitre.org/data/definitions/89.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Identify the endpoint that exercises the vulnerable code path from the source reference."
+    - "Inject a single quote (') into the parameter and observe error messages or behaviour changes."
+    - "Test with a time-based payload: ' OR SLEEP(5)-- to confirm blind injection."
+    - "Use sqlmap: sqlmap -u '<url>' -p '<param>' --level=3 to enumerate tables and extract data."
+    - "Document the vulnerable endpoint, parameter name, payload, and extracted proof-of-concept data."
+
+- id: command-injection-source
+  title: "OS Command Injection (Source Code)"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 78
+  owasp_id: "A05:2025"
+  attack_ids: ["T1059"]
+  attack_tactics: ["Execution"]
+  methodology_items: ["INPV-12"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "python.lang.security.audit.dangerous-system-call"
+      - "python.lang.security.audit.subprocess-shell-true"
+      - "java.lang.security.audit.command-injection-formatted-runtime-call"
+    bandit_test: ["B602", "B603", "B604"]
+    cwe: [78]
+  description: |
+    Static analysis identified code that passes user-controlled input to OS
+    command execution functions (subprocess, os.system, exec) without proper
+    sanitization.
+  impact: |
+    An attacker can execute arbitrary operating system commands with the
+    privileges of the application process, leading to full system compromise,
+    data exfiltration, or lateral movement.
+  remediation: |
+    Avoid passing user input to shell commands. Use parameterized APIs instead
+    of shell=True. If shell execution is unavoidable, apply strict allowlist
+    validation on all inputs and use shlex.quote() for escaping.
+  references:
+    - "https://owasp.org/www-community/attacks/Command_Injection"
+    - "https://cwe.mitre.org/data/definitions/78.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Identify the endpoint that reaches the vulnerable command execution code path."
+    - "Inject a payload: ; id or | whoami into the parameter."
+    - "Observe whether command output appears in the response or behaviour changes."
+    - "Test time-based: ; sleep 5 to confirm blind command injection."
+    - "Document the endpoint, parameter, payload, and command output."
+
+- id: path-traversal-source
+  title: "Path Traversal (Source Code)"
+  severity: HIGH
+  cvss_score: 8.2
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 22
+  owasp_id: "A01:2025"
+  attack_ids: ["T1083"]
+  attack_tactics: ["Discovery"]
+  methodology_items: ["ATHZ-01"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "python.lang.security.audit.path-traversal-open"
+      - "java.lang.security.audit.path-traversal-tainted"
+    bandit_test: []
+    cwe: [22]
+  description: |
+    Static analysis identified code that constructs file paths using
+    user-controlled input without validating against directory traversal
+    sequences (../).
+  impact: |
+    An attacker can read arbitrary files on the server including /etc/passwd,
+    configuration files containing credentials, application source code, and
+    database files.
+  remediation: |
+    Validate and canonicalize all file paths. Use os.path.realpath() to
+    resolve the absolute path and verify it falls within the intended base
+    directory. Never use user input directly in file path construction.
+  references:
+    - "https://owasp.org/www-community/attacks/Path_Traversal"
+    - "https://cwe.mitre.org/data/definitions/22.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Identify the endpoint that handles file access using the vulnerable code path."
+    - "Inject ../../etc/passwd into the file parameter."
+    - "Observe whether the contents of /etc/passwd are returned."
+    - "Test Windows variants: ..\\..\\windows\\win.ini if applicable."
+    - "Document the endpoint, parameter, and file contents retrieved."
+
+- id: insecure-deserialization
+  title: "Insecure Deserialization (Source Code)"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 502
+  owasp_id: "A08:2025"
+  attack_ids: ["T1059"]
+  attack_tactics: ["Execution"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "python.lang.security.deserialization.avoid-pyyaml-load"
+      - "python.lang.security.audit.pickle"
+      - "java.lang.security.audit.object-deserialization"
+    bandit_test: ["B301", "B302"]
+    cwe: [502]
+  description: |
+    Static analysis identified use of unsafe deserialization functions (pickle,
+    yaml.load, Java ObjectInputStream) that can execute arbitrary code when
+    processing untrusted data.
+  impact: |
+    An attacker can achieve remote code execution by supplying a crafted
+    serialized payload to the deserialization endpoint.
+  remediation: |
+    Replace unsafe deserialization with safe alternatives (json, yaml.safe_load,
+    whitelisted deserialization). If native deserialization is required,
+    implement integrity verification (HMAC) before deserialization.
+  references:
+    - "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/16-Testing_for_HTTP_Incoming_Requests"
+    - "https://cwe.mitre.org/data/definitions/502.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Identify the endpoint that consumes serialized input."
+    - "Craft a malicious pickle/YAML/Java payload using ysoserial or similar."
+    - "Submit the payload and observe code execution (DNS callback, sleep, file write)."
+    - "Document the endpoint, content type, and proof of execution."
+
+- id: ssrf-source
+  title: "Server-Side Request Forgery (Source Code)"
+  severity: HIGH
+  cvss_score: 8.2
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:H/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 918
+  owasp_id: "A10:2025"
+  attack_ids: ["T1090"]
+  attack_tactics: ["Command and Control"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "python.lang.security.audit.ssrf-injection-requests"
+      - "java.lang.security.audit.ssrf"
+    bandit_test: []
+    cwe: [918]
+  description: |
+    Static analysis identified code that makes HTTP requests using
+    user-controlled URLs without validating the target, allowing an attacker
+    to make the server access internal resources.
+  impact: |
+    An attacker can scan internal networks, access cloud metadata endpoints
+    (169.254.169.254), read internal services, and potentially achieve remote
+    code execution via internal services.
+  remediation: |
+    Validate and sanitize all user-supplied URLs against an allowlist of
+    permitted hosts and schemes. Block private IP ranges and cloud metadata
+    endpoints. Use a dedicated HTTP client with network-level restrictions.
+  references:
+    - "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery"
+    - "https://cwe.mitre.org/data/definitions/918.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Identify the endpoint that accepts a URL parameter used in server-side requests."
+    - "Submit a Burp Collaborator or webhook.site URL to confirm outbound requests."
+    - "Test internal access: http://169.254.169.254/latest/meta-data/ (AWS metadata)."
+    - "Test internal port scanning: http://127.0.0.1:22 and observe response differences."
+    - "Document the endpoint, parameter, and internal resources accessed."
+
+- id: open-redirect-source
+  title: "Open Redirect (Source Code)"
+  severity: MEDIUM
+  cvss_score: 5.1
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 601
+  owasp_id: "A01:2025"
+  attack_ids: ["T1566"]
+  attack_tactics: ["Initial Access"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "python.django.security.audit.unvalidated-redirect"
+      - "python.flask.security.audit.open-redirect"
+    bandit_test: []
+    cwe: [601]
+  description: |
+    Static analysis identified code that performs HTTP redirects using
+    user-controlled input without validating the target URL.
+  impact: |
+    An attacker can craft phishing URLs using the trusted domain that redirect
+    victims to malicious sites, enabling credential theft or malware delivery.
+  remediation: |
+    Validate redirect targets against an allowlist of permitted URLs or domains.
+    Never redirect to a URL taken directly from user input. Use relative paths
+    where possible.
+  references:
+    - "https://cwe.mitre.org/data/definitions/601.html"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html"
+  compliance_refs: []
+  steps:
+    - "Identify the endpoint that handles redirects using the vulnerable code path."
+    - "Set the redirect parameter to an external URL: https://evil.com"
+    - "Observe whether the browser is redirected to the external site."
+    - "Test bypass techniques: //evil.com, /\\evil.com, /%09/evil.com"
+    - "Document the endpoint, parameter, and proof of redirect."
+
+- id: xxe-source
+  title: "XML External Entity Injection (Source Code)"
+  severity: HIGH
+  cvss_score: 8.2
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:L/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 611
+  owasp_id: "A05:2025"
+  attack_ids: ["T1190"]
+  attack_tactics: ["Initial Access"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "python.lang.security.audit.insecure-xml-use"
+      - "java.lang.security.audit.xxe"
+    bandit_test: ["B314", "B320"]
+    cwe: [611]
+  description: |
+    Static analysis identified XML parsing code that does not disable external
+    entity resolution, making it vulnerable to XXE attacks.
+  impact: |
+    An attacker can read local files on the server, perform SSRF to internal
+    services, and in some cases achieve denial of service or remote code
+    execution.
+  remediation: |
+    Disable external entity resolution in the XML parser. Use defusedxml
+    in Python, or configure DocumentBuilderFactory with
+    FEATURE_SECURE_PROCESSING in Java.
+  references:
+    - "https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing"
+    - "https://cwe.mitre.org/data/definitions/611.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Identify the endpoint that accepts XML input."
+    - "Submit XML with an external entity: <!DOCTYPE foo [<!ENTITY xxe SYSTEM 'file:///etc/passwd'>]><root>&xxe;</root>"
+    - "Observe whether file contents appear in the response."
+    - "Test blind XXE with an out-of-band callback."
+    - "Document the endpoint, payload, and data exfiltrated."
+
+- id: xss-source
+  title: "Cross-Site Scripting (Source Code)"
+  severity: HIGH
+  cvss_score: 8.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:N/VA:N/SC:H/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 79
+  owasp_id: "A05:2025"
+  attack_ids: ["T1185"]
+  attack_tactics: ["Collection"]
+  methodology_items: ["INPV-01"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "python.flask.security.audit.render-template-string"
+      - "python.django.security.audit.xss.template-autoescape-off"
+      - "javascript.express.security.audit.xss.mustache-escape"
+    bandit_test: []
+    cwe: [79]
+  description: |
+    Static analysis identified template code or response construction that
+    includes user-controlled data without proper output encoding.
+  impact: |
+    An attacker can execute arbitrary JavaScript in a victim's browser,
+    stealing session cookies, performing actions on behalf of the user,
+    and capturing credentials.
+  remediation: |
+    Apply context-aware output encoding for all user-controlled data rendered
+    in HTML, JavaScript, CSS, or URL contexts. Enable auto-escaping in
+    template engines and implement a strict Content Security Policy.
+  references:
+    - "https://owasp.org/www-community/attacks/xss/"
+    - "https://cwe.mitre.org/data/definitions/79.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Identify the endpoint that reflects user input in the response."
+    - "Inject a probe: <script>alert(document.domain)</script> into the parameter."
+    - "Observe whether the JavaScript executes in the browser."
+    - "Test alternative contexts: event handlers, href attributes, inline CSS."
+    - "Document the endpoint, parameter, payload, and browser response."
+
+- id: insecure-random
+  title: "Insecure Randomness (Source Code)"
+  severity: MEDIUM
+  cvss_score: 5.9
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 330
+  owasp_id: "A02:2025"
+  attack_ids: ["T1110"]
+  attack_tactics: ["Credential Access"]
+  methodology_items: ["CRYP-04"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "python.lang.security.audit.insecure-random"
+      - "java.lang.security.audit.insecure-random"
+    bandit_test: ["B311"]
+    cwe: [330]
+  description: |
+    Static analysis identified use of non-cryptographic random number
+    generators (random.random, Math.random, java.util.Random) for
+    security-sensitive operations like token or session generation.
+  impact: |
+    An attacker may be able to predict generated tokens, session IDs, or
+    CSRF tokens, leading to session hijacking or authentication bypass.
+  remediation: |
+    Use cryptographically secure random generators: secrets module in Python,
+    SecureRandom in Java, crypto.randomBytes in Node.js.
+  references:
+    - "https://cwe.mitre.org/data/definitions/330.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Identify the endpoint that generates tokens or session IDs."
+    - "Collect 100+ generated values and analyse for predictable patterns."
+    - "Use z3 or similar tools to check for linear congruential generator state recovery."
+    - "Attempt to predict the next token and use it for authentication."
+    - "Document the predictability analysis and proof of token prediction."
+
+- id: weak-crypto-source
+  title: "Weak Cryptographic Algorithm (Source Code)"
+  severity: MEDIUM
+  cvss_score: 5.9
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 327
+  owasp_id: "A02:2025"
+  attack_ids: ["T1557"]
+  attack_tactics: ["Collection"]
+  methodology_items: ["CRYP-01"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "python.lang.security.audit.insecure-hash-algorithms"
+      - "java.lang.security.audit.weak-crypto"
+    bandit_test: ["B303", "B304", "B305"]
+    cwe: [327]
+  description: |
+    Static analysis identified use of weak or deprecated cryptographic
+    algorithms (MD5, SHA1, DES, RC4) for security-sensitive operations.
+  impact: |
+    An attacker may be able to forge signatures, crack password hashes,
+    or decrypt protected data using known weaknesses in the algorithm.
+  remediation: |
+    Replace weak algorithms with modern alternatives: SHA-256/SHA-3 for
+    hashing, AES-256-GCM for encryption, bcrypt/argon2 for password hashing.
+  references:
+    - "https://cwe.mitre.org/data/definitions/327.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "NIST SP 800-131Ar2"
+  steps:
+    - "Identify where the weak algorithm is used (password hashing, token signing, data encryption)."
+    - "If password hashing: extract a hash and crack with hashcat using the known algorithm."
+    - "If signing: attempt to forge a valid signature using collision attacks."
+    - "Document the algorithm in use, the context, and the proof of weakness."
+
+- id: buffer-overflow-source
+  title: "Buffer Overflow (Source Code)"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 120
+  owasp_id: "A06:2025"
+  attack_ids: ["T1203"]
+  attack_tactics: ["Execution"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "c.lang.security.insecure-use-gets-fn"
+      - "c.lang.security.insecure-use-string-copy-fn"
+    bandit_test: []
+    cwe: [120]
+  description: |
+    Static analysis identified use of unsafe buffer operations (gets, strcpy,
+    sprintf) that do not perform bounds checking, creating a buffer overflow
+    vulnerability.
+  impact: |
+    An attacker can corrupt memory to achieve arbitrary code execution,
+    crash the application (denial of service), or leak sensitive data
+    from adjacent memory.
+  remediation: |
+    Replace unsafe functions with bounds-checked alternatives: fgets instead
+    of gets, strncpy/strlcpy instead of strcpy, snprintf instead of sprintf.
+    Enable compiler protections: -fstack-protector, ASLR, DEP/NX.
+  references:
+    - "https://cwe.mitre.org/data/definitions/120.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Identify the network service or input vector that reaches the vulnerable function."
+    - "Craft an input exceeding the buffer size and observe application crash."
+    - "Use gdb to analyse the crash and confirm instruction pointer control."
+    - "Develop a proof-of-concept exploit demonstrating code execution."
+    - "Document the input vector, buffer size, crash analysis, and PoC."
+
+- id: format-string-source
+  title: "Format String Vulnerability (Source Code)"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 134
+  owasp_id: "A06:2025"
+  attack_ids: ["T1203"]
+  attack_tactics: ["Execution"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "c.lang.security.audit.format-string-vuln"
+    bandit_test: []
+    cwe: [134]
+  description: |
+    Static analysis identified printf-family function calls where the format
+    string is user-controlled, enabling format string attacks.
+  impact: |
+    An attacker can read stack memory (%x), write to arbitrary memory
+    locations (%n), and achieve code execution on vulnerable targets.
+  remediation: |
+    Never pass user input as the format string argument. Always use a
+    fixed format string with user data as subsequent arguments:
+    printf("%s", user_input) instead of printf(user_input).
+  references:
+    - "https://cwe.mitre.org/data/definitions/134.html"
+    - "https://owasp.org/www-community/attacks/Format_string_attack"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Identify the input vector that reaches the vulnerable printf call."
+    - "Inject %x.%x.%x.%x to read stack values and confirm the vulnerability."
+    - "Use %s to attempt reading from attacker-controlled addresses."
+    - "Document the input vector, stack leak output, and proof of exploitation."
+
+- id: use-after-free-source
+  title: "Use-After-Free (Source Code)"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 416
+  owasp_id: "A06:2025"
+  attack_ids: ["T1203"]
+  attack_tactics: ["Execution"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule: []
+    bandit_test: []
+    cwe: [416]
+  description: |
+    Static analysis identified code that accesses memory after it has been
+    freed, leading to undefined behaviour that can be exploited.
+  impact: |
+    An attacker can manipulate freed memory to achieve arbitrary code
+    execution, crash the application, or leak sensitive data from
+    reallocated memory.
+  remediation: |
+    Set pointers to NULL after freeing. Use smart pointers (C++) or
+    RAII patterns. Enable AddressSanitizer during testing to detect
+    use-after-free at runtime.
+  references:
+    - "https://cwe.mitre.org/data/definitions/416.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Identify the input or sequence of operations that triggers the use-after-free."
+    - "Craft input that allocates, frees, and then accesses the memory region."
+    - "Use AddressSanitizer to confirm the vulnerability."
+    - "Attempt heap spray to place controlled data in the freed region."
+    - "Document the trigger sequence, crash analysis, and exploitation path."
+
+- id: integer-overflow-source
+  title: "Integer Overflow (Source Code)"
+  severity: HIGH
+  cvss_score: 7.7
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 190
+  owasp_id: "A06:2025"
+  attack_ids: ["T1203"]
+  attack_tactics: ["Execution"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+    semgrep_rule:
+      - "c.lang.security.audit.integer-overflow"
+    bandit_test: []
+    cwe: [190]
+  description: |
+    Static analysis identified arithmetic operations on integer values
+    without overflow checks, where user-controlled input can trigger
+    an integer overflow leading to unexpected behaviour.
+  impact: |
+    An attacker can trigger buffer overflows, bypass size checks, cause
+    incorrect memory allocations, or corrupt application logic by
+    supplying values that cause integer wraparound.
+  remediation: |
+    Use safe integer arithmetic functions that check for overflow.
+    Validate all integer inputs against expected ranges before
+    arithmetic operations. Use compiler flags like -ftrapv.
+  references:
+    - "https://cwe.mitre.org/data/definitions/190.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Identify the input that feeds into the vulnerable arithmetic operation."
+    - "Supply the maximum integer value (INT_MAX, 2^31-1) to trigger overflow."
+    - "Observe resulting behaviour: incorrect allocation size, bypassed check, crash."
+    - "Document the input value, expected vs actual result, and security impact."

@@ -1,0 +1,481 @@
+{ 
+   "banner":{ 
+      "description":"WordPress Security Scanner by the WPScan Team",
+      "version":"3.7.5",
+      "authors":[ 
+         "@_WPScan_",
+         "@ethicalhack3r",
+         "@erwan_lr",
+         "@_FireFart_"
+      ],
+      "sponsor":"WPScan.io - Online WordPress Vulnerability Scanner"
+   },
+   "start_time":1573480650,
+   "start_memory":49602560,
+   "target_url":"http://www.redacted.com/",
+   "effective_url":"http://www.redacted.com/",
+   "interesting_findings":[ 
+      { 
+         "url":"http://www.redacted.com/",
+         "to_s":"http://www.redacted.com/",
+         "type":"headers",
+         "found_by":"Headers (Passive Detection)",
+         "confidence":100,
+         "confirmed_by":{ 
+
+         },
+         "references":{ 
+
+         },
+         "interesting_entries":[ 
+            "Server: nginx"
+         ]
+      },
+      { 
+         "url":"http://www.redacted.com/robots.txt",
+         "to_s":"http://www.redacted.com/robots.txt",
+         "type":"robots_txt",
+         "found_by":"Robots Txt (Aggressive Detection)",
+         "confidence":100,
+         "confirmed_by":{ 
+
+         },
+         "references":{ 
+
+         },
+         "interesting_entries":[ 
+            "/wp-admin/",
+            "/wp-admin/admin-ajax.php"
+         ]
+      },
+      { 
+         "url":"http://www.redacted.com/xmlrpc.php",
+         "to_s":"http://www.redacted.com/xmlrpc.php",
+         "type":"xmlrpc",
+         "found_by":"Headers (Passive Detection)",
+         "confidence":100,
+         "confirmed_by":{ 
+            "Link Tag (Passive Detection)":{ 
+               "confidence":30
+            },
+            "Direct Access (Aggressive Detection)":{ 
+               "confidence":100
+            }
+         },
+         "references":{ 
+            "url":[ 
+               "http://codex.wordpress.org/XML-RPC_Pingback_API"
+            ],
+            "metasploit":[ 
+               "auxiliary/scanner/http/wordpress_ghost_scanner",
+               "auxiliary/dos/http/wordpress_xmlrpc_dos",
+               "auxiliary/scanner/http/wordpress_xmlrpc_login",
+               "auxiliary/scanner/http/wordpress_pingback_access"
+            ]
+         },
+         "interesting_entries":[ 
+
+         ]
+      },
+      { 
+         "url":"http://www.redacted.com/readme.html",
+         "to_s":"http://www.redacted.com/readme.html",
+         "type":"readme",
+         "found_by":"Direct Access (Aggressive Detection)",
+         "confidence":100,
+         "confirmed_by":{ 
+
+         },
+         "references":{ 
+
+         },
+         "interesting_entries":[ 
+
+         ]
+      },
+      { 
+         "url":"http://www.redacted.com/wp-cron.php",
+         "to_s":"http://www.redacted.com/wp-cron.php",
+         "type":"wp_cron",
+         "found_by":"Direct Access (Aggressive Detection)",
+         "confidence":60,
+         "confirmed_by":{ 
+
+         },
+         "references":{ 
+            "url":[ 
+               "https://www.iplocation.net/defend-wordpress-from-ddos",
+               "https://github.com/wpscanteam/wpscan/issues/1299"
+            ]
+         },
+         "interesting_entries":[ 
+
+         ]
+      }
+   ],
+   "version":{ 
+      "number":"4.7.2",
+      "release_date":"2017-01-26",
+      "status":"insecure",
+      "found_by":"Meta Generator (Passive Detection)",
+      "confidence":60,
+      "interesting_entries":[ 
+         "http://www.redacted.com/, Match: 'WordPress 4.7.2'"
+      ],
+      "confirmed_by":{ 
+
+      },
+      "vulnerabilities":[ 
+         { 
+            "title":"WordPress 3.6.0-4.7.2 - Authenticated Cross-Site Scripting (XSS) via Media File Metadata",
+            "fixed_in":"4.7.3",
+            "references":{ 
+               "cve":[ 
+                  "2017-6814"
+               ],
+               "url":[ 
+                  "https://wordpress.org/news/2017/03/wordpress-4-7-3-security-and-maintenance-release/",
+                  "https://github.com/WordPress/WordPress/commit/28f838ca3ee205b6f39cd2bf23eb4e5f52796bd7",
+                  "https://sumofpwn.nl/advisory/2016/wordpress_audio_playlist_functionality_is_affected_by_cross_site_scripting.html",
+                  "https://seclists.org/oss-sec/2017/q1/563"
+               ],
+               "wpvulndb":[ 
+                  "8765"
+               ]
+            }
+         },
+         { 
+            "title":"WordPress 2.8.1-4.7.2 - Control Characters in Redirect URL Validation",
+            "fixed_in":"4.7.3",
+            "references":{ 
+               "cve":[ 
+                  "2017-6815"
+               ],
+               "url":[ 
+                  "https://wordpress.org/news/2017/03/wordpress-4-7-3-security-and-maintenance-release/",
+                  "https://github.com/WordPress/WordPress/commit/288cd469396cfe7055972b457eb589cea51ce40e"
+               ],
+               "wpvulndb":[ 
+                  "8766"
+               ]
+            }
+         }
+      ]
+   },
+   "main_theme":{ 
+      "slug":"liquorice",
+      "location":"http://www.redacted.com/wp-content/themes/liquorice/",
+      "latest_version":"2.3",
+      "last_updated":"2013-05-30T00:00:00.000Z",
+      "outdated":false,
+      "readme_url":"http://www.redacted.com/wp-content/themes/liquorice/readme.txt",
+      "directory_listing":false,
+      "error_log_url":null,
+      "style_url":"http://www.redacted.com/wp-content/themes/liquorice/style.css",
+      "style_name":"Liquorice",
+      "style_uri":"http://www.nudgedesign.ca/wordpress-themes/liquorice",
+      "description":"A simple and clean vintage looking theme for you to build on using Google's font API Lobster font. Custom background feature enabled.",
+      "author":"Nudge Design",
+      "author_uri":"http://www.nudgedesign.ca",
+      "template":null,
+      "license":"GNU General Public License v2.0",
+      "license_uri":"http://www.gnu.org/licenses/gpl-2.0.html",
+      "tags":"custom-background, two-columns, fixed-width, right-sidebar, light, brown, orange, blue",
+      "text_domain":null,
+      "found_by":"Css Style In Homepage (Passive Detection)",
+      "confidence":100,
+      "interesting_entries":[ 
+
+      ],
+      "confirmed_by":{ 
+         "Css Style In 404 Page (Passive Detection)":{ 
+            "confidence":70,
+            "interesting_entries":[ 
+
+            ]
+         }
+      },
+      "vulnerabilities":[ 
+
+      ],
+      "version":{ 
+         "number":"2.3",
+         "confidence":80,
+         "found_by":"Style (Passive Detection)",
+         "interesting_entries":[ 
+            "http://www.redacted.com/wp-content/themes/liquorice/style.css, Match: 'Version: 2.3'"
+         ],
+         "confirmed_by":{ 
+
+         }
+      },
+      "parents":[ 
+
+      ]
+   },
+   "plugins":{ 
+      "all-in-one-seo-pack":{ 
+         "slug":"all-in-one-seo-pack",
+         "location":"http://www.redacted.com/wp-content/plugins/all-in-one-seo-pack/",
+         "latest_version":"3.2.10",
+         "last_updated":"2019-10-17T15:07:00.000Z",
+         "outdated":true,
+         "readme_url":null,
+         "directory_listing":null,
+         "error_log_url":null,
+         "found_by":"Comment (Passive Detection)",
+         "confidence":30,
+         "interesting_entries":[ 
+
+         ],
+         "confirmed_by":{ 
+
+         },
+         "vulnerabilities":[ 
+            { 
+               "title":"All In One SEO Pack < 3.2.7 - Stored Cross-Site Scripting (XSS)",
+               "fixed_in":"3.2.7",
+               "references":{ 
+                  "cve":[ 
+                     "2019-16520"
+                  ],
+                  "url":[ 
+                     "https://github.com/sbaresearch/advisories/tree/public/2019/SBA-ADV-20190913-04_WordPress_Plugin_All_in_One_SEO_Pack"
+                  ],
+                  "wpvulndb":[ 
+                     "9915"
+                  ]
+               }
+            }
+         ],
+         "version":{ 
+            "number":"3.1",
+            "confidence":100,
+            "found_by":"Comment (Passive Detection)",
+            "interesting_entries":[ 
+               "http://www.redacted.com/, Match: 'All in One SEO Pack 3.1 by'"
+            ],
+            "confirmed_by":{ 
+               "Readme - Stable Tag (Aggressive Detection)":{ 
+                  "confidence":80,
+                  "interesting_entries":[ 
+                     "http://www.redacted.com/wp-content/plugins/all-in-one-seo-pack/readme.txt"
+                  ]
+               }
+            }
+         }
+      },
+      "qtranslate":{ 
+         "slug":"qtranslate",
+         "location":"http://www.redacted.com/wp-content/plugins/qtranslate/",
+         "latest_version":null,
+         "last_updated":null,
+         "outdated":false,
+         "readme_url":null,
+         "directory_listing":null,
+         "error_log_url":null,
+         "found_by":"Urls In Homepage (Passive Detection)",
+         "confidence":100,
+         "interesting_entries":[ 
+
+         ],
+         "confirmed_by":{ 
+            "Urls In 404 Page (Passive Detection)":{ 
+               "confidence":80,
+               "interesting_entries":[ 
+
+               ]
+            }
+         },
+         "vulnerabilities":[ 
+            { 
+               "title":"qTranslate 2.5.34 - Setting Manipulation CSRF",
+               "fixed_in":null,
+               "references":{ 
+                  "cve":[ 
+                     "2013-3251"
+                  ],
+                  "wpvulndb":[ 
+                     "6846"
+                  ]
+               }
+            },
+            { 
+               "title":"qTranslate <= 2.5.39 - Cross-Site Scripting (XSS)",
+               "fixed_in":null,
+               "references":{ 
+                  "cve":[ 
+                     "2015-5535"
+                  ],
+                  "url":[ 
+                     "https://seclists.org/bugtraq/2015/Jul/139",
+                     "https://www.immuniweb.com/advisory/HTB23265"
+                  ],
+                  "wpvulndb":[ 
+                     "8120"
+                  ]
+               }
+            }
+         ],
+         "version":null
+      }
+   },
+   "db_exports":{ 
+      "http://www.redacted.com/redacted.sql":{ 
+         "found_by":"Direct Access (Aggressive Detection)",
+         "confidence":100,
+         "interesting_entries":[ 
+
+         ],
+         "confirmed_by":{ 
+
+         }
+      },
+      "http://www.redacted.com/dump.sql":{ 
+         "found_by":"Direct Access (Aggressive Detection)",
+         "confidence":100,
+         "interesting_entries":[ 
+
+         ],
+         "confirmed_by":{ 
+
+         }
+      }
+   },
+   "timthumbs":{ 
+      "http://www.redacted.com/wordpress-5.2.4/timthumb.php":{ 
+         "confirmed_by":{ 
+
+         },
+         "confidence":100,
+         "interesting_entries":[ 
+
+         ],
+         "version":{ 
+            "found_by":"Bad Request (Aggressive Detection)",
+            "interesting_entries":[ 
+               "http://www.redacted.com/wordpress-5.2.4/timthumb.php, Match: 'TimThumb version : 2.8.13'"
+            ],
+            "number":"2.8.13",
+            "confirmed_by":{ 
+
+            },
+            "confidence":90
+         },
+         "vulnerabilities":[ 
+
+         ],
+         "found_by":"Known Locations (Aggressive Detection)"
+      },
+      "http://www.redacted.com/wordpress-5.2.4/thumb.php":{ 
+         "interesting_entries":[ 
+
+         ],
+         "confidence":100,
+         "confirmed_by":{ 
+
+         },
+         "vulnerabilities":[ 
+            { 
+               "title":"Timthumb <= 2.8.13 WebShot Remote Code Execution",
+               "fixed_in":"2.8.14",
+               "references":{ 
+                  "cve":[ 
+                     "2014-4663"
+                  ],
+                  "url":[ 
+                     "http://seclists.org/fulldisclosure/2014/Jun/117",
+                     "https://github.com/wpscanteam/wpscan/issues/519"
+                  ]
+               }
+            }
+         ],
+         "found_by":"Known Locations (Aggressive Detection)",
+         "version":{ 
+            "confirmed_by":{ 
+
+            },
+            "confidence":90,
+            "number":"2.8.13",
+            "interesting_entries":[ 
+               "http://www.redacted.com/wordpress-5.2.4/thumb.php, Match: 'TimThumb version : 2.8.13'"
+            ],
+            "found_by":"Bad Request (Aggressive Detection)"
+         }
+      }
+   },
+   "config_backups":{ 
+      "http://www.redacted.com/wp-config.txt":{ 
+         "found_by":"Direct Access (Aggressive Detection)",
+         "confidence":100,
+         "interesting_entries":[ 
+
+         ],
+         "confirmed_by":{ 
+
+         }
+      }
+   },
+   "users": {
+    "marie": {
+      "id": null,
+      "found_by": "Rss Generator (Passive Detection)",
+      "confidence": 100,
+      "interesting_entries": [
+
+      ],
+      "confirmed_by": {
+        "Wp Json Api (Aggressive Detection)": {
+          "confidence": 100,
+          "interesting_entries": [
+            "http://www.lagardelanguages.com/wp-json/wp/v2/users/?per_page=100&page=1"
+          ]
+        },
+        "Oembed API - Author URL (Aggressive Detection)": {
+          "confidence": 90,
+          "interesting_entries": [
+            "http://www.lagardelanguages.com/wp-json/oembed/1.0/embed?url=http://www.lagardelanguages.com/&format=json"
+          ]
+        },
+        "Rss Generator (Aggressive Detection)": {
+          "confidence": 50,
+          "interesting_entries": [
+
+          ]
+        },
+        "Author Id Brute Forcing - Author Pattern (Aggressive Detection)": {
+          "confidence": 100,
+          "interesting_entries": [
+
+          ]
+        },
+        "Login Error Messages (Aggressive Detection)": {
+          "confidence": 100,
+          "interesting_entries": [
+
+          ]
+        }
+      }
+    }
+  },
+  "password_attack": {
+    "marie": {
+      "password": "your-password"
+    }
+  },
+   "vuln_api":{ 
+      "plan":"enterprise",
+      "requests_done_during_scan":2,
+      "requests_remaining":"Unlimited"
+   },
+   "stop_time":1573480662,
+   "elapsed":12,
+   "requests_done":456,
+   "cached_requests":8,
+   "data_sent":96169,
+   "data_sent_humanised":"93.915 KB",
+   "data_received":479810,
+   "data_received_humanised":"468.564 KB",
+   "used_memory":212566016,
+   "used_memory_humanised":"202.719 MB"
+}

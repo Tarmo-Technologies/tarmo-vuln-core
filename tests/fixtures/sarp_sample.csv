@@ -1,0 +1,4 @@
+ID,Type,Message,Tool CWE,Tool Severity,Scanner,Path,Line,Tool,Confidence,Exploit Maturity,Proposed Mitigation,Validator Justification,Mitigation CVSS Vector,Symbol,Language,Scoring Basis
+1,SQL Injection,SQL injection in login form,89,High,checkmarx,src/auth/login.java,42,Checkmarx SAST,Confirmed,proof_of_concept,Use parameterized queries,,AV:N/AC:L/PR:N/UI:N,buildQuery,Java,tool
+2,Buffer Overflow,Stack buffer overflow in parser,120,Critical,cppcheck,src/parser.c,88,CppCheck,Reasonable,functional,Bounds checking required,,AV:N/AC:L/PR:N/UI:N,parse_input,C,tool
+3,Cross-Site Scripting,XSS in search page,79,Medium,semgrep,src/views/search.py,15,Semgrep,Plausible,,Sanitize output,,,searchHandler,Python,tool

@@ -1,0 +1,114 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Documents/CommitteeSpecifications/2.1.0/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "TestScanner",
+          "version": "1.0.0",
+          "rules": [
+            {
+              "id": "CWE-89",
+              "name": "SQL Injection",
+              "fullDescription": {
+                "text": "User-controlled input is used in a SQL query without parameterization."
+              },
+              "help": {
+                "text": "Use parameterized queries or prepared statements to prevent SQL injection."
+              },
+              "properties": {
+                "tags": ["security-severity: 9.0", "cwe:CWE-89"],
+                "security-severity": "9.0"
+              },
+              "relationships": [
+                {
+                  "target": {
+                    "id": "CWE-89",
+                    "toolComponent": {"name": "CWE"}
+                  },
+                  "kinds": ["superset"]
+                }
+              ]
+            },
+            {
+              "id": "CWE-79",
+              "name": "Cross-Site Scripting",
+              "fullDescription": {
+                "text": "User input is reflected in the HTML response without encoding."
+              },
+              "help": {
+                "text": "Encode all user-supplied output before embedding in HTML."
+              },
+              "properties": {
+                "tags": ["security-severity: 6.1", "cwe:CWE-79"]
+              },
+              "relationships": [
+                {
+                  "target": {
+                    "id": "CWE-79",
+                    "toolComponent": {"name": "CWE"}
+                  },
+                  "kinds": ["superset"]
+                }
+              ]
+            },
+            {
+              "id": "INFO-001",
+              "name": "Verbose Error Message",
+              "fullDescription": {
+                "text": "Detailed error messages expose internal application details."
+              },
+              "help": {
+                "text": "Configure the application to show generic error messages in production."
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "CWE-89",
+          "level": "error",
+          "message": {"text": "SQL injection found in login query at /api/login"},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "https://app.example.com/api/login"}
+              }
+            },
+            {
+              "logicalLocations": [
+                {"name": "10.0.0.1", "kind": "host"}
+              ]
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-79",
+          "level": "warning",
+          "message": {"text": "Reflected XSS in search parameter at /search"},
+          "locations": [
+            {
+              "logicalLocations": [
+                {"name": "10.0.0.2", "kind": "host"}
+              ]
+            }
+          ]
+        },
+        {
+          "ruleId": "INFO-001",
+          "level": "note",
+          "message": {"text": "Stack trace exposed on error page at /error"},
+          "locations": [
+            {
+              "logicalLocations": [
+                {"name": "10.0.0.1", "kind": "host"}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

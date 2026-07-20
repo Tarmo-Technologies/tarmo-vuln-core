@@ -1,0 +1,25 @@
+- id: reflected-xss-login
+  title: "Reflected Cross-Site Scripting on Login Page"
+  severity: HIGH
+  cvss_score: 7.4
+  cvss_vector: "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:N/A:N"
+  cwe_id: 79
+  owasp_id: "A03:2021"
+  affected_hosts:
+    - "10.0.0.1"
+    - "app.example.com"
+  description: |
+    The login page at /auth/login reflects user-supplied input from the
+    `redirect` parameter directly into the HTML response without sanitization.
+    An attacker can craft a URL that executes arbitrary JavaScript in the
+    victim's browser.
+  impact: |
+    An attacker can steal session cookies, perform actions on behalf of the
+    victim, redirect users to phishing sites, or capture credentials entered
+    on the page.
+  remediation: |
+    Encode all user-supplied data before rendering in HTML context. Use a
+    Content Security Policy (CSP) header to restrict script execution sources.
+    Validate the `redirect` parameter against an allowlist of known-good URLs.
+  source_tool: manual
+  raw_ref: null

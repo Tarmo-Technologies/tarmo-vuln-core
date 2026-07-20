@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetasploitV4>
+  <generated time="2026-01-15 12:00:00 UTC" project="Test Project"/>
+  <hosts>
+    <host>
+      <id>1</id>
+      <address>10.0.0.1</address>
+      <name>target.example.com</name>
+      <state>alive</state>
+      <os-name>Linux</os-name>
+    </host>
+  </hosts>
+  <services>
+    <service>
+      <host>10.0.0.1</host>
+      <port>22</port>
+      <proto>tcp</proto>
+      <state>open</state>
+      <name>ssh</name>
+    </service>
+  </services>
+</MetasploitV4>

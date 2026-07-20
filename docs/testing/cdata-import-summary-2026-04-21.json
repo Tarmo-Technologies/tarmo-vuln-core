@@ -1,0 +1,14 @@
+{
+  "rows_imported": 175,
+  "rows_skipped_existing": 100,
+  "rows_skipped_invalid": 22,
+  "rows_total": 297,
+  "tools_created": [
+    "srm"
+  ],
+  "tools_extended": [
+    "cppcheck",
+    "srm"
+  ],
+  "unmatched_scanners": []
+}

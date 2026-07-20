@@ -1,0 +1,944 @@
+{
+  "verilog:1": {
+    "cwe": 1071
+  },
+  "verilog:10": {
+    "cwe": 710
+  },
+  "verilog:100": {
+    "cwe": 1339
+  },
+  "verilog:101": {
+    "cwe": 563
+  },
+  "verilog:102": {
+    "cwe": 710
+  },
+  "verilog:103": {
+    "cwe": 710
+  },
+  "verilog:104": {
+    "cwe": 710
+  },
+  "verilog:105": {
+    "cwe": 710
+  },
+  "verilog:106": {
+    "cwe": 710
+  },
+  "verilog:107": {
+    "cwe": 710
+  },
+  "verilog:108": {
+    "cwe": 710
+  },
+  "verilog:109": {
+    "cwe": 710
+  },
+  "verilog:11": {
+    "cwe": 710
+  },
+  "verilog:110": {
+    "cwe": 710
+  },
+  "verilog:111": {
+    "cwe": 710
+  },
+  "verilog:112": {
+    "cwe": 710
+  },
+  "verilog:113": {
+    "cwe": 710
+  },
+  "verilog:114": {
+    "cwe": 710
+  },
+  "verilog:115": {
+    "cwe": 710
+  },
+  "verilog:116": {
+    "cwe": 710
+  },
+  "verilog:117": {
+    "cwe": 1114
+  },
+  "verilog:118": {
+    "cwe": 710
+  },
+  "verilog:119": {
+    "cwe": 710
+  },
+  "verilog:12": {
+    "cwe": 710
+  },
+  "verilog:120": {
+    "cwe": 710
+  },
+  "verilog:121": {
+    "cwe": 710
+  },
+  "verilog:122": {
+    "cwe": 710
+  },
+  "verilog:123": {
+    "cwe": 710
+  },
+  "verilog:124": {
+    "cwe": 710
+  },
+  "verilog:125": {
+    "cwe": 710
+  },
+  "verilog:126": {
+    "cwe": 710
+  },
+  "verilog:127": {
+    "cwe": 710
+  },
+  "verilog:128": {
+    "cwe": 561
+  },
+  "verilog:129": {
+    "cwe": 1177
+  },
+  "verilog:13": {
+    "cwe": 710
+  },
+  "verilog:130": {
+    "cwe": 563
+  },
+  "verilog:131": {
+    "cwe": 710
+  },
+  "verilog:132": {
+    "cwe": 710
+  },
+  "verilog:133": {
+    "cwe": 710
+  },
+  "verilog:134": {
+    "cwe": 710
+  },
+  "verilog:135": {
+    "cwe": 710
+  },
+  "verilog:136": {
+    "cwe": 710
+  },
+  "verilog:137": {
+    "cwe": 710
+  },
+  "verilog:138": {
+    "cwe": 710
+  },
+  "verilog:139": {
+    "cwe": 710
+  },
+  "verilog:14": {
+    "cwe": 710
+  },
+  "verilog:140": {
+    "cwe": 710
+  },
+  "verilog:141": {
+    "cwe": 710
+  },
+  "verilog:142": {
+    "cwe": 710
+  },
+  "verilog:143": {
+    "cwe": 682
+  },
+  "verilog:144": {
+    "cwe": 710
+  },
+  "verilog:145": {
+    "cwe": 710
+  },
+  "verilog:146": {
+    "cwe": 686
+  },
+  "verilog:147": {
+    "cwe": 686
+  },
+  "verilog:148": {
+    "cwe": 665
+  },
+  "verilog:149": {
+    "cwe": 1099
+  },
+  "verilog:15": {
+    "cwe": 710
+  },
+  "verilog:150": {
+    "cwe": 407
+  },
+  "verilog:151": {
+    "cwe": 686
+  },
+  "verilog:152": {
+    "cwe": 477
+  },
+  "verilog:153": {
+    "cwe": 710
+  },
+  "verilog:154": {
+    "cwe": 710
+  },
+  "verilog:155": {
+    "cwe": 1127
+  },
+  "verilog:156": {
+    "cwe": 1114
+  },
+  "verilog:157": {
+    "cwe": 710
+  },
+  "verilog:158": {
+    "cwe": 710
+  },
+  "verilog:159": {
+    "cwe": 710
+  },
+  "verilog:16": {
+    "cwe": 710
+  },
+  "verilog:160": {
+    "cwe": 710
+  },
+  "verilog:161": {
+    "cwe": 710
+  },
+  "verilog:162": {
+    "cwe": 710
+  },
+  "verilog:163": {
+    "cwe": 710
+  },
+  "verilog:164": {
+    "cwe": 710
+  },
+  "verilog:165": {
+    "cwe": 710
+  },
+  "verilog:166": {
+    "cwe": 1099
+  },
+  "verilog:167": {
+    "cwe": 1124
+  },
+  "verilog:168": {
+    "cwe": 710
+  },
+  "verilog:169": {
+    "cwe": 1164
+  },
+  "verilog:17": {
+    "cwe": 710
+  },
+  "verilog:170": {
+    "cwe": 710
+  },
+  "verilog:18": {
+    "cwe": 710
+  },
+  "verilog:19": {
+    "cwe": 1419
+  },
+  "verilog:2": {
+    "cwe": 1099
+  },
+  "verilog:20": {
+    "cwe": 710
+  },
+  "verilog:21": {
+    "cwe": 710
+  },
+  "verilog:22": {
+    "cwe": 710
+  },
+  "verilog:23": {
+    "cwe": 710
+  },
+  "verilog:24": {
+    "cwe": 710
+  },
+  "verilog:25": {
+    "cwe": 710
+  },
+  "verilog:26": {
+    "cwe": 710
+  },
+  "verilog:27": {
+    "cwe": 710
+  },
+  "verilog:28": {
+    "cwe": 1419
+  },
+  "verilog:29": {
+    "cwe": 710
+  },
+  "verilog:3": {
+    "cwe": 710
+  },
+  "verilog:30": {
+    "cwe": 710
+  },
+  "verilog:31": {
+    "cwe": 710
+  },
+  "verilog:32": {
+    "cwe": 710
+  },
+  "verilog:33": {
+    "cwe": 710
+  },
+  "verilog:34": {
+    "cwe": 710
+  },
+  "verilog:35": {
+    "cwe": 1419
+  },
+  "verilog:36": {
+    "cwe": 710
+  },
+  "verilog:37": {
+    "cwe": 710
+  },
+  "verilog:38": {
+    "cwe": 1419
+  },
+  "verilog:39": {
+    "cwe": 710
+  },
+  "verilog:4": {
+    "cwe": 710
+  },
+  "verilog:40": {
+    "cwe": 478
+  },
+  "verilog:41": {
+    "cwe": 710
+  },
+  "verilog:42": {
+    "cwe": 1078
+  },
+  "verilog:43": {
+    "cwe": 1078
+  },
+  "verilog:44": {
+    "cwe": 710
+  },
+  "verilog:45": {
+    "cwe": 710
+  },
+  "verilog:46": {
+    "cwe": 710
+  },
+  "verilog:47": {
+    "cwe": 710
+  },
+  "verilog:48": {
+    "cwe": 682
+  },
+  "verilog:49": {
+    "cwe": 710
+  },
+  "verilog:5": {
+    "cwe": 710
+  },
+  "verilog:50": {
+    "cwe": 710
+  },
+  "verilog:51": {
+    "cwe": 710
+  },
+  "verilog:52": {
+    "cwe": 710
+  },
+  "verilog:53": {
+    "cwe": 710
+  },
+  "verilog:54": {
+    "cwe": 710
+  },
+  "verilog:55": {
+    "cwe": 710
+  },
+  "verilog:56": {
+    "cwe": 710
+  },
+  "verilog:57": {
+    "cwe": 710
+  },
+  "verilog:58": {
+    "cwe": 710
+  },
+  "verilog:59": {
+    "cwe": 710
+  },
+  "verilog:6": {
+    "cwe": 710
+  },
+  "verilog:60": {
+    "cwe": 710
+  },
+  "verilog:61": {
+    "cwe": 710
+  },
+  "verilog:62": {
+    "cwe": 710
+  },
+  "verilog:63": {
+    "cwe": 710
+  },
+  "verilog:64": {
+    "cwe": 710
+  },
+  "verilog:65": {
+    "cwe": 710
+  },
+  "verilog:66": {
+    "cwe": 710
+  },
+  "verilog:67": {
+    "cwe": 710
+  },
+  "verilog:68": {
+    "cwe": 710
+  },
+  "verilog:69": {
+    "cwe": 710
+  },
+  "verilog:7": {
+    "cwe": 710
+  },
+  "verilog:70": {
+    "cwe": 710
+  },
+  "verilog:71": {
+    "cwe": 456
+  },
+  "verilog:72": {
+    "cwe": 710
+  },
+  "verilog:73": {
+    "cwe": 710
+  },
+  "verilog:74": {
+    "cwe": 710
+  },
+  "verilog:75": {
+    "cwe": 710
+  },
+  "verilog:76": {
+    "cwe": 710
+  },
+  "verilog:77": {
+    "cwe": 710
+  },
+  "verilog:78": {
+    "cwe": 710
+  },
+  "verilog:79": {
+    "cwe": 710
+  },
+  "verilog:8": {
+    "cwe": 1099
+  },
+  "verilog:80": {
+    "cwe": 710
+  },
+  "verilog:81": {
+    "cwe": 710
+  },
+  "verilog:82": {
+    "cwe": 710
+  },
+  "verilog:83": {
+    "cwe": 710
+  },
+  "verilog:84": {
+    "cwe": 710
+  },
+  "verilog:85": {
+    "cwe": 710
+  },
+  "verilog:86": {
+    "cwe": 710
+  },
+  "verilog:87": {
+    "cwe": 710
+  },
+  "verilog:88": {
+    "cwe": 710
+  },
+  "verilog:89": {
+    "cwe": 710
+  },
+  "verilog:9": {
+    "cwe": 478
+  },
+  "verilog:90": {
+    "cwe": 710
+  },
+  "verilog:91": {
+    "cwe": 710
+  },
+  "verilog:92": {
+    "cwe": 710
+  },
+  "verilog:93": {
+    "cwe": 1109
+  },
+  "verilog:94": {
+    "cwe": 710
+  },
+  "verilog:95": {
+    "cwe": 710
+  },
+  "verilog:96": {
+    "cwe": 710
+  },
+  "verilog:97": {
+    "cwe": 710
+  },
+  "verilog:98": {
+    "cwe": 1041
+  },
+  "verilog:99": {
+    "cwe": 710
+  },
+  "vhdl:1": {
+    "cwe": 681
+  },
+  "vhdl:10": {
+    "cwe": 710
+  },
+  "vhdl:11": {
+    "cwe": 710
+  },
+  "vhdl:12": {
+    "cwe": 1041
+  },
+  "vhdl:13": {
+    "cwe": 1164
+  },
+  "vhdl:14": {
+    "cwe": 705
+  },
+  "vhdl:144": {
+    "cwe": 118
+  },
+  "vhdl:15": {
+    "cwe": 710
+  },
+  "vhdl:16": {
+    "cwe": 710
+  },
+  "vhdl:163": {
+    "cwe": 1099
+  },
+  "vhdl:164": {
+    "cwe": 710
+  },
+  "vhdl:168": {
+    "cwe": 710
+  },
+  "vhdl:169": {
+    "cwe": 99
+  },
+  "vhdl:17": {
+    "cwe": 710
+  },
+  "vhdl:170": {
+    "cwe": 710
+  },
+  "vhdl:171": {
+    "cwe": 710
+  },
+  "vhdl:172": {
+    "cwe": 688
+  },
+  "vhdl:173": {
+    "cwe": 688
+  },
+  "vhdl:174": {
+    "cwe": 394
+  },
+  "vhdl:175": {
+    "cwe": 457
+  },
+  "vhdl:176": {
+    "cwe": 665
+  },
+  "vhdl:177": {
+    "cwe": 683
+  },
+  "vhdl:178": {
+    "cwe": 706
+  },
+  "vhdl:179": {
+    "cwe": 394
+  },
+  "vhdl:18": {
+    "cwe": 710
+  },
+  "vhdl:180": {
+    "cwe": 710
+  },
+  "vhdl:181": {
+    "cwe": 710
+  },
+  "vhdl:182": {
+    "cwe": 665
+  },
+  "vhdl:183": {
+    "cwe": 710
+  },
+  "vhdl:184": {
+    "cwe": 710
+  },
+  "vhdl:185": {
+    "cwe": 571
+  },
+  "vhdl:186": {
+    "cwe": 570
+  },
+  "vhdl:187": {
+    "cwe": 665
+  },
+  "vhdl:188": {
+    "cwe": 710
+  },
+  "vhdl:189": {
+    "cwe": 710
+  },
+  "vhdl:19": {
+    "cwe": 710
+  },
+  "vhdl:190": {
+    "cwe": 1071
+  },
+  "vhdl:191": {
+    "cwe": 710
+  },
+  "vhdl:192": {
+    "cwe": 1099
+  },
+  "vhdl:193": {
+    "cwe": 710
+  },
+  "vhdl:194": {
+    "cwe": 710
+  },
+  "vhdl:195": {
+    "cwe": 710
+  },
+  "vhdl:196": {
+    "cwe": 710
+  },
+  "vhdl:197": {
+    "cwe": 664
+  },
+  "vhdl:198": {
+    "cwe": 1287
+  },
+  "vhdl:199": {
+    "cwe": 710
+  },
+  "vhdl:2": {
+    "cwe": 696
+  },
+  "vhdl:20": {
+    "cwe": 835
+  },
+  "vhdl:200": {
+    "cwe": 710
+  },
+  "vhdl:21": {
+    "cwe": 710
+  },
+  "vhdl:210": {
+    "cwe": 129
+  },
+  "vhdl:211": {
+    "cwe": 129
+  },
+  "vhdl:212": {
+    "cwe": 710
+  },
+  "vhdl:213": {
+    "cwe": 394
+  },
+  "vhdl:214": {
+    "cwe": 710
+  },
+  "vhdl:215": {
+    "cwe": 710
+  },
+  "vhdl:216": {
+    "cwe": 710
+  },
+  "vhdl:217": {
+    "cwe": 710
+  },
+  "vhdl:218": {
+    "cwe": 682
+  },
+  "vhdl:219": {
+    "cwe": 706
+  },
+  "vhdl:22": {
+    "cwe": 710
+  },
+  "vhdl:220": {
+    "cwe": 706
+  },
+  "vhdl:221": {
+    "cwe": 706
+  },
+  "vhdl:222": {
+    "cwe": 710
+  },
+  "vhdl:223": {
+    "cwe": 710
+  },
+  "vhdl:224": {
+    "cwe": 1006
+  },
+  "vhdl:225": {
+    "cwe": 710
+  },
+  "vhdl:226": {
+    "cwe": 1287
+  },
+  "vhdl:227": {
+    "cwe": 606
+  },
+  "vhdl:228": {
+    "cwe": 156
+  },
+  "vhdl:229": {
+    "cwe": 457
+  },
+  "vhdl:23": {
+    "cwe": 710
+  },
+  "vhdl:230": {
+    "cwe": 783
+  },
+  "vhdl:231": {
+    "cwe": 758
+  },
+  "vhdl:232": {
+    "cwe": 697
+  },
+  "vhdl:233": {
+    "cwe": 704
+  },
+  "vhdl:234": {
+    "cwe": 704
+  },
+  "vhdl:235": {
+    "cwe": 1006
+  },
+  "vhdl:236": {
+    "cwe": 770
+  },
+  "vhdl:251": {
+    "cwe": 1099
+  },
+  "vhdl:252": {
+    "cwe": 1256
+  },
+  "vhdl:253": {
+    "cwe": 1109
+  },
+  "vhdl:254": {
+    "cwe": 1247
+  },
+  "vhdl:26": {
+    "cwe": 682
+  },
+  "vhdl:27": {
+    "cwe": 710
+  },
+  "vhdl:28": {
+    "cwe": 710
+  },
+  "vhdl:29": {
+    "cwe": 710
+  },
+  "vhdl:3": {
+    "cwe": 696
+  },
+  "vhdl:30": {
+    "cwe": 710
+  },
+  "vhdl:32": {
+    "cwe": 710
+  },
+  "vhdl:33": {
+    "cwe": 710
+  },
+  "vhdl:34": {
+    "cwe": 710
+  },
+  "vhdl:35": {
+    "cwe": 99
+  },
+  "vhdl:36": {
+    "cwe": 710
+  },
+  "vhdl:37": {
+    "cwe": 477
+  },
+  "vhdl:38": {
+    "cwe": 710
+  },
+  "vhdl:39": {
+    "cwe": 710
+  },
+  "vhdl:4": {
+    "cwe": 696
+  },
+  "vhdl:40": {
+    "cwe": 708
+  },
+  "vhdl:41": {
+    "cwe": 710
+  },
+  "vhdl:42": {
+    "cwe": 710
+  },
+  "vhdl:43": {
+    "cwe": 710
+  },
+  "vhdl:44": {
+    "cwe": 710
+  },
+  "vhdl:47": {
+    "cwe": 1114
+  },
+  "vhdl:48": {
+    "cwe": 710
+  },
+  "vhdl:49": {
+    "cwe": 1164
+  },
+  "vhdl:5": {
+    "cwe": 605
+  },
+  "vhdl:50": {
+    "cwe": 114
+  },
+  "vhdl:51": {
+    "cwe": 710
+  },
+  "vhdl:52": {
+    "cwe": 710
+  },
+  "vhdl:53": {
+    "cwe": 710
+  },
+  "vhdl:54": {
+    "cwe": 710
+  },
+  "vhdl:55": {
+    "cwe": 561
+  },
+  "vhdl:57": {
+    "cwe": 710
+  },
+  "vhdl:58": {
+    "cwe": 710
+  },
+  "vhdl:6": {
+    "cwe": 562
+  },
+  "vhdl:64": {
+    "cwe": 710
+  },
+  "vhdl:67": {
+    "cwe": 561
+  },
+  "vhdl:68": {
+    "cwe": 561
+  },
+  "vhdl:69": {
+    "cwe": 710
+  },
+  "vhdl:7": {
+    "cwe": 710
+  },
+  "vhdl:70": {
+    "cwe": 710
+  },
+  "vhdl:71": {
+    "cwe": 561
+  },
+  "vhdl:72": {
+    "cwe": 710
+  },
+  "vhdl:73": {
+    "cwe": 710
+  },
+  "vhdl:76": {
+    "cwe": 710
+  },
+  "vhdl:79": {
+    "cwe": 561
+  },
+  "vhdl:8": {
+    "cwe": 477
+  },
+  "vhdl:80": {
+    "cwe": 561
+  },
+  "vhdl:81": {
+    "cwe": 710
+  },
+  "vhdl:82": {
+    "cwe": 710
+  },
+  "vhdl:83": {
+    "cwe": 710
+  },
+  "vhdl:84": {
+    "cwe": 710
+  },
+  "vhdl:85": {
+    "cwe": 710
+  },
+  "vhdl:86": {
+    "cwe": 710
+  },
+  "vhdl:88": {
+    "cwe": 561
+  },
+  "vhdl:89": {
+    "cwe": 563
+  },
+  "vhdl:9": {
+    "cwe": 710
+  },
+  "vhdl:90": {
+    "cwe": 1109
+  },
+  "vhdl:91": {
+    "cwe": 1270
+  },
+  "vhdl:92": {
+    "cwe": 1099
+  },
+  "vhdl:94": {
+    "cwe": 99
+  },
+  "vhdl:97": {
+    "cwe": 710
+  },
+  "vhdl:99": {
+    "cwe": 1114
+  }
+}

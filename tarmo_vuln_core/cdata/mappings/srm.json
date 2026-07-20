@@ -1,0 +1,288 @@
+{
+  "A function const value parameter should be passed as a const reference": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "API Abuse": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Arguments differ": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Assertion contains side effects": {
+    "confidence": "Inform",
+    "cwe": 439
+  },
+  "Assertion contains variable assignment": {
+    "confidence": "Inform",
+    "cwe": 439
+  },
+  "Assignment of function parameter": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Avoid calling overridable methods in constructors": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Buffer Operation": {
+    "confidence": "Inform",
+    "cwe": 120
+  },
+  "C-style pointer casting can make the code overly complex and error prone": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Class has a constructor with 1 argument that is not explicit": {
+    "confidence": "Inform",
+    "cwe": 233
+  },
+  "Class method defined without decorator syntax": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Code Injection": {
+    "confidence": "Inform",
+    "cwe": 94
+  },
+  "Comparison": {
+    "confidence": "Inform",
+    "cwe": 697
+  },
+  "Control Flow": {
+    "confidence": "Inform",
+    "cwe": 691
+  },
+  "Dead Code": {
+    "confidence": "Inform",
+    "cwe": 561
+  },
+  "Denial of Service": {
+    "confidence": "Inform",
+    "cwe": 770
+  },
+  "Don't store incoming arrays directly": {
+    "confidence": "Inform",
+    "cwe": 374
+  },
+  "Duplicate expression for condition and assignment": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Duplicate if condition": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Error Handling": {
+    "confidence": "Inform",
+    "cwe": 248
+  },
+  "Excessive cognitive complexity": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Expression 'x = x++;' depends on order of evaluation of side effects": {
+    "confidence": "Inform",
+    "cwe": 768
+  },
+  "Expression Issue": {
+    "cwe": 570
+  },
+  "Finalize should call super.finalize()": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Fixme": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Found a statement that begins with a numeric/string constant": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Function parameter assignment has no external effect": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Global statement": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Incorrect Type Conversion or Cast": {
+    "confidence": "Inform",
+    "cwe": 704
+  },
+  "Initialization": {
+    "confidence": "Inform",
+    "cwe": 457
+  },
+  "Invalid Pointer": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Label is not used": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Leftover Debug Code": {
+    "confidence": "Inform",
+    "cwe": 489
+  },
+  "Local variable shadows outer argument": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Local variable shadows outer function": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Local variable shadows outer variable": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Memory": {
+    "confidence": "Inform",
+    "cwe": 401
+  },
+  "Missing override specifier": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "NULL passed after the last typed argument to a variadic function": {
+    "confidence": "Inform",
+    "cwe": 475
+  },
+  "No Finalizer": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Non-parent __init__ called": {
+    "confidence": "Inform",
+    "cwe": 452
+  },
+  "Non-private static fields should be final": {
+    "confidence": "Inform",
+    "cwe": 500
+  },
+  "Numeric Error": {
+    "confidence": "Inform",
+    "cwe": 190
+  },
+  "Opposite expression on both sides of operator": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Package Declaration": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Parameter Assignment": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Parameter can be declared with const": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Pointless statement": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Preserve stack traces in catch blocks": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Redundant assignment of Variable to itself": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Resource Injection": {
+    "confidence": "Inform",
+    "cwe": 99
+  },
+  "Resource Management": {
+    "confidence": "Inform",
+    "cwe": 770
+  },
+  "Return Value": {
+    "cwe": 252
+  },
+  "Same expression in both branches of ternary operator": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Same expression on both sides of OPERATOR": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Same value in both branches of ternary operator": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Shared mutable default value": {
+    "confidence": "Inform",
+    "cwe": 374
+  },
+  "Simplify for loops to foreach loops when possible": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Singleton Comparison": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "String Usage": {
+    "confidence": "Inform",
+    "cwe": 133
+  },
+  "Trailing whitespace": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Unidiomatic Typecheck": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Unnecessary pass": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Unneeded boolean negation": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Unused import": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Use ArrayList instead of Vector": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Use Override annotation when overriding methods": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Use interface types when possible": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Use isEmpty() on collections": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Using subprocess.run without check parameter": {
+    "confidence": "Inform",
+    "cwe": 252
+  },
+  "Variable can be declared with const": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "Wrong Import Order": {
+    "confidence": "Inform",
+    "cwe": 710
+  }
+}

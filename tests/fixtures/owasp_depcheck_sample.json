@@ -1,0 +1,21 @@
+{
+  "reportSchema": "https://jeremylong.github.io/DependencyCheck/dependency-check.1.8.xsd",
+  "scanInfo": {"engineVersion": "9.0.0"},
+  "dependencies": [
+    {
+      "fileName": "commons-collections-3.2.1.jar",
+      "filePath": "/lib/commons-collections-3.2.1.jar",
+      "vulnerabilities": [
+        {"name": "CVE-2015-6420", "severity": "HIGH", "cwes": ["502"], "description": "Deserialization of untrusted data in Apache Commons Collections."},
+        {"name": "CVE-2017-15708", "severity": "CRITICAL", "cwes": ["502"], "description": "Remote code execution via deserialization."}
+      ]
+    },
+    {
+      "fileName": "log4j-core-2.14.1.jar",
+      "filePath": "/lib/log4j-core-2.14.1.jar",
+      "vulnerabilities": [
+        {"name": "CVE-2021-44228", "severity": "CRITICAL", "cwes": ["400", "502", "917"], "description": "Log4Shell: JNDI injection via log messages."}
+      ]
+    }
+  ]
+}

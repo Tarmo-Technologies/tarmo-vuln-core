@@ -1,0 +1,75 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "sample-image:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "alpine:3.18",
+      "Class": "os-pkgs",
+      "Type": "alpine",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-SAMPLE-0001",
+          "PkgName": "bash",
+          "InstalledVersion": "1.0",
+          "Severity": "CRITICAL",
+          "Title": "bash: sample critical vulnerability",
+          "Description": "A critical vulnerability in bash allows remote code execution.",
+          "CweIDs": ["CWE-79"],
+          "CVSS": {
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+              "V3Score": 9.5
+            }
+          }
+        },
+        {
+          "VulnerabilityID": "CVE-SAMPLE-0002",
+          "PkgName": "libssl",
+          "InstalledVersion": "2.0",
+          "FixedVersion": "2.1",
+          "Severity": "HIGH",
+          "Title": "libssl: sample high vulnerability",
+          "Description": "A high-severity vulnerability in libssl.",
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            }
+          }
+        }
+      ]
+    },
+    {
+      "Target": "python:3.11",
+      "Class": "os-pkgs",
+      "Type": "alpine",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-SAMPLE-0001",
+          "PkgName": "bash",
+          "InstalledVersion": "1.0",
+          "Severity": "CRITICAL",
+          "Title": "bash: sample critical vulnerability",
+          "Description": "A critical vulnerability in bash allows remote code execution.",
+          "CweIDs": ["CWE-79"],
+          "CVSS": {
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+              "V3Score": 9.5
+            }
+          }
+        },
+        {
+          "VulnerabilityID": "CVE-SAMPLE-0003",
+          "PkgName": "libcurl",
+          "InstalledVersion": "3.0",
+          "FixedVersion": "3.1",
+          "Severity": "MEDIUM",
+          "Title": "libcurl: sample medium vulnerability",
+          "Description": "A medium-severity vulnerability in libcurl."
+        }
+      ]
+    }
+  ]
+}

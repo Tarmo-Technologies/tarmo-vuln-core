@@ -1,0 +1,8 @@
+{
+  "no-undef": {
+    "cwe": 457
+  },
+  "no-unused-vars": {
+    "cwe": 563
+  }
+}

@@ -1,0 +1,4216 @@
+{
+  "Absolute_Path_Traversal": {
+    "cwe": 36,
+    "severity": "Medium"
+  },
+  "Access_Specifier_Manipulation": {
+    "cwe": 749,
+    "severity": "Information"
+  },
+  "Accessible_Content_Provider": {
+    "cwe": 668,
+    "severity": "Low"
+  },
+  "ActionPoller_Frequency_Check": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Ajax_Toolkit_From_VF": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Akka_Debug_Loglevel_Enabled": {
+    "cwe": 15,
+    "severity": "Low"
+  },
+  "Akka_Encrypt_Data_Disabled": {
+    "cwe": 15,
+    "severity": "Low"
+  },
+  "Akka_Missing_Max_Age": {
+    "cwe": 15,
+    "severity": "Low"
+  },
+  "Akka_Serialize_Enabled": {
+    "cwe": 15,
+    "severity": "Low"
+  },
+  "Akka_Untrusted_Mode_Enabled": {
+    "cwe": 15,
+    "severity": "Low"
+  },
+  "Akka_Verbose_Mode_Enabled": {
+    "cwe": 209,
+    "severity": "Low"
+  },
+  "Allowed_Backup": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Android_Improper_Resource_Shutdown_or_Release": {
+    "cwe": 404,
+    "severity": "Low"
+  },
+  "Angular_Client_DOM_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Angular_Client_Stored_DOM_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Angular_Deprecated_API": {
+    "cwe": 477,
+    "severity": "Low"
+  },
+  "Angular_Improper_Type_Pipe_Usage": {
+    "cwe": 228,
+    "severity": "Medium"
+  },
+  "Angular_Usage_of_Unsafe_DOM_Sanitizer": {
+    "cwe": 116,
+    "severity": "Low"
+  },
+  "App_Transport_Security_Bypass": {
+    "cwe": 319,
+    "severity": "High"
+  },
+  "Aptca_Methods_Call_Non_Aptca_Methods": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Arithmetic_Operation_On_Boolean": {
+    "cwe": 480,
+    "severity": "Low"
+  },
+  "Array_Declared_Public_Final_and_Static": {
+    "cwe": 582,
+    "severity": "Information"
+  },
+  "Assign_Collection": {
+    "cwe": 398,
+    "severity": "Information"
+  },
+  "Assigning_instead_of_Comparing": {
+    "cwe": 481,
+    "severity": "Information"
+  },
+  "Asymmetric_Encryption_Improper_Padding": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Asymmetric_Encryption_Insufficient_Key_Size": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Asymmetric_Encryption_RSA_Low_Public_Exponent": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Async_Future_Method_Inside_Loops": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Attr_accessible_Not_Set": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Authorization_Bypass_Through_User_Controlled_SQL_PrimaryKey": {
+    "cwe": 566,
+    "severity": "Low"
+  },
+  "Autocorrection_Keystroke_Logging": {
+    "cwe": 359,
+    "severity": "Medium"
+  },
+  "Batch_Apex_exists": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Batch_Apex_makes_outbound_call": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Blind_SQL_Injections": {
+    "cwe": 89,
+    "severity": "Low"
+  },
+  "Boolean_Overflow": {
+    "cwe": 190,
+    "severity": "Medium"
+  },
+  "Bounds_Check_Disabled": {
+    "cwe": 118,
+    "severity": "Low"
+  },
+  "Buffer_Improper_Index_Access": {
+    "cwe": 129,
+    "severity": "High"
+  },
+  "Buffer_Overflow": {
+    "cwe": 120,
+    "severity": "Medium"
+  },
+  "Buffer_Overflow_AddressOfLocalVarReturned": {
+    "cwe": 562,
+    "severity": "Medium"
+  },
+  "Buffer_Overflow_IndexFromInput": {
+    "cwe": 787,
+    "severity": "High"
+  },
+  "Buffer_Overflow_Indexes": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_LongString": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_Loops": {
+    "cwe": 193,
+    "severity": "Medium"
+  },
+  "Buffer_Overflow_Loops_Old": {
+    "cwe": 193,
+    "severity": "Medium"
+  },
+  "Buffer_Overflow_LowBound": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_OutOfBound": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_StrcpyStrcat": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_Unbounded_Buffer": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_Unbounded_Format": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_Wrong_Buffer_Size": {
+    "cwe": 131,
+    "severity": "High"
+  },
+  "Buffer_Overflow_boundcpy_WrongSizeParam": {
+    "cwe": 121,
+    "severity": "Medium"
+  },
+  "Buffer_Overflow_boundedcpy": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_boundedcpy2": {
+    "cwe": 120,
+    "severity": "Medium"
+  },
+  "Buffer_Overflow_cin": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_cpycat": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_fgets": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_scanf": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_sizeof": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Overflow_unbounded": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Buffer_Size_Literal": {
+    "confidence": "Inform",
+    "cwe": 547,
+    "severity": "Information"
+  },
+  "Buffer_Size_Literal_Condition": {
+    "confidence": "Inform",
+    "cwe": 547,
+    "severity": "Information"
+  },
+  "Buffer_Size_Literal_Overflow": {
+    "cwe": 118,
+    "severity": "Information"
+  },
+  "Bulkify_Apex_Methods_Using_Collections_In_Methods": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "CGI_Reflected_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "CGI_Reflected_XSS_All_Clients": {
+    "cwe": 79,
+    "severity": "Medium"
+  },
+  "CGI_Stored_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "CGI_XSS": {
+    "cwe": 79,
+    "severity": "Medium"
+  },
+  "CRUD_Delete": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "Caching_False_In_Production": {
+    "cwe": 10713,
+    "severity": "Information"
+  },
+  "Call_to_Thread_run": {
+    "cwe": 572,
+    "severity": "Information"
+  },
+  "Catch_NullPointerException": {
+    "cwe": 395,
+    "severity": "Information"
+  },
+  "Channel_Accessible_by_NonEndpoint": {
+    "cwe": 300,
+    "severity": "Low"
+  },
+  "Char_Overflow": {
+    "cwe": 190,
+    "severity": "Medium"
+  },
+  "Citrus_Developer_Mode_Enabled": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Cleansing_Canonicalization_and_Comparison_Errors": {
+    "cwe": 171,
+    "severity": "Low"
+  },
+  "Cleartext_Storage_Of_Sensitive_Information": {
+    "cwe": 312,
+    "severity": "Medium"
+  },
+  "Cleartext_Submission_of_Sensitive_Information": {
+    "cwe": 319,
+    "severity": "Medium"
+  },
+  "Cleartext_Transmission_Of_Sensitive_Information": {
+    "cwe": 319,
+    "severity": "Medium"
+  },
+  "Client_CSS_Injection": {
+    "cwe": 83,
+    "severity": "Medium"
+  },
+  "Client_Cookies_Inspection": {
+    "cwe": 315,
+    "severity": "Low"
+  },
+  "Client_Cross_Frame_Scripting_Attack": {
+    "cwe": 79,
+    "severity": "Medium"
+  },
+  "Client_Cross_Session_Contamination": {
+    "cwe": 488,
+    "severity": "Low"
+  },
+  "Client_DB_Parameter_Tampering": {
+    "cwe": 284,
+    "severity": "Medium"
+  },
+  "Client_DOM_Code_Injection": {
+    "cwe": 94,
+    "severity": "High"
+  },
+  "Client_DOM_Cookie_Poisoning": {
+    "cwe": 472,
+    "severity": "Medium"
+  },
+  "Client_DOM_Open_Redirect": {
+    "cwe": 601,
+    "severity": "Low"
+  },
+  "Client_DOM_Stored_Code_Injection": {
+    "cwe": 94,
+    "severity": "High"
+  },
+  "Client_DOM_Stored_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Client_DOM_XSRF": {
+    "cwe": 352,
+    "severity": "Medium"
+  },
+  "Client_DOM_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Client_DoS_By_Sleep": {
+    "cwe": 730,
+    "severity": "Medium"
+  },
+  "Client_Empty_Password": {
+    "cwe": 259,
+    "severity": "Low"
+  },
+  "Client_HTML5_Easy_To_Guess_Database_Name": {
+    "cwe": 330,
+    "severity": "Low"
+  },
+  "Client_HTML5_Heuristic_Session_Insecure_Storage": {
+    "cwe": 922,
+    "severity": "Low"
+  },
+  "Client_HTML5_Information_Exposure": {
+    "cwe": 200,
+    "severity": "Medium"
+  },
+  "Client_HTML5_Insecure_Storage": {
+    "cwe": 312,
+    "severity": "Medium"
+  },
+  "Client_HTML5_Store_Sensitive_data_In_Web_Storage": {
+    "cwe": 312,
+    "severity": "Medium"
+  },
+  "Client_Hardcoded_Domain": {
+    "cwe": 829,
+    "severity": "Low"
+  },
+  "Client_Header_Manipulation": {
+    "cwe": 113,
+    "severity": "Medium"
+  },
+  "Client_Heuristic_Poor_XSS_Validation": {
+    "cwe": 80,
+    "severity": "Low"
+  },
+  "Client_Insecure_Randomness": {
+    "cwe": 330,
+    "severity": "Low"
+  },
+  "Client_Insufficient_ClickJacking_Protection": {
+    "cwe": 693,
+    "severity": "Low"
+  },
+  "Client_Insufficient_Key_Size": {
+    "cwe": 310,
+    "severity": "Low"
+  },
+  "Client_JQuery_Deprecated_Symbols": {
+    "cwe": 477,
+    "severity": "Low"
+  },
+  "Client_Located_JQuery_Outdated_Lib_File": {
+    "cwe": 477,
+    "severity": "Low"
+  },
+  "Client_Manual_XHR_Handling": {
+    "cwe": 474,
+    "severity": "Information"
+  },
+  "Client_Manual_XSRF_Token_Handling": {
+    "cwe": 352,
+    "severity": "Low"
+  },
+  "Client_Negative_Content_Length": {
+    "cwe": 398,
+    "severity": "Low"
+  },
+  "Client_Null_Password": {
+    "cwe": 259,
+    "severity": "Low"
+  },
+  "Client_Overly_Permissive_Message_Posting": {
+    "cwe": 942,
+    "severity": "Low"
+  },
+  "Client_Password_In_Comment": {
+    "cwe": 615,
+    "severity": "Low"
+  },
+  "Client_Password_Weak_Encryption": {
+    "cwe": 261,
+    "severity": "Low"
+  },
+  "Client_Path_Manipulation": {
+    "cwe": 73,
+    "severity": "Medium"
+  },
+  "Client_Potential_Ad_Hoc_Ajax": {
+    "cwe": 693,
+    "severity": "Low"
+  },
+  "Client_Potential_Code_Injection": {
+    "cwe": 94,
+    "severity": "Medium"
+  },
+  "Client_Potential_DOM_Open_Redirect": {
+    "cwe": 601,
+    "severity": "Low"
+  },
+  "Client_Potential_ReDoS_In_Match": {
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Client_Potential_ReDoS_In_Replace": {
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Client_Potential_XSS": {
+    "cwe": 79,
+    "severity": "Medium"
+  },
+  "Client_Privacy_Violation": {
+    "cwe": 359,
+    "severity": "Medium"
+  },
+  "Client_ReDoS_From_Regex_Injection": {
+    "confidence": "Inform",
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "Client_ReDoS_In_Match": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "Client_ReDoS_In_Replace": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "Client_ReDos_In_RegExp": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "Client_Reflected_File_Download": {
+    "cwe": 425,
+    "severity": "Medium"
+  },
+  "Client_Regex_Injection": {
+    "cwe": 624,
+    "severity": "Low"
+  },
+  "Client_Remote_File_Inclusion": {
+    "cwe": 829,
+    "severity": "Low"
+  },
+  "Client_Resource_Injection": {
+    "cwe": 99,
+    "severity": "High"
+  },
+  "Client_SQL_Injection": {
+    "cwe": 89,
+    "severity": "High"
+  },
+  "Client_Sandbox_Allows_Scripts_With_Same_Origin": {
+    "cwe": 829,
+    "severity": "Medium"
+  },
+  "Client_Second_Order_Sql_Injection": {
+    "cwe": 89,
+    "severity": "High"
+  },
+  "Client_Server_Empty_Password": {
+    "cwe": 259,
+    "severity": "Low"
+  },
+  "Client_Side_Injection": {
+    "cwe": 89,
+    "severity": "High"
+  },
+  "Client_Side_Only_Validation": {
+    "cwe": 602,
+    "severity": "Low"
+  },
+  "Client_Side_ReDoS": {
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Client_State_Saving_Method_JSF": {
+    "cwe": 254,
+    "severity": "Medium"
+  },
+  "Client_Untrusted_Activex": {
+    "cwe": 618,
+    "severity": "Medium"
+  },
+  "Client_Use_Of_Deprecated_SQL_Database": {
+    "cwe": 937,
+    "severity": "Low"
+  },
+  "Client_Use_Of_Iframe_Without_Sandbox": {
+    "cwe": 829,
+    "severity": "Low"
+  },
+  "Client_Use_Of_JQuery_Outdated_Version": {
+    "cwe": 477,
+    "severity": "Medium"
+  },
+  "Client_Weak_Cryptographic_Hash": {
+    "cwe": 310,
+    "severity": "Low"
+  },
+  "Client_Weak_Encryption": {
+    "cwe": 327,
+    "severity": "Low"
+  },
+  "Client_Weak_Password_Authentication": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Client_XPATH_Injection": {
+    "cwe": 643,
+    "severity": "Medium"
+  },
+  "Code_Injection": {
+    "cwe": 94,
+    "severity": "High"
+  },
+  "Collapse_of_Data_into_Unsafe_Value": {
+    "cwe": 182,
+    "severity": "Low"
+  },
+  "Command_Injection": {
+    "cwe": 77,
+    "severity": "High"
+  },
+  "Communication_Over_HTTP": {
+    "cwe": 319,
+    "severity": "Medium"
+  },
+  "Comparing_instead_of_Assigning": {
+    "cwe": 482,
+    "severity": "Information"
+  },
+  "Comparison_Timing_Attack": {
+    "cwe": 208,
+    "severity": "Medium"
+  },
+  "Comparison_of_Classes_By_Name": {
+    "cwe": 486,
+    "severity": "Information"
+  },
+  "Confusing_Naming": {
+    "cwe": 710,
+    "severity": "Information"
+  },
+  "Connect_Loop_To_DB": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Connection_String_Injection": {
+    "cwe": 99,
+    "severity": "High"
+  },
+  "CookieLess_Authentication": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "CookieLess_Session": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "CookieLess_Session_State": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "Cookie_Injection": {
+    "cwe": 20,
+    "severity": "Medium"
+  },
+  "Cookie_Overly_Broad_Path": {
+    "cwe": 539,
+    "severity": "Low"
+  },
+  "Cookie_Poisoning": {
+    "cwe": 472,
+    "severity": "Medium"
+  },
+  "Cookies_Inspection": {
+    "cwe": 315,
+    "severity": "Low"
+  },
+  "Cookies_Scoping": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "Copy_Paste_Buffer_Caching": {
+    "cwe": 200,
+    "severity": "Low"
+  },
+  "Cordova_Code_Injection": {
+    "cwe": 94,
+    "severity": "Medium"
+  },
+  "Cordova_File_Disclosure": {
+    "cwe": 538,
+    "severity": "Medium"
+  },
+  "Cordova_File_Manipulation": {
+    "cwe": 552,
+    "severity": "Medium"
+  },
+  "Cordova_Insufficient_Domain_Whitelist": {
+    "cwe": 942,
+    "severity": "Low"
+  },
+  "Cordova_Missing_Content_Security_Policy": {
+    "cwe": 346,
+    "severity": "Low"
+  },
+  "Cordova_Open_Redirect": {
+    "cwe": 601,
+    "severity": "Medium"
+  },
+  "Cordova_Permissive_Content_Security_Policy": {
+    "cwe": 346,
+    "severity": "Low"
+  },
+  "Cordova_Privacy_Violation": {
+    "cwe": 359,
+    "severity": "Medium"
+  },
+  "Creation_of_Temp_File_With_Insecure_Permissions": {
+    "cwe": 378,
+    "severity": "Low"
+  },
+  "Creation_of_Temp_File_in_Dir_with_Incorrect_Permissions": {
+    "cwe": 379,
+    "severity": "Low"
+  },
+  "Creation_of_chroot_Jail_without_Changing_Working_Directory": {
+    "cwe": 243,
+    "severity": "Low"
+  },
+  "Critical_Public_Variable_Without_Final_Modifier": {
+    "cwe": 493,
+    "severity": "Information"
+  },
+  "Cross_Site_History_Manipulation": {
+    "cwe": 203,
+    "severity": "Medium"
+  },
+  "CustomError": {
+    "cwe": 12,
+    "severity": "Low"
+  },
+  "Cut_And_Paste_Leakage": {
+    "cwe": 200,
+    "severity": "Medium"
+  },
+  "DB_Control_of_System_or_Config_Setting": {
+    "cwe": 15,
+    "severity": "Low"
+  },
+  "DB_Information_Leak": {
+    "cwe": 200,
+    "severity": "Low"
+  },
+  "DB_Parameter_Tampering": {
+    "cwe": 284,
+    "severity": "Medium"
+  },
+  "DB_Tampering": {
+    "cwe": 20,
+    "severity": "Medium"
+  },
+  "DML_Statements_Inside_Loops": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "DOM_Code_Injection": {
+    "cwe": 94,
+    "severity": "High"
+  },
+  "DOM_Cookie_Poisoning": {
+    "cwe": 472,
+    "severity": "Medium"
+  },
+  "DOM_Open_Redirect": {
+    "cwe": 601,
+    "severity": "Low"
+  },
+  "DOM_XSRF": {
+    "cwe": 352,
+    "severity": "Medium"
+  },
+  "DOM_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "DOS_To_Symbol": {
+    "cwe": 730,
+    "severity": "Medium"
+  },
+  "Dangerous_File_Inclusion": {
+    "cwe": 829,
+    "severity": "Medium"
+  },
+  "Dangerous_File_Size_Upload": {
+    "confidence": "Inform",
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Dangerous_File_Upload": {
+    "cwe": 434,
+    "severity": "Low"
+  },
+  "Dangerous_Functions": {
+    "cwe": 242,
+    "severity": "Medium"
+  },
+  "Dangerous_Send": {
+    "cwe": 77,
+    "severity": "Medium"
+  },
+  "Dangling_Database_Cursor": {
+    "cwe": 619,
+    "severity": "Medium"
+  },
+  "Data_Filter_Injection": {
+    "cwe": 200,
+    "severity": "Medium"
+  },
+  "Data_Leak_Between_Sessions": {
+    "cwe": 362,
+    "severity": "Low"
+  },
+  "Dead_Code": {
+    "cwe": 561,
+    "severity": "Information"
+  },
+  "DebugEnabled": {
+    "cwe": 11,
+    "severity": "Low"
+  },
+  "Debug_Enabled": {
+    "cwe": 11,
+    "severity": "Low"
+  },
+  "Debuggable_App": {
+    "cwe": 668,
+    "severity": "Low"
+  },
+  "Declaration_Of_Catch_For_Generic_Exception": {
+    "cwe": 396,
+    "severity": "Information"
+  },
+  "Declaration_of_Throws_for_Generic_Exception": {
+    "cwe": 397,
+    "severity": "Information"
+  },
+  "Default_Definer_Rights_in_Method_Definition": {
+    "cwe": 265,
+    "severity": "Low"
+  },
+  "Default_Definer_Rights_in_Package_or_Object_Definition": {
+    "cwe": 265,
+    "severity": "Medium"
+  },
+  "Default_Routes": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "Denial_Of_Service_Resource_Exhaustion": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "Deprecated_CRT_Functions_VS2005": {
+    "cwe": 477,
+    "severity": "Low"
+  },
+  "Deprecated_Functions": {
+    "cwe": 477,
+    "severity": "Low"
+  },
+  "Deprecated_Functions_or_Properties": {
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Deprecated_Groovy_Code": {
+    "cwe": 477,
+    "severity": "Information"
+  },
+  "Deprecated_Methods": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Deprecated_Modules_or_Libraries": {
+    "confidence": "Inform",
+    "cwe": 1104,
+    "severity": "Low"
+  },
+  "Dereferenced_Field": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "Deserialization_of_Untrusted_Data": {
+    "cwe": 502,
+    "severity": "High"
+  },
+  "Deserialization_of_Untrusted_Data_MSMQ": {
+    "cwe": 502,
+    "severity": "High"
+  },
+  "Deserialization_of_Untrusted_Data_in_JMS": {
+    "cwe": 502,
+    "severity": "High"
+  },
+  "Detection_of_Error_Condition_Without_Action": {
+    "cwe": 390,
+    "severity": "Information"
+  },
+  "DeviceId_Authentication": {
+    "cwe": 259,
+    "severity": "Low"
+  },
+  "Direct_Use_of_Sockets": {
+    "cwe": 246,
+    "severity": "Information"
+  },
+  "Direct_Use_of_Threads": {
+    "cwe": 383,
+    "severity": "Information"
+  },
+  "Direct_Use_of_Unsafe_JNI": {
+    "cwe": 111,
+    "severity": "Medium"
+  },
+  "Directory_Browse": {
+    "cwe": 548,
+    "severity": "Low"
+  },
+  "Disabling_SAFE_Mode": {
+    "cwe": 250,
+    "severity": "Low"
+  },
+  "Divide_By_Zero": {
+    "cwe": 369,
+    "severity": "Medium"
+  },
+  "DmlOptions_Set_To_False": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "DoS_By_Sleep": {
+    "cwe": 730,
+    "severity": "Medium"
+  },
+  "DoS_by_Sleep": {
+    "cwe": 730,
+    "severity": "Medium"
+  },
+  "Double_Free": {
+    "cwe": 415,
+    "severity": "Medium"
+  },
+  "Download_Arbitrary_File": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "Download_of_Code_Without_Integrity_Check": {
+    "cwe": 494,
+    "severity": "Medium"
+  },
+  "Dynamic_File_Inclusion": {
+    "cwe": 829,
+    "severity": "Information"
+  },
+  "Dynamic_Render_Path": {
+    "cwe": 10714,
+    "severity": "Information"
+  },
+  "Dynamic_SQL_Queries": {
+    "cwe": 89,
+    "severity": "Information"
+  },
+  "ESAPI_Banned_API": {
+    "cwe": 676,
+    "severity": "Information"
+  },
+  "ESAPI_Same_Password_Repeats_Twice": {
+    "cwe": 521,
+    "severity": "Low"
+  },
+  "Elmah_Enabled": {
+    "cwe": 213,
+    "severity": "Medium"
+  },
+  "Empty_Catch": {
+    "cwe": 390,
+    "severity": "Information"
+  },
+  "Empty_Catch_Blocks": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Empty_Methods": {
+    "cwe": 1071,
+    "severity": "Information"
+  },
+  "Empty_Password": {
+    "cwe": 521,
+    "severity": "Low"
+  },
+  "Empty_Password_In_Connection_String": {
+    "cwe": 259,
+    "severity": "Low"
+  },
+  "Empty_Synchronized_Block": {
+    "cwe": 585,
+    "severity": "Information"
+  },
+  "Empty_TryBlocks": {
+    "cwe": 390,
+    "severity": "Information"
+  },
+  "Encoding_Used_Instead_of_Encryption": {
+    "cwe": 311,
+    "severity": "Medium"
+  },
+  "Environment_Injection": {
+    "cwe": 77,
+    "severity": "Medium"
+  },
+  "Environment_Variable_Injection": {
+    "cwe": 77,
+    "severity": "Medium"
+  },
+  "Escape_False": {
+    "cwe": 116,
+    "severity": "Low"
+  },
+  "Escape_False_Warning": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Explicit_Call_to_Finalize": {
+    "cwe": 586,
+    "severity": "Information"
+  },
+  "Explicit_Calls_To_Methods": {
+    "cwe": 398,
+    "severity": "Information"
+  },
+  "Explicit_Instantiation": {
+    "cwe": 398,
+    "severity": "Information"
+  },
+  "Exported_Service_Without_Permissions": {
+    "cwe": 668,
+    "severity": "Medium"
+  },
+  "Exposure_Of_Resource_To_Other_Applications": {
+    "cwe": 668,
+    "severity": "Information"
+  },
+  "Exposure_of_Resource_to_Wrong_Sphere": {
+    "confidence": "Inform",
+    "cwe": 668,
+    "severity": "Information"
+  },
+  "Exposure_of_System_Data": {
+    "cwe": 497,
+    "severity": "Low"
+  },
+  "Exposure_of_System_Data_to_Unauthorized_Control_Sphere": {
+    "cwe": 497,
+    "severity": "Low"
+  },
+  "Expression_Language_Injection_OGNL": {
+    "cwe": 917,
+    "severity": "High"
+  },
+  "Expression_Language_Injection_SPEL": {
+    "cwe": 917,
+    "severity": "High"
+  },
+  "Expression_is_Always_False": {
+    "cwe": 570,
+    "severity": "Information"
+  },
+  "Expression_is_Always_True": {
+    "cwe": 571,
+    "severity": "Information"
+  },
+  "External_Control_of_Critical_State_Data": {
+    "cwe": 642,
+    "severity": "Medium"
+  },
+  "External_Control_of_System_or_Config_Setting": {
+    "cwe": 15,
+    "severity": "Medium"
+  },
+  "FLS_Create": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "FLS_Create_Partial": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "FLS_Update": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "FLS_Update_Partial": {
+    "cwe": 0,
+    "severity": "Medium"
+  },
+  "Failure_To_Implement_Least_Privilege": {
+    "cwe": 250,
+    "severity": "Medium"
+  },
+  "Failure_to_Catch_All_Exceptions_in_Servlet": {
+    "cwe": 600,
+    "severity": "Information"
+  },
+  "Failure_to_Implement_Least_Privilege": {
+    "cwe": 807,
+    "severity": "Low"
+  },
+  "File_Disclosure": {
+    "cwe": 538,
+    "severity": "High"
+  },
+  "File_Inclusion": {
+    "cwe": 98,
+    "severity": "High"
+  },
+  "File_Manipulation": {
+    "cwe": 552,
+    "severity": "High"
+  },
+  "File_Permissions_World_Readable": {
+    "cwe": 732,
+    "severity": "Low"
+  },
+  "Filtering_Sensitive_Logs": {
+    "cwe": 10602,
+    "severity": "Medium"
+  },
+  "Find_Exposed_Test_Data": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Float_Overflow": {
+    "cwe": 190,
+    "severity": "Medium"
+  },
+  "Format_String_Attack": {
+    "cwe": 134,
+    "severity": "High"
+  },
+  "Frame_Spoofing": {
+    "cwe": 79,
+    "severity": "Medium"
+  },
+  "Frameable_Login_Page": {
+    "cwe": 829,
+    "severity": "Medium"
+  },
+  "Freed_Pointer_Not_Set_To_Null": {
+    "cwe": 476,
+    "severity": "Low"
+  },
+  "Full_Error_Reports_In_Production": {
+    "cwe": 209,
+    "severity": "Low"
+  },
+  "Functions_Apple_Recommends_To_Avoid": {
+    "cwe": 937,
+    "severity": "Low"
+  },
+  "Future_exists": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "GOTO_Statement": {
+    "confidence": "Inform",
+    "cwe": 1075,
+    "severity": "Information"
+  },
+  "GWT_DOM_XSS": {
+    "cwe": 79,
+    "severity": "Medium"
+  },
+  "GWT_Reflected_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "General_Android_Find_Request_Permissions": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "GetLastWin32Error_Is_Not_Called_After_Pinvoke": {
+    "cwe": 10018,
+    "severity": "Information"
+  },
+  "Get_Right_Assignment": {
+    "cwe": 190,
+    "severity": "Information"
+  },
+  "Getter_Method_Could_Be_Property": {
+    "cwe": 398,
+    "severity": "Information"
+  },
+  "Global_Variables_Without_Meaningful_Name": {
+    "cwe": 10715,
+    "severity": "Information"
+  },
+  "HTTP_Callouts": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "HTTP_Response_Splitting": {
+    "cwe": 113,
+    "severity": "Medium"
+  },
+  "Hard_Coded_Cryptography_Key": {
+    "cwe": 321,
+    "severity": "Medium"
+  },
+  "HardcodedCredentials": {
+    "cwe": 489,
+    "severity": "Medium"
+  },
+  "Hardcoded_AWS_Credentials": {
+    "cwe": 798,
+    "severity": "Low"
+  },
+  "Hardcoded_Absolute_Path": {
+    "cwe": 426,
+    "severity": "Low"
+  },
+  "Hardcoded_Connection_String": {
+    "cwe": 798,
+    "severity": "Information"
+  },
+  "Hardcoded_Password": {
+    "cwe": 259,
+    "severity": "Low"
+  },
+  "Hardcoded_Password_In_Gradle": {
+    "cwe": 259,
+    "severity": "Low"
+  },
+  "Hardcoded_Password_in_Connection_String": {
+    "cwe": 547,
+    "severity": "Medium"
+  },
+  "Hardcoded_Session_Secret_Token": {
+    "cwe": 798,
+    "severity": "Medium"
+  },
+  "Hardcoded_password_in_Connection_String": {
+    "cwe": 547,
+    "severity": "Low"
+  },
+  "Hardcoding_Ids": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Hardcoding_Of_Trigger_New": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Hardcoding_Of_Trigger_Old": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Hardcoding_References_To_Static_Resources": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Hashing_Length_Extension_Attack": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Header_Injection": {
+    "cwe": 113,
+    "severity": "Medium"
+  },
+  "Heap_Inspection": {
+    "cwe": 244,
+    "severity": "Medium"
+  },
+  "Heuristic_2nd_Order_Buffer_Overflow_malloc": {
+    "cwe": 120,
+    "severity": "Low"
+  },
+  "Heuristic_2nd_Order_Buffer_Overflow_read": {
+    "cwe": 120,
+    "severity": "Low"
+  },
+  "Heuristic_2nd_Order_SQL_Injection": {
+    "cwe": 89,
+    "severity": "Low"
+  },
+  "Heuristic_Buffer_Improper_Index_Access": {
+    "cwe": 129,
+    "severity": "Low"
+  },
+  "Heuristic_Buffer_Overflow_malloc": {
+    "cwe": 120,
+    "severity": "Low"
+  },
+  "Heuristic_Buffer_Overflow_read": {
+    "cwe": 120,
+    "severity": "Low"
+  },
+  "Heuristic_CGI_Stored_XSS": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "Heuristic_DB_Parameter_Tampering": {
+    "cwe": 284,
+    "severity": "Low"
+  },
+  "Heuristic_NULL_Pointer_Dereference1": {
+    "cwe": 476,
+    "severity": "Low"
+  },
+  "Heuristic_NULL_Pointer_Dereference2": {
+    "cwe": 476,
+    "severity": "Low"
+  },
+  "Heuristic_Parameter_Tampering": {
+    "cwe": 472,
+    "severity": "Low"
+  },
+  "Heuristic_SQL_Injection": {
+    "cwe": 89,
+    "severity": "Low"
+  },
+  "Heuristic_Stored_XSS": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "Heuristic_Unchecked_Return_Value": {
+    "cwe": 252,
+    "severity": "Low"
+  },
+  "Heuristic_XSRF": {
+    "cwe": 352,
+    "severity": "Low"
+  },
+  "HttpOnlyCookies": {
+    "cwe": 1004,
+    "severity": "Medium"
+  },
+  "HttpOnlyCookies_In_Config": {
+    "cwe": 1004,
+    "severity": "Medium"
+  },
+  "HttpOnlyCookies_XSS": {
+    "cwe": 1004,
+    "severity": "High"
+  },
+  "HttpSplitting": {
+    "cwe": 113,
+    "severity": "Medium"
+  },
+  "Http_Only_Set_To_False": {
+    "cwe": 79,
+    "severity": "Medium"
+  },
+  "Impersonation_Issue": {
+    "cwe": 520,
+    "severity": "Low"
+  },
+  "Implicit_Intent_With_Read_Write_Permissions": {
+    "cwe": 668,
+    "severity": "Low"
+  },
+  "Import_Relative_To_File": {
+    "cwe": 10716,
+    "severity": "Information"
+  },
+  "Import_of_Deprecated_Modules": {
+    "cwe": 937,
+    "severity": "Low"
+  },
+  "Improper_Build_Of_Sql_Mapping": {
+    "cwe": 89,
+    "severity": "Low"
+  },
+  "Improper_Certificate_Validation": {
+    "cwe": 297,
+    "severity": "Medium"
+  },
+  "Improper_Control_of_Dynamically_Identified_Variables": {
+    "cwe": 914,
+    "severity": "Medium"
+  },
+  "Improper_Encoding_Of_Output": {
+    "cwe": 116,
+    "severity": "Low"
+  },
+  "Improper_Error_Handling": {
+    "cwe": 248,
+    "severity": "Low"
+  },
+  "Improper_Exception_Handling": {
+    "cwe": 248,
+    "severity": "Low"
+  },
+  "Improper_Filtering_of_Special_Elements": {
+    "cwe": 790,
+    "severity": "Low"
+  },
+  "Improper_Implementation_of_NSSecureCoding": {
+    "cwe": 502,
+    "severity": "High"
+  },
+  "Improper_Initialization": {
+    "cwe": 665,
+    "severity": "Information"
+  },
+  "Improper_Locking": {
+    "cwe": 667,
+    "severity": "Medium"
+  },
+  "Improper_Neutralization_of_SQL_Command": {
+    "cwe": 89,
+    "severity": "Medium"
+  },
+  "Improper_Null_Termination": {
+    "cwe": 170,
+    "severity": "High"
+  },
+  "Improper_Privilege_Management": {
+    "cwe": 269,
+    "severity": "Medium"
+  },
+  "Improper_Resource_Access_Authorization": {
+    "cwe": 285,
+    "severity": "Low"
+  },
+  "Improper_Resource_Locking": {
+    "cwe": 413,
+    "severity": "Low"
+  },
+  "Improper_Resource_Shutdown_or_Release": {
+    "cwe": 404,
+    "severity": "Low"
+  },
+  "Improper_Restriction_of_Stored_XXE_Ref": {
+    "cwe": 611,
+    "severity": "Medium"
+  },
+  "Improper_Restriction_of_XXE_Ref": {
+    "cwe": 611,
+    "severity": "Medium"
+  },
+  "Improper_Session_Management": {
+    "cwe": 201,
+    "severity": "Low"
+  },
+  "Improper_Transaction_Handling": {
+    "cwe": 460,
+    "severity": "Low"
+  },
+  "Improper_Verification_Of_Intent_By_Broadcast_Receiver": {
+    "cwe": 925,
+    "severity": "Medium"
+  },
+  "Improperly_Locked_Memory": {
+    "cwe": 591,
+    "severity": "Medium"
+  },
+  "Inadequate_Encryption_Strength": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Inadequate_Pointer_Validation": {
+    "cwe": 477,
+    "severity": "Medium"
+  },
+  "Inappropriate_Encoding_for_Output_Context": {
+    "cwe": 838,
+    "severity": "Low"
+  },
+  "Inconsistent_Implementations": {
+    "cwe": 474,
+    "severity": "Low"
+  },
+  "Incorrect_Block_Delimitation": {
+    "cwe": 483,
+    "severity": "Information"
+  },
+  "Incorrect_Conversion_between_Numeric_Types": {
+    "cwe": 681,
+    "severity": "Information"
+  },
+  "Incorrect_Implementation_of_Authentication_Algorithm": {
+    "cwe": 303,
+    "severity": "Low"
+  },
+  "Incorrect_Initialization": {
+    "cwe": 456,
+    "severity": "Low"
+  },
+  "Incorrect_Permission_Assignment_For_Critical_Resources": {
+    "cwe": 732,
+    "severity": "Low"
+  },
+  "Incorrect_Permission_Assignment_For_File_System_Resources": {
+    "cwe": 732,
+    "severity": "Low"
+  },
+  "Information_Exposure_Through_Comments": {
+    "cwe": 615,
+    "severity": "Low"
+  },
+  "Information_Exposure_Through_Debug_Log": {
+    "cwe": 534,
+    "severity": "Low"
+  },
+  "Information_Exposure_Through_Directory_Listing": {
+    "cwe": 548,
+    "severity": "Low"
+  },
+  "Information_Exposure_Through_Extension": {
+    "cwe": 200,
+    "severity": "High"
+  },
+  "Information_Exposure_Through_Log_Files": {
+    "cwe": 532,
+    "severity": "Low"
+  },
+  "Information_Exposure_Through_Query_String": {
+    "cwe": 598,
+    "severity": "Medium"
+  },
+  "Information_Exposure_Through_Server_Log": {
+    "cwe": 533,
+    "severity": "Low"
+  },
+  "Information_Exposure_Through_an_Error_Message": {
+    "cwe": 209,
+    "severity": "Low"
+  },
+  "Information_Leak_Through_Comments": {
+    "cwe": 615,
+    "severity": "Low"
+  },
+  "Information_Leak_Through_Persistent_Cookies": {
+    "cwe": 539,
+    "severity": "Low"
+  },
+  "Information_Leak_Through_Response_Caching": {
+    "cwe": 524,
+    "severity": "Low"
+  },
+  "Information_Leak_Through_Shell_Error_Message": {
+    "cwe": 535,
+    "severity": "Low"
+  },
+  "Input_Not_Normalized": {
+    "cwe": 180,
+    "severity": "Information"
+  },
+  "Input_Path_Not_Canonicalized": {
+    "cwe": 73,
+    "severity": "Medium"
+  },
+  "Insecure_Android_SDK_Version": {
+    "cwe": 477,
+    "severity": "Low"
+  },
+  "Insecure_Cipher_Mode": {
+    "cwe": 326,
+    "severity": "Information"
+  },
+  "Insecure_Cookie": {
+    "cwe": 614,
+    "severity": "Medium"
+  },
+  "Insecure_Credential_Storage_Mechanism": {
+    "cwe": 522,
+    "severity": "Medium"
+  },
+  "Insecure_Data_Storage": {
+    "cwe": 311,
+    "severity": "High"
+  },
+  "Insecure_Data_Storage_Usage": {
+    "cwe": 312,
+    "severity": "Low"
+  },
+  "Insecure_Direct_Object_References": {
+    "cwe": 813,
+    "severity": "High"
+  },
+  "Insecure_Randomness": {
+    "cwe": 330,
+    "severity": "Low"
+  },
+  "Insecure_Scrypt_Parameters": {
+    "cwe": 522,
+    "severity": "Medium"
+  },
+  "Insecure_Sensitive_Data_Storage": {
+    "cwe": 295,
+    "severity": "Low"
+  },
+  "Insecure_Temporary_File": {
+    "cwe": 377,
+    "severity": "Low"
+  },
+  "Insecure_WebView_Usage": {
+    "cwe": 829,
+    "severity": "High"
+  },
+  "Insufficient_BCrypt_Cost": {
+    "cwe": 522,
+    "severity": "Medium"
+  },
+  "Insufficient_Bcrypt_Cost": {
+    "cwe": 522,
+    "severity": "Medium"
+  },
+  "Insufficient_Connection_String_Encryption": {
+    "cwe": 522,
+    "severity": "Medium"
+  },
+  "Insufficient_Encryption_Key_Size": {
+    "cwe": 310,
+    "severity": "Low"
+  },
+  "Insufficient_Format_Validation": {
+    "cwe": 625,
+    "severity": "Medium"
+  },
+  "Insufficient_Logging_of_Database_Actions": {
+    "cwe": 778,
+    "severity": "Information"
+  },
+  "Insufficient_Logging_of_Exceptions": {
+    "cwe": 778,
+    "severity": "Information"
+  },
+  "Insufficient_Output_Length": {
+    "cwe": 522,
+    "severity": "Medium"
+  },
+  "Insufficient_Sensitive_Transport_Layer": {
+    "cwe": 319,
+    "severity": "High"
+  },
+  "Insufficient_Session_Expiration": {
+    "cwe": 613,
+    "severity": "Low"
+  },
+  "Insufficient_Transport_Layer_Input": {
+    "cwe": 319,
+    "severity": "Medium"
+  },
+  "Insufficient_Transport_Layer_Output": {
+    "cwe": 319,
+    "severity": "Medium"
+  },
+  "Insufficient_Transport_Layer_Protect": {
+    "cwe": 311,
+    "severity": "High"
+  },
+  "Insufficiently_Protected_Credentials": {
+    "cwe": 522,
+    "severity": "Low"
+  },
+  "Integer_Overflow": {
+    "cwe": 190,
+    "severity": "Medium"
+  },
+  "Integer_Underflow": {
+    "cwe": 191,
+    "severity": "Low"
+  },
+  "Interactive_Render_Path": {
+    "cwe": 73,
+    "severity": "Low"
+  },
+  "JSON_Hijacking": {
+    "cwe": 352,
+    "severity": "Low"
+  },
+  "Jailbrake_File_Referenced_By_Name": {
+    "cwe": 668,
+    "severity": "Low"
+  },
+  "Jailbreak_Unchecked_File_Operation_Result_Code": {
+    "cwe": 252,
+    "severity": "Low"
+  },
+  "JavaScript_Hijacking": {
+    "cwe": 352,
+    "severity": "Low"
+  },
+  "Jelly_Injection": {
+    "cwe": 94,
+    "severity": "High"
+  },
+  "Jelly_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Just_One_of_Equals_and_Hash_code_Defined": {
+    "cwe": 581,
+    "severity": "Low"
+  },
+  "Keyboard_Cache_Information_Leak": {
+    "cwe": 524,
+    "severity": "Low"
+  },
+  "Kony_Code_Injection": {
+    "cwe": 94,
+    "severity": "High"
+  },
+  "Kony_Deprecated_Functions": {
+    "cwe": 477,
+    "severity": "Information"
+  },
+  "Kony_Hardcoded_EncryptionKey": {
+    "cwe": 321,
+    "severity": "Medium"
+  },
+  "Kony_Information_Leakage": {
+    "cwe": 319,
+    "severity": "High"
+  },
+  "Kony_Path_Injection": {
+    "cwe": 73,
+    "severity": "High"
+  },
+  "Kony_Reflected_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Kony_SQL_Injection": {
+    "cwe": 89,
+    "severity": "High"
+  },
+  "Kony_Second_Order_SQL_Injection": {
+    "cwe": 89,
+    "severity": "High"
+  },
+  "Kony_Stored_Code_Injection": {
+    "cwe": 94,
+    "severity": "High"
+  },
+  "Kony_Stored_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Kony_URL_Injection": {
+    "cwe": 601,
+    "severity": "Medium"
+  },
+  "Kony_Unsecure_Browser_Configuration": {
+    "cwe": 15,
+    "severity": "High"
+  },
+  "Kony_Unsecure_iOSBrowser_Configuration": {
+    "cwe": 15,
+    "severity": "High"
+  },
+  "Kony_Use_WeakEncryption": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Kony_Use_WeakHash": {
+    "cwe": 328,
+    "severity": "Medium"
+  },
+  "LDAP_Injection": {
+    "cwe": 90,
+    "severity": "High"
+  },
+  "Leaving_Temporary_File": {
+    "cwe": 376,
+    "severity": "Low"
+  },
+  "Leaving_Temporary_Files": {
+    "cwe": 376,
+    "severity": "Low"
+  },
+  "Leftover_Debug_Code": {
+    "cwe": 489,
+    "severity": "Low"
+  },
+  "Lightning_DOM_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Lightning_Stored_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Local_File_Inclusion": {
+    "cwe": 829,
+    "severity": "Low"
+  },
+  "Log_Forging": {
+    "cwe": 117,
+    "severity": "Low"
+  },
+  "Logic_Time_Bomb": {
+    "cwe": 511,
+    "severity": "Low"
+  },
+  "Long_Overflow": {
+    "cwe": 190,
+    "severity": "Medium"
+  },
+  "MVC_View_Injection": {
+    "cwe": 74,
+    "severity": "Medium"
+  },
+  "Magic_Numbers": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Malicious_Program": {
+    "cwe": 265,
+    "severity": "High"
+  },
+  "MemoryFree_on_StackVariable": {
+    "cwe": 590,
+    "severity": "Medium"
+  },
+  "Memory_Leak": {
+    "cwe": 401,
+    "severity": "Medium"
+  },
+  "Methods_Without_ReturnType": {
+    "confidence": "Inform",
+    "cwe": 1076,
+    "severity": "Information"
+  },
+  "Missing_CSP_Header": {
+    "cwe": 346,
+    "severity": "Low"
+  },
+  "Missing_Certificate_Pinning": {
+    "cwe": 295,
+    "severity": "Low"
+  },
+  "Missing_Colon_In_Selector": {
+    "cwe": 483,
+    "severity": "Information"
+  },
+  "Missing_Column_Encryption": {
+    "cwe": 311,
+    "severity": "Medium"
+  },
+  "Missing_Content_Security_Policy": {
+    "cwe": 346,
+    "severity": "Low"
+  },
+  "Missing_Default_Case_In_Switch_Statement": {
+    "cwe": 478,
+    "severity": "Information"
+  },
+  "Missing_Device_Lock_Verification": {
+    "cwe": 829,
+    "severity": "Low"
+  },
+  "Missing_Encryption_of_Sensitive_Data": {
+    "cwe": 311,
+    "severity": "Medium"
+  },
+  "Missing_HSTS_Header": {
+    "cwe": 346,
+    "severity": "Medium"
+  },
+  "Missing_Jailbreak_Check": {
+    "cwe": 693,
+    "severity": "Low"
+  },
+  "Missing_Password_Field_Masking": {
+    "cwe": 549,
+    "severity": "Low"
+  },
+  "Missing_Precision": {
+    "cwe": 120,
+    "severity": "Medium"
+  },
+  "Missing_Rooted_Device_Check": {
+    "cwe": 693,
+    "severity": "Low"
+  },
+  "Missing_XML_Validation": {
+    "cwe": 112,
+    "severity": "Information"
+  },
+  "Missing_X_Frame_Options": {
+    "cwe": 1021,
+    "severity": "Low"
+  },
+  "MultiByte_String_Length": {
+    "cwe": 135,
+    "severity": "Medium"
+  },
+  "Multiple_Binds_to_the_Same_Port": {
+    "cwe": 605,
+    "severity": "Medium"
+  },
+  "Multiple_Forms_In_Visualforce_Page": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Multiple_Trigger_On_same_sObject": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "NSPredicate_Injection": {
+    "cwe": 134,
+    "severity": "High"
+  },
+  "NSPredicate_Injection_Via_Deserialization": {
+    "cwe": 502,
+    "severity": "High"
+  },
+  "NULL_Argument_to_Equals": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "NULL_Pointer_Dereference": {
+    "cwe": 476,
+    "severity": "Low"
+  },
+  "No_Installer_Verification_Implemented": {
+    "cwe": 829,
+    "severity": "Low"
+  },
+  "No_Protection_From_Forgery": {
+    "cwe": 352,
+    "severity": "Low"
+  },
+  "No_Request_Validation": {
+    "cwe": 20,
+    "severity": "Medium"
+  },
+  "No_Session_Expiration": {
+    "cwe": 613,
+    "severity": "Low"
+  },
+  "NonUniqueFormName": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Non_Encrypted_Data_Storage": {
+    "cwe": 311,
+    "severity": "Low"
+  },
+  "Non_Private_Static_Constructors": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Non_serializable_Object_Stored_in_Session": {
+    "cwe": 579,
+    "severity": "Information"
+  },
+  "Nonvalidated_File_Upload": {
+    "cwe": 434,
+    "severity": "Medium"
+  },
+  "Not_Checking_Regular_Expressions_Results": {
+    "cwe": 252,
+    "severity": "Low"
+  },
+  "Not_Static_Final_Logger": {
+    "confidence": "Inform",
+    "cwe": 710,
+    "severity": "Information"
+  },
+  "Not_Using_a_Random_IV_with_CBC_Mode": {
+    "cwe": 329,
+    "severity": "Low"
+  },
+  "Null_Password": {
+    "cwe": 259,
+    "severity": "Low"
+  },
+  "Null_Pointer_Dereference": {
+    "cwe": 476,
+    "severity": "Information"
+  },
+  "OS_Access_Violation": {
+    "cwe": 77,
+    "severity": "High"
+  },
+  "Object_Access_Violation": {
+    "cwe": 610,
+    "severity": "Medium"
+  },
+  "Object_Hijack": {
+    "cwe": 491,
+    "severity": "Low"
+  },
+  "Object_Injection": {
+    "cwe": 502,
+    "severity": "Medium"
+  },
+  "Off_By_One_Error": {
+    "cwe": 193,
+    "severity": "Low"
+  },
+  "Off_by_One_Error": {
+    "cwe": 193,
+    "severity": "High"
+  },
+  "Off_by_One_Error_in_Arrays": {
+    "cwe": 193,
+    "severity": "High"
+  },
+  "Off_by_One_Error_in_Loops": {
+    "cwe": 193,
+    "severity": "Medium"
+  },
+  "Off_by_One_Error_in_Methods": {
+    "cwe": 193,
+    "severity": "Medium"
+  },
+  "Old_API_Version": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Omitted_Break_Statement_In_Switch": {
+    "cwe": 484,
+    "severity": "Information"
+  },
+  "Open_Redirect": {
+    "cwe": 601,
+    "severity": "Low"
+  },
+  "Open_SSL_HeartBleed": {
+    "cwe": 120,
+    "severity": "High"
+  },
+  "Outbound_Email_Send": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Outdated_JSON_GEM_Remote_Code": {
+    "cwe": 20,
+    "severity": "Low"
+  },
+  "Outdated_JSON_Remote_Code_Execution": {
+    "cwe": 94,
+    "severity": "Low"
+  },
+  "Outdated_Rails_Allows_Bypass_Access_Control": {
+    "cwe": 264,
+    "severity": "Low"
+  },
+  "Outdated_Rails_Allows_Cross_Site_Request_Forgery": {
+    "cwe": 352,
+    "severity": "Low"
+  },
+  "Outdated_Rails_Allows_SQL_Injection": {
+    "cwe": 89,
+    "severity": "Low"
+  },
+  "Outdated_Rails_Allows_XSS": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "Outdated_Rails_allows_DOS_via_ActiveRecord": {
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Overloading_Reserved_Keywords_or_Subroutines": {
+    "confidence": "Inform",
+    "cwe": 710,
+    "severity": "Low"
+  },
+  "Overly_Permissive_Cross_Origin_Resource_Sharing_Policy": {
+    "cwe": 346,
+    "severity": "Low"
+  },
+  "PBKDF2_Insufficient_Iteration_Count": {
+    "cwe": 522,
+    "severity": "Medium"
+  },
+  "PBKDF2_Weak_Salt_Value": {
+    "cwe": 522,
+    "severity": "Medium"
+  },
+  "Pages_Without_Global_Error_Handler": {
+    "cwe": 12,
+    "severity": "Information"
+  },
+  "Parameter_Tampering": {
+    "cwe": 472,
+    "severity": "Low"
+  },
+  "Parse_Double_DoS": {
+    "cwe": 730,
+    "severity": "Low"
+  },
+  "Passing_Non_Encrypted_Data_Between_Activities": {
+    "cwe": 311,
+    "severity": "Low"
+  },
+  "Password_In_Comment": {
+    "cwe": 615,
+    "severity": "Low"
+  },
+  "Password_In_Configuration_File": {
+    "cwe": 260,
+    "severity": "Low"
+  },
+  "Password_Weak_Encryption": {
+    "cwe": 261,
+    "severity": "Low"
+  },
+  "Password_in_Configuration_File": {
+    "cwe": 260,
+    "severity": "Low"
+  },
+  "Password_misuse": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Path_Manipulation": {
+    "cwe": 73,
+    "severity": "Medium"
+  },
+  "Path_Traversal": {
+    "cwe": 36,
+    "severity": "Medium"
+  },
+  "Permissive_Regular_Expression": {
+    "cwe": 625,
+    "severity": "Low"
+  },
+  "PersistSecurityInfo_is_True": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Persistent_Connection_String": {
+    "cwe": 257,
+    "severity": "Medium"
+  },
+  "Personal_Info_In_Session": {
+    "cwe": 539,
+    "severity": "Low"
+  },
+  "Personal_Information_Without_Encryption": {
+    "cwe": 311,
+    "severity": "Medium"
+  },
+  "PhoneGap_Code_Injection": {
+    "cwe": 94,
+    "severity": "Medium"
+  },
+  "PhoneGap_File_Disclosure": {
+    "cwe": 538,
+    "severity": "Medium"
+  },
+  "PhoneGap_File_Manipulation": {
+    "cwe": 552,
+    "severity": "Medium"
+  },
+  "PhoneGap_Open_Redirect": {
+    "cwe": 601,
+    "severity": "Medium"
+  },
+  "PhoneGap_Privacy_Violation": {
+    "cwe": 359,
+    "severity": "Medium"
+  },
+  "Plain_Text_Transport_Layer": {
+    "cwe": 311,
+    "severity": "Low"
+  },
+  "Plaintext_Storage_Of_A_Password": {
+    "cwe": 256,
+    "severity": "Medium"
+  },
+  "Plaintext_Storage_in_a_Cookie": {
+    "cwe": 315,
+    "severity": "Low"
+  },
+  "Plaintext_Storage_of_a_Password": {
+    "cwe": 256,
+    "severity": "Medium"
+  },
+  "Pointer_Subtraction_Determins_Size": {
+    "cwe": 469
+  },
+  "Poor_Authorization_and_Authentication": {
+    "cwe": 285,
+    "severity": "Medium"
+  },
+  "Poor_Database_Access_Control": {
+    "cwe": 285,
+    "severity": "Low"
+  },
+  "Portability_Flaw_In_File_Separator": {
+    "cwe": 474,
+    "severity": "Information"
+  },
+  "Portability_Flaw_Locale_Dependent_Comparison": {
+    "cwe": 474,
+    "severity": "Low"
+  },
+  "Possible_Flow_Control": {
+    "cwe": 691,
+    "severity": "Low"
+  },
+  "Possible_Global_Variable_Overwrite": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Potenial_UTF7_XSS": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "Potential_Clickjacking_on_Legacy_Browsers": {
+    "cwe": 1021
+  },
+  "Potential_Code_Injection": {
+    "cwe": 94,
+    "severity": "Low"
+  },
+  "Potential_Command_Injection": {
+    "cwe": 77,
+    "severity": "Low"
+  },
+  "Potential_Connection_String_Injection": {
+    "cwe": 99,
+    "severity": "Low"
+  },
+  "Potential_Frame_Injection": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Potential_GWT_Reflected_XSS": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "Potential_IO_Reflected_XSS_All_Clients": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "Potential_I_Reflected_XSS_All_Clients": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "Potential_LDAP_Injection": {
+    "cwe": 90,
+    "severity": "Low"
+  },
+  "Potential_O_Reflected_XSS_All_Clients": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "Potential_Off_by_One_Error_in_Loops": {
+    "cwe": 193,
+    "severity": "Low"
+  },
+  "Potential_Parameter_Tampering": {
+    "cwe": 472,
+    "severity": "Low"
+  },
+  "Potential_Path_Traversal": {
+    "cwe": 36,
+    "severity": "Low"
+  },
+  "Potential_Precision_Problem": {
+    "cwe": 120,
+    "severity": "Low"
+  },
+  "Potential_ReDoS": {
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Potential_ReDoS_By_Injection": {
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Potential_ReDoS_In_Code": {
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Potential_ReDoS_In_Match": {
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Potential_ReDoS_In_Replace": {
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Potential_ReDoS_In_Static_Field": {
+    "cwe": 400,
+    "severity": "Low"
+  },
+  "Potential_Resource_Injection": {
+    "cwe": 99,
+    "severity": "Low"
+  },
+  "Potential_SQL_Injection": {
+    "cwe": 89,
+    "severity": "Low"
+  },
+  "Potential_Stored_XSS": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "Potential_URL_Redirection_Attack": {
+    "cwe": 601,
+    "severity": "Low"
+  },
+  "Potential_UTF7_XSS": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "Potential_XPath_Injection": {
+    "cwe": 643,
+    "severity": "Low"
+  },
+  "Potential_XXE_Injection": {
+    "cwe": 776,
+    "severity": "Low"
+  },
+  "Potentially_Serializable_Class_With_Sensitive_Data": {
+    "cwe": 499,
+    "severity": "Information"
+  },
+  "Potentially_Vulnerable_To_Xsrf": {
+    "cwe": 352,
+    "severity": "Low"
+  },
+  "Prepending_Leading_Zeroes_To_Integer_Literals": {
+    "cwe": 665,
+    "severity": "Information"
+  },
+  "Privacy_Violation": {
+    "cwe": 359,
+    "severity": "Low"
+  },
+  "Private_Array_Returned_From_A_Public_Method": {
+    "cwe": 495,
+    "severity": "Low"
+  },
+  "Privilege_Escalation": {
+    "cwe": 285,
+    "severity": "Medium"
+  },
+  "ProGuard_Obfuscation_Not_In_Use": {
+    "cwe": 693,
+    "severity": "Low"
+  },
+  "Process_Control": {
+    "cwe": 114,
+    "severity": "High"
+  },
+  "Prohibit_Indirect_Object_Call_Syntax": {
+    "cwe": 665,
+    "severity": "Low"
+  },
+  "Public_Data_Assigned_to_Private_Array": {
+    "cwe": 496,
+    "severity": "Low"
+  },
+  "Public_Static_Field_Not_Marked_Final": {
+    "cwe": 500,
+    "severity": "Information"
+  },
+  "Public_Static_Final_References_Mutable_Object": {
+    "cwe": 607,
+    "severity": "Low"
+  },
+  "Queries_With_No_Where_Or_Limit_Clause": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "R00_01_03_Find_Unused_Variables": {
+    "cwe": 10775,
+    "severity": "Information"
+  },
+  "R00_01_05_Find_Unused_Typedefs": {
+    "cwe": 10776,
+    "severity": "Information"
+  },
+  "R00_01_10_Find_Unused_Defined_Functions": {
+    "cwe": 10777,
+    "severity": "Information"
+  },
+  "R00_01_11_Find_Unused_Parameters": {
+    "cwe": 10778,
+    "severity": "Information"
+  },
+  "R00_01_12_Find_Virtual_Unused_Parameters": {
+    "cwe": 10779,
+    "severity": "Information"
+  },
+  "R02_02_CPP_Comment_Style": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_03_01_Trigraphs": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_03_Nested_Comments": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_04_Code_Commented_Out": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_05_01_Digraphs": {
+    "cwe": 10750,
+    "severity": "Information"
+  },
+  "R02_07_02_Code_Commented_Out": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_07_03_Code_CPP_Commented_Out": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_10_02_Identifiers_Hide_Outer_Scope_Identifiers": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_10_03_Typedef_Name_Reused": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_10_04_Class_Enum_Union_Names_Reused": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_10_05_Non_Member_Static_Name_Reuse": {
+    "cwe": 10751,
+    "severity": "Information"
+  },
+  "R02_13_01_Non_ISO_Escapes": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_13_02_Non_Zero_Octal_Constant": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_13_03_U_Suffix_Not_Applied_To_Unsigned_Hex_Oct": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R02_13_04_Literal_Suffix_Uppercase": {
+    "cwe": 10780,
+    "severity": "Information"
+  },
+  "R03_01_03_Find_Arrays_Without_Size": {
+    "cwe": 10781,
+    "severity": "Information"
+  },
+  "R03_02_01_Identical_Function_and_Object_Decl_Def": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R03_04_01_Obj_Defined_Outside_Minimal_Scope": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R03_04_Not_Explained_Pragma_Usage": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R03_09_02_Non_Typedef_Basic_Types": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R04_01_Non_ISO_Escape_Sequences": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R04_02_Trigraphs": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R04_10_01_NULL_As_An_Integer_Value": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R04_10_02_Literal_Zero_As_Null_Pointer_Constant": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_00_07_Improper_Explicit_Floating_Integral_Conversion_Of_Expression": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_00_10_Bitwise_Operator_On_Unsigned_Char_Short_Types": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_00_11_Plain_Char_Type_Usage": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_00_12_Not_Plain_Char_Type_Usage": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_00_21_Bitwise_Operator_On_Signed_Type": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_01_Identifiers_Length_Violation": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_02_01_AND_OR_Operands_Not_As_Postfix_Expressions": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_02_10_Using_Of_Incremental_And_Decrimental_Operators": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_02_11_Find_Special_Operator_Overloads": {
+    "cwe": 10782,
+    "severity": "Information"
+  },
+  "R05_02_Identifiers_Hiding_Outer_Scope_Identifiers": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_03_02_Unary_Minus_Operator_On_Unsigned_Type": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_03_03_Overloading_Reference_Oper": {
+    "cwe": 10753,
+    "severity": "Information"
+  },
+  "R05_03_Typedef_Name_Reused": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_04_Tag_Name_Reused": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_05_Identifier_With_Static_Storage_Reused": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_07_Identifier_Name_Reused": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R05_18_01_Comma_Operator_Used": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_01_Plain_Char_Type_Usage": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_02_01_Assignment_in_Sub_Expr": {
+    "cwe": 10754,
+    "severity": "Information"
+  },
+  "R06_02_02_FloatingPt_Equality_Inequality_Testing": {
+    "cwe": 10752,
+    "severity": "Information"
+  },
+  "R06_02_Not_Plain_Char_Type_Usage": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_03_01_Not_Compound_Switch_Or_Iteration_Statement": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_03_Non_Typedefd_Basic_Types": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_04_01_Not_Compound_If_Or_Else": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_04_02_If_Else_If_Not_Ending_With_Else": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_04_04_Case_Not_Enclosed_By_Compound_Switch": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_04_05_Non_Empty_Switch_Clause_Without_Break_or_Throw": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_04_06_Non_Default_Final_Clause_In_Switch_Statement": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_04_07_Find_Switch_Condition_Bool": {
+    "cwe": 10783,
+    "severity": "Information"
+  },
+  "R06_04_Bit_Fields_Type": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_05_01_Single_Non_Float_LC": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_05_02_Loop_Counter_Modify": {
+    "cwe": 10755,
+    "severity": "Information"
+  },
+  "R06_05_03_Change_Lc_In_St_And_Cond": {
+    "cwe": 10756,
+    "severity": "Information"
+  },
+  "R06_05_04_Incremental_Modified": {
+    "cwe": 10757,
+    "severity": "Information"
+  },
+  "R06_05_05_Lcv_Change_In_For_Stmt": {
+    "cwe": 10758,
+    "severity": "Information"
+  },
+  "R06_05_06_Bool_Lcv_Change": {
+    "cwe": 10759,
+    "severity": "Information"
+  },
+  "R06_05_Bit_Fields_Length": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R06_06_02_Backward_Use_Of_Goto": {
+    "cwe": 1075,
+    "severity": "Information"
+  },
+  "R06_06_03_Continue_In_Legal_For": {
+    "cwe": 10760,
+    "severity": "Information"
+  },
+  "R06_06_04_One_GoTo_Break_In_Iteration": {
+    "cwe": 1075,
+    "severity": "Information"
+  },
+  "R06_06_05_Single_Point_Exit_At_Function_End": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R07_01_01_Declare_Const_if_not_Modified": {
+    "cwe": 10784,
+    "severity": "Information"
+  },
+  "R07_01_02_Declare_Ref_Const_if_not_Modified": {
+    "cwe": 10785,
+    "severity": "Information"
+  },
+  "R07_01_Non_Zero_Octal_Constant": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R07_03_01_Definitions_in_Global_Namespace": {
+    "cwe": 10786,
+    "severity": "Information"
+  },
+  "R07_03_02_Find_non_Global_Mains": {
+    "cwe": 10787,
+    "severity": "Information"
+  },
+  "R07_03_03_Unnamed_NS_in_Headers": {
+    "cwe": 10788,
+    "severity": "Information"
+  },
+  "R07_03_04_Find_Using_Directives": {
+    "cwe": 10789,
+    "severity": "Information"
+  },
+  "R07_03_05_Multiple_Declarations_After_Using": {
+    "cwe": 10790,
+    "severity": "Information"
+  },
+  "R07_03_06_Find_Using_in_Headers": {
+    "cwe": 10791,
+    "severity": "Information"
+  },
+  "R07_05_02_Address_Assignment_out_of_Scope": {
+    "cwe": 10792,
+    "severity": "Information"
+  },
+  "R07_05_03_Return_Parameter_Passed_by_Ref": {
+    "cwe": 10793,
+    "severity": "Information"
+  },
+  "R07_05_04_Recursion_Exists": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R08_00_01_Find_Multiple_Declarators": {
+    "cwe": 10794,
+    "severity": "Information"
+  },
+  "R08_03_Identical_Function_Decl_Def": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R08_04_01_Function_With_Variable_Number_Of_Arguments": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R08_04_03_Explicit_Return_Throw": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R08_05_01_Uninitialized_Variable_Use": {
+    "cwe": 10761,
+    "severity": "Information"
+  },
+  "R08_05_Object_Function_In_Header_File": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R08_07_Block_Scope_Obj_If_Used_By_Single_Function": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R08_08_External_Objects_Declared_Once": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R09_03_Initializing_Non_First_And_Not_All_Members_In_Enum": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R09_05_01_Use_Of_Union": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R09_06_02_bool_Unsigned_Signed_Bit_Field": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R09_06_03_Enum_Bit_Fields": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R09_06_04_Bit_Fields_Length": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R10_01_01_Find_Virtual_Base_Classes": {
+    "cwe": 10795,
+    "severity": "Information"
+  },
+  "R10_03_02_Find_Override_Without_Virtual": {
+    "cwe": 10796,
+    "severity": "Information"
+  },
+  "R10_03_03_Redeclare_Function_as_Pure": {
+    "cwe": 10797,
+    "severity": "Information"
+  },
+  "R10_06_U_Suffix_Not_Applied_To_Unsigned_Const": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R12_01_03_Find_non_Explicit_Constructor": {
+    "cwe": 10798,
+    "severity": "Information"
+  },
+  "R12_05_AND_OR_Operands_Not_As_Primary_Expressions": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R12_07_Bitwise_Operator_On_Signed_Type": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R12_09_Unary_Minus_Operator_On_Unsigned_Type": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R12_10_Comma_Operator_Used": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R12_12_Floating_Point_Bit_Underlying_Representation_Used": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R12_13_Using_Of_Incremental_And_Decrimental_Operators": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R13_01_Assignment_Operators_In_Boolean_Expressions": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R13_03_Floating_Point_Equality_Or_Inequality": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R13_04_Floating_Points_Objects_In_For_Control": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R13_06_Loop_Iterator_Modified_In_Loop_Body": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R14_04_Use_Of_Goto": {
+    "cwe": 1075,
+    "severity": "Information"
+  },
+  "R14_05_Use_Of_Continue": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R14_06_Multiple_Breaks_In_Iteration_Statement": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R14_07_Single_Point_Exit_At_Function_End": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R14_08_Not_Compound_Switch_Or_Iteration_Statement": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R14_09_Not_Compound_If_Or_Else": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R14_10_If_Else_If_Not_Ending_With_Else": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R15_00_02_Throw_Pointers": {
+    "cwe": 10762,
+    "severity": "Information"
+  },
+  "R15_00_03_Goto_Label_Inside_TryCatch": {
+    "cwe": 1075,
+    "severity": "Information"
+  },
+  "R15_01_02_No_Explicit_Null_Throw": {
+    "cwe": 10764,
+    "severity": "Information"
+  },
+  "R15_01_03_Empty_Throw_Outside_Catch": {
+    "cwe": 10765,
+    "severity": "Information"
+  },
+  "R15_01_Case_Not_Enclosed_By_Compound_Switch": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R15_02_Non_Empty_Switch_Clause_Without_Break": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R15_03_02_Catch_All_In_Main": {
+    "cwe": 10766,
+    "severity": "Information"
+  },
+  "R15_03_03_Accessing_Non_Static_Mem_In_Ctr_Dtr": {
+    "cwe": 10767,
+    "severity": "Information"
+  },
+  "R15_03_07_Catch_All_Final": {
+    "cwe": 10768,
+    "severity": "Information"
+  },
+  "R15_03_Non_Default_Final_Clause_In_Switch_Statement": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R15_05_01_Statements_Outside_TryCatch_Dtr": {
+    "cwe": 10769,
+    "severity": "Information"
+  },
+  "R15_05_No_Cases_in_Switch_Statement": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_00_02_Define_Only_in_Global_Namespace": {
+    "cwe": 10770,
+    "severity": "Information"
+  },
+  "R16_00_03_Use_Of_Undef_Directive": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_00_04_Function_Like_Macros_Shall_Not_Be_Defined": {
+    "cwe": 10771,
+    "severity": "Information"
+  },
+  "R16_00_05_No_Tokens_In_Func_Like_Macro": {
+    "cwe": 10772,
+    "severity": "Information"
+  },
+  "R16_00_07_Undefined_Macro_Identifiers": {
+    "cwe": 10799,
+    "severity": "Information"
+  },
+  "R16_00_08_Sharp_Before_Preprocessing_Token": {
+    "cwe": 10773,
+    "severity": "Information"
+  },
+  "R16_01_01_Defined_Standart_Forms": {
+    "cwe": 10774,
+    "severity": "Information"
+  },
+  "R16_01_02_Preprocessor_If_And_Else_Operators_Reside_In_Different_Files": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_01_Function_With_Variable_Number_Of_Arguments": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_02_06_Include_Directive_In_Wrong_Format": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_02_Recursion_Exists": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_03_02_Pound_Preprocessor_Operator_Is_Used": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_03_Function_Prototype_Without_Identifiers": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_04_Different_Identifiers_In_Function_Definition_And_Prototype": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_05_Function_Prototype_Declaration_Without_Parameters": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_06_Function_Invoke_Arg_Number_Not_Match_Function_Def_Number": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_07_Parameter_Pointer_To_Const_Where_Not_Modified": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_08_Non_Explicit_Return_Statement_In_Non_Void_Function": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R16_09_Using_Function_Identifier_Not_Call_Or_Pointer": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R17_00_01_Standard_Library_Redefined_Or_Undefined": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R17_00_02_Standard_Library_Macros_Reuse": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R17_00_03_Standard_Library_Functions_Override": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R18_00_04_Ctime": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R18_00_05_Unbounded_Functions_Of_Library_CString": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R18_04_01_Dynamic_Heap_Memory_Allocation": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R18_04_Use_Of_Union": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R18_07_01_Csignal": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R19_01_Non_Prepocessor_Command_Before_Include_In_File": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R19_02_Non_Standard_Chars_In_Header_File_Name": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R19_03_Include_Directive_In_Wrong_Format": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R19_05_Using_Define_Or_Undef_Directive_In_Block": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R19_06_Use_Of_Undef_Derective": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R19_12_Multiple_Pound_Or_Double_Pound_In_Same_Macro": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R19_13_Pound_Preprocessor_Operator_Is_Used": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R19_17_Preprocessor_If_And_Else_Operators_Reside_In_Different_Files": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R20_05_Using_Errno_Indicator_From_Errno_H": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R20_06_Using_Offsetof_Macro_From_Stddef_H": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R20_07_Using_Setjmp_Longjmp_Macros_From_Setjmp_H": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R20_08_Using_Signal_Handling_From_Signal_H": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R20_09_Using_Input_Output_From_Stdio_H": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R20_10_Using_Atof_Atoi_Atol_Functions_From_Stdlib_H": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R20_11_Using_Abort_Exit_Getenv_System_Functions_From_Stdlib_H": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "R20_12_Using_Time_Handling_From_Time_H": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Race_Condition": {
+    "cwe": 362,
+    "severity": "Low"
+  },
+  "Race_Condition_Format_Flaw": {
+    "cwe": 362,
+    "severity": "Low"
+  },
+  "Race_Condition_In_Cross_Functionality": {
+    "cwe": 362,
+    "severity": "Low"
+  },
+  "Race_Condition_within_a_Thread": {
+    "cwe": 366,
+    "severity": "Medium"
+  },
+  "ReDOS_in_RegExp": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "ReDoS": {
+    "cwe": 730,
+    "severity": "Medium"
+  },
+  "ReDoS_By_Regex_Injection": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "ReDoS_From_Regex_Injection": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "ReDoS_In_Code": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "ReDoS_In_Match": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "ReDoS_In_Pattern": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "ReDoS_In_Replace": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "ReDoS_In_Validation": {
+    "cwe": 400,
+    "severity": "Medium"
+  },
+  "Reachable_Assertion": {
+    "cwe": 617,
+    "severity": "Information"
+  },
+  "ReactJS_Deprecated": {
+    "cwe": 477,
+    "severity": "Low"
+  },
+  "Redirect_Without_Exit": {
+    "cwe": 698,
+    "severity": "Information"
+  },
+  "Reflected_File_Download": {
+    "cwe": 425,
+    "severity": "Medium"
+  },
+  "Reflected_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Reflected_XSS_All_Clients": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Reflected_XSS_Specific_Clients": {
+    "cwe": 79,
+    "severity": "Medium"
+  },
+  "Reflection_Injection": {
+    "cwe": 470,
+    "severity": "High"
+  },
+  "Relative_Path_Traversal": {
+    "cwe": 23,
+    "severity": "Low"
+  },
+  "Reliance_On_Untrusted_Inputs_In_Security_Decision": {
+    "cwe": 807,
+    "severity": "Information"
+  },
+  "Reliance_on_Cookies_in_a_Decision": {
+    "cwe": 784,
+    "severity": "Low"
+  },
+  "Reliance_on_Cookies_without_Validation": {
+    "cwe": 565,
+    "severity": "Medium"
+  },
+  "Reliance_on_DNS_Lookups_in_a_Decision": {
+    "cwe": 350,
+    "severity": "Low"
+  },
+  "Reliance_on_Reverse_DNS_Lookups_in_an_Action": {
+    "cwe": 350
+  },
+  "Remote_Code_Execution": {
+    "cwe": 94,
+    "severity": "Medium"
+  },
+  "Remote_File_Inclusion": {
+    "cwe": 829,
+    "severity": "Low"
+  },
+  "Report_with_no_Filter": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "RequireSSL": {
+    "cwe": 614,
+    "severity": "Medium"
+  },
+  "Resource_Injection": {
+    "cwe": 99,
+    "severity": "High"
+  },
+  "Return_Inside_Finally_Block": {
+    "cwe": 584,
+    "severity": "Information"
+  },
+  "Reuse_Of_Cryptographic_Key": {
+    "cwe": 521,
+    "severity": "Low"
+  },
+  "Reusing_Variable_Names_In_Subscopes": {
+    "confidence": "Inform",
+    "cwe": 710,
+    "severity": "Information"
+  },
+  "Reversible_One_Way_Hash": {
+    "cwe": 328,
+    "severity": "Low"
+  },
+  "SAPUI5_Custom_OData_Model": {
+    "cwe": 474,
+    "severity": "Information"
+  },
+  "SAPUI5_Deprecated_Symbols": {
+    "cwe": 477,
+    "severity": "Low"
+  },
+  "SAPUI5_OData_Call_Without_Batch_Mode": {
+    "cwe": 474,
+    "severity": "Information"
+  },
+  "SAPUI5_Potential_Malicious_File_Upload": {
+    "cwe": 434,
+    "severity": "Low"
+  },
+  "SOQL_Dynamic_null_in_Where": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "SOQL_Formula_in_Where": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "SOQL_Hardcoded_null_in_Where": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "SOQL_Relationship_in_Where": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "SOQL_SOSL_Injection": {
+    "cwe": 89,
+    "severity": "High"
+  },
+  "SOQL_With_All_Fields": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "SOQL_with_All_Fields_in_loop": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "SOSL_SOQL_Statments_Inside_Loops": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "SOSL_With_Where_Clause": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "SQL_Injection": {
+    "cwe": 89,
+    "severity": "High"
+  },
+  "SQL_Injection_Evasion_Attack": {
+    "cwe": 89,
+    "severity": "Medium"
+  },
+  "SSL_Verification_Bypass": {
+    "cwe": 599,
+    "severity": "Medium"
+  },
+  "SSRF": {
+    "cwe": 918,
+    "severity": "Medium"
+  },
+  "Same_Seed_in_PRNG": {
+    "cwe": 336,
+    "severity": "Medium"
+  },
+  "Screen_Caching": {
+    "cwe": 524,
+    "severity": "Medium"
+  },
+  "Script_Poinsoning": {
+    "cwe": 20,
+    "severity": "Low"
+  },
+  "Scrypt_Weak_Salt_Value": {
+    "cwe": 522,
+    "severity": "Medium"
+  },
+  "Second_Order_SOQL_SOSL_Injection": {
+    "cwe": 89,
+    "severity": "Low"
+  },
+  "Second_Order_SQL_Injection": {
+    "cwe": 89,
+    "severity": "High"
+  },
+  "Security_Misconfiguration": {
+    "cwe": 933,
+    "severity": "High"
+  },
+  "Sensitive_Cookie_in_HTTPS_Session_Without_Secure_Attribute": {
+    "cwe": 614,
+    "severity": "Low"
+  },
+  "Sensitive_Data_In_Temp_Folders": {
+    "cwe": 377,
+    "severity": "Low"
+  },
+  "Sensitive_Information_Over_HTTP": {
+    "cwe": 319,
+    "severity": "High"
+  },
+  "Serializable_Class_Containing_Sensitive_Data": {
+    "cwe": 499,
+    "severity": "Low"
+  },
+  "Server_Code_In_Client_Comment": {
+    "cwe": 615,
+    "severity": "Low"
+  },
+  "Server_DoS_by_loop": {
+    "cwe": 730,
+    "severity": "Medium"
+  },
+  "Server_DoS_by_sleep": {
+    "cwe": 730,
+    "severity": "Medium"
+  },
+  "Server_Information_Exposure": {
+    "cwe": 497,
+    "severity": "High"
+  },
+  "Session_Clearing_Problems": {
+    "cwe": 613,
+    "severity": "Low"
+  },
+  "Session_Fixation": {
+    "cwe": 384,
+    "severity": "Medium"
+  },
+  "Session_Poisoning": {
+    "cwe": 472,
+    "severity": "Low"
+  },
+  "Setting_Manipulation": {
+    "cwe": 15,
+    "severity": "Medium"
+  },
+  "Sharing": {
+    "cwe": 472,
+    "severity": "Medium"
+  },
+  "Sharing_With_Controller": {
+    "cwe": 472,
+    "severity": "Medium"
+  },
+  "Short_Overflow": {
+    "cwe": 190,
+    "severity": "Medium"
+  },
+  "Short_Session_Key": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Side_Channel_Data_Leakage": {
+    "cwe": 200,
+    "severity": "Low"
+  },
+  "Signed_Memory_Arithmetic": {
+    "cwe": 190,
+    "severity": "High"
+  },
+  "Signifying_Inheritence_At_Runtime": {
+    "confidence": "Inform",
+    "cwe": 710,
+    "severity": "Low"
+  },
+  "Sizeof_Pointer_Argument": {
+    "cwe": 467,
+    "severity": "Low"
+  },
+  "SlidingExpiration": {
+    "cwe": 613,
+    "severity": "Low"
+  },
+  "Sockets_in_WebApp": {
+    "cwe": 246,
+    "severity": "Information"
+  },
+  "Something_In_Loop": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Spring_ModelView_Injection": {
+    "cwe": 74,
+    "severity": "Medium"
+  },
+  "Spring_defaultHtmlEscape_Not_True": {
+    "cwe": 10711,
+    "severity": "Low"
+  },
+  "Stored_Absolute_Path_Traversal": {
+    "cwe": 36,
+    "severity": "Low"
+  },
+  "Stored_Blind_SQL_Injections": {
+    "cwe": 89,
+    "severity": "Low"
+  },
+  "Stored_Boundary_Violation": {
+    "cwe": 646,
+    "severity": "Low"
+  },
+  "Stored_Buffer_Overflow_boundcpy": {
+    "cwe": 120,
+    "severity": "Medium"
+  },
+  "Stored_Buffer_Overflow_cpycat": {
+    "cwe": 120,
+    "severity": "Medium"
+  },
+  "Stored_Buffer_Overflow_fgets": {
+    "cwe": 120,
+    "severity": "Medium"
+  },
+  "Stored_Buffer_Overflow_fscanf": {
+    "cwe": 120,
+    "severity": "Medium"
+  },
+  "Stored_Code_Injection": {
+    "cwe": 94,
+    "severity": "Medium"
+  },
+  "Stored_Command_Argument_Injection": {
+    "cwe": 77
+  },
+  "Stored_Command_Injection": {
+    "cwe": 77,
+    "severity": "Medium"
+  },
+  "Stored_Connection_String_Injection": {
+    "cwe": 99,
+    "severity": "Medium"
+  },
+  "Stored_DB_Parameter_Tampering": {
+    "cwe": 284,
+    "severity": "Low"
+  },
+  "Stored_DoS_by_Sleep": {
+    "cwe": 730,
+    "severity": "Low"
+  },
+  "Stored_Environment_Injection": {
+    "cwe": 77,
+    "severity": "Low"
+  },
+  "Stored_File_Inclusion": {
+    "cwe": 98,
+    "severity": "Medium"
+  },
+  "Stored_File_Manipulation": {
+    "cwe": 552,
+    "severity": "Medium"
+  },
+  "Stored_Format_String_Attack": {
+    "cwe": 134,
+    "severity": "Medium"
+  },
+  "Stored_HTTP_Response_Splitting": {
+    "cwe": 113,
+    "severity": "Low"
+  },
+  "Stored_LDAP_Injection": {
+    "cwe": 90,
+    "severity": "Medium"
+  },
+  "Stored_Log_Forging": {
+    "cwe": 117,
+    "severity": "Low"
+  },
+  "Stored_Open_Redirect": {
+    "cwe": 601,
+    "severity": "Low"
+  },
+  "Stored_Parameter_Tampering": {
+    "cwe": 472,
+    "severity": "Low"
+  },
+  "Stored_Path_Traversal": {
+    "cwe": 36,
+    "severity": "Low"
+  },
+  "Stored_Process_Control": {
+    "cwe": 114,
+    "severity": "Medium"
+  },
+  "Stored_Reflection_Injection": {
+    "cwe": 470,
+    "severity": "Medium"
+  },
+  "Stored_Relative_Path_Traversal": {
+    "cwe": 23,
+    "severity": "Low"
+  },
+  "Stored_Remote_File_Inclusion": {
+    "cwe": 98,
+    "severity": "Medium"
+  },
+  "Stored_Resource_Injection": {
+    "cwe": 99,
+    "severity": "Medium"
+  },
+  "Stored_XPath_Injection": {
+    "cwe": 643,
+    "severity": "Medium"
+  },
+  "Stored_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Stored_XSS_All_Clients": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Storing_Passwords_in_a_Recoverable_Format": {
+    "cwe": 257,
+    "severity": "Low"
+  },
+  "String_Termination_Error": {
+    "cwe": 170,
+    "severity": "High"
+  },
+  "String_Termination_cin": {
+    "cwe": 170,
+    "severity": "High"
+  },
+  "Struts2_Action_Field_Without_Validator": {
+    "cwe": 108,
+    "severity": "Low"
+  },
+  "Struts2_Duplicate_Action_Field_Validators": {
+    "cwe": 102,
+    "severity": "Low"
+  },
+  "Struts2_Duplicate_Validators": {
+    "cwe": 102,
+    "severity": "Low"
+  },
+  "Struts2_Undeclared_Validator": {
+    "cwe": 105,
+    "severity": "Information"
+  },
+  "Struts2_Validation_File_Without_Action": {
+    "cwe": 107,
+    "severity": "Information"
+  },
+  "Struts2_Validator_Without_Action_Field": {
+    "cwe": 110,
+    "severity": "Information"
+  },
+  "Struts_Duplicate_Config_Files": {
+    "cwe": 694,
+    "severity": "Low"
+  },
+  "Struts_Duplicate_Form_Bean": {
+    "cwe": 694,
+    "severity": "Low"
+  },
+  "Struts_Duplicate_Validation_Files": {
+    "cwe": 694,
+    "severity": "Low"
+  },
+  "Struts_Duplicate_Validation_Forms": {
+    "cwe": 102,
+    "severity": "Low"
+  },
+  "Struts_Form_Does_Not_Extend_Validation_Class": {
+    "cwe": 104,
+    "severity": "Medium"
+  },
+  "Struts_Form_Field_Without_Validator": {
+    "cwe": 105,
+    "severity": "Low"
+  },
+  "Struts_Incomplete_Validate_Method_Definition": {
+    "cwe": 103,
+    "severity": "Medium"
+  },
+  "Struts_Mapping_to_Missing_Form_Bean": {
+    "cwe": 457,
+    "severity": "Low"
+  },
+  "Struts_Missing_Form_Bean_Name": {
+    "cwe": 563,
+    "severity": "Information"
+  },
+  "Struts_Missing_Form_Bean_Type": {
+    "cwe": 563,
+    "severity": "Information"
+  },
+  "Struts_Missing_Forward_Name": {
+    "cwe": 489,
+    "severity": "Information"
+  },
+  "Struts_Non_Private_Field_In_ActionForm_Class": {
+    "cwe": 608,
+    "severity": "Low"
+  },
+  "Struts_Thread_Safety_Violation_In_Action_Class": {
+    "cwe": 856,
+    "severity": "Low"
+  },
+  "Struts_Unused_Action_Form": {
+    "cwe": 489,
+    "severity": "Information"
+  },
+  "Struts_Unused_Validation_Form": {
+    "cwe": 107,
+    "severity": "Low"
+  },
+  "Struts_Unvalidated_Action_Form": {
+    "cwe": 108,
+    "severity": "Low"
+  },
+  "Struts_Use_of_Relative_Path_in_Config": {
+    "cwe": 21,
+    "severity": "Information"
+  },
+  "Struts_Validation_Turned_Off": {
+    "cwe": 109,
+    "severity": "Medium"
+  },
+  "Struts_Validator_Without_Form_Field": {
+    "cwe": 110,
+    "severity": "Low"
+  },
+  "Suspected_XSS": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "Symmetric_Encryption_Insecure_Cipher_Mode": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Symmetric_Encryption_Insecure_Predictable_IV": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Symmetric_Encryption_Insecure_Predictable_Key": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Symmetric_Encryption_Insecure_Static_IV": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Symmetric_Encryption_Insecure_Static_Key": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "TOCTOU": {
+    "cwe": 367,
+    "severity": "Low"
+  },
+  "Test_Methods_With_No_Assert": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Third_Party_Keyboard_Enabled": {
+    "cwe": 829,
+    "severity": "Low"
+  },
+  "Third_Party_Keyboards_On_Sensitive_Field": {
+    "cwe": 829,
+    "severity": "High"
+  },
+  "Thread_Safety_Issue": {
+    "cwe": 567,
+    "severity": "Low"
+  },
+  "Threads_in_WebApp": {
+    "cwe": 383,
+    "severity": "Information"
+  },
+  "TraceEnabled": {
+    "cwe": 749,
+    "severity": "Low"
+  },
+  "TruffleHog HighEntropy Strings": {
+    "cwe": 331
+  },
+  "Trust_Boundary_Violation": {
+    "cwe": 501,
+    "severity": "Medium"
+  },
+  "Type_Conversion_Error": {
+    "cwe": 681,
+    "severity": "Medium"
+  },
+  "UDP_Protocol_Used": {
+    "cwe": 398,
+    "severity": "Information"
+  },
+  "URL_Canonicalization_Issue": {
+    "cwe": 647,
+    "severity": "Low"
+  },
+  "URL_Injection": {
+    "cwe": 74,
+    "severity": "Low"
+  },
+  "URL_Redirection_Attack": {
+    "cwe": 601,
+    "severity": "Medium"
+  },
+  "UTF7_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Uncaught_Exception": {
+    "cwe": 248,
+    "severity": "Low"
+  },
+  "Unchecked_Array_Index": {
+    "cwe": 129,
+    "severity": "Low"
+  },
+  "Unchecked_CString_Convertion": {
+    "cwe": 252,
+    "severity": "Low"
+  },
+  "Unchecked_Error_Condition": {
+    "cwe": 391,
+    "severity": "Information"
+  },
+  "Unchecked_Input_for_Loop_Condition": {
+    "cwe": 606,
+    "severity": "Medium"
+  },
+  "Unchecked_Return_Value": {
+    "cwe": 252,
+    "severity": "Low"
+  },
+  "Unchecked_Return_Value_to_NULL_Pointer_Dereference": {
+    "cwe": 690,
+    "severity": "Low"
+  },
+  "Unclosed_Connection": {
+    "cwe": 404,
+    "severity": "Medium"
+  },
+  "Unclosed_Objects": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Uncontrolled_Format_String": {
+    "cwe": 134,
+    "severity": "Medium"
+  },
+  "Uncontrolled_Memory_Allocation": {
+    "cwe": 789,
+    "severity": "Low"
+  },
+  "Uncontrolled_Recursion": {
+    "cwe": 674,
+    "severity": "Medium"
+  },
+  "Undefined_Behavior": {
+    "cwe": 475,
+    "severity": "Low"
+  },
+  "Unencrypted_Web_Config_File": {
+    "cwe": 312,
+    "severity": "Low"
+  },
+  "Universal_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "Unnormalize_Input_String": {
+    "cwe": 20,
+    "severity": "Medium"
+  },
+  "Unprotected_Cookie": {
+    "cwe": 614,
+    "severity": "Low"
+  },
+  "Unprotected_Transport_of_Credentials": {
+    "cwe": 523,
+    "severity": "Medium"
+  },
+  "Unreleased_Resource_Leak": {
+    "cwe": 411,
+    "severity": "Low"
+  },
+  "Unrestricted_File_Upload": {
+    "cwe": 434,
+    "severity": "Low"
+  },
+  "Unsafe_Deserialization": {
+    "cwe": 502,
+    "severity": "Low"
+  },
+  "Unsafe_Mass_Assignment": {
+    "cwe": 915,
+    "severity": "Medium"
+  },
+  "Unsafe_Object_Binding": {
+    "cwe": 915,
+    "severity": "Medium"
+  },
+  "Unsafe_Permission_Check": {
+    "cwe": 284,
+    "severity": "Medium"
+  },
+  "Unsafe_Reflection": {
+    "cwe": 470,
+    "severity": "High"
+  },
+  "Unsafe_Use_Of_Target_Blank": {
+    "cwe": 1022,
+    "severity": "Low"
+  },
+  "Unsafe_Use_Of_Target_blank": {
+    "cwe": 1022,
+    "severity": "Low"
+  },
+  "Unscrubbed_Secret": {
+    "cwe": 226,
+    "severity": "Low"
+  },
+  "Unsecure_Deserialization": {
+    "cwe": 502,
+    "severity": "High"
+  },
+  "Unsynchronized_Access_To_Shared_Data": {
+    "cwe": 567,
+    "severity": "Low"
+  },
+  "Untrusted_Activex": {
+    "cwe": 618,
+    "severity": "Medium"
+  },
+  "Unused_Variable": {
+    "cwe": 563,
+    "severity": "Information"
+  },
+  "Unvalidated_Arguments_Of_Public_Methods": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Unvalidated_Forwards": {
+    "cwe": 819,
+    "severity": "Medium"
+  },
+  "Unvalidated_SSL_Certificate_Hostname": {
+    "cwe": 297,
+    "severity": "Medium"
+  },
+  "Unvalidated_Self_Signed_Certificate": {
+    "cwe": 295,
+    "severity": "Medium"
+  },
+  "Use_After_Free": {
+    "cwe": 416,
+    "severity": "Medium"
+  },
+  "Use_Collect_Many": {
+    "cwe": 398,
+    "severity": "Information"
+  },
+  "Use_Collect_Nested": {
+    "cwe": 398,
+    "severity": "Information"
+  },
+  "Use_Of_Ajax_Toolkit": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Use_Of_Broken_Or_Risky_Cryptographic_Algorithm": {
+    "cwe": 327,
+    "severity": "Low"
+  },
+  "Use_Of_Controlled_Input_On_Sensitive_Field": {
+    "cwe": 0,
+    "severity": "Low"
+  },
+  "Use_Of_Deprecated_Class": {
+    "cwe": 477,
+    "severity": "Low"
+  },
+  "Use_Of_Global_Variables": {
+    "cwe": 766,
+    "severity": "Information"
+  },
+  "Use_Of_HTTP_Sensitive_Data_Exposure": {
+    "cwe": 319,
+    "severity": "Low"
+  },
+  "Use_Of_Hardcoded_Password": {
+    "cwe": 259,
+    "severity": "Low"
+  },
+  "Use_Of_Implicit_Intent_For_Sensitive_Communication": {
+    "cwe": 927,
+    "severity": "Medium"
+  },
+  "Use_Of_Multiple_Mixins": {
+    "cwe": 710,
+    "severity": "Information"
+  },
+  "Use_Of_Namespace": {
+    "cwe": 398,
+    "severity": "Information"
+  },
+  "Use_Of_Private_Static_Variable": {
+    "cwe": 398,
+    "severity": "Information"
+  },
+  "Use_Of_Sanitize_Instead_Of_h": {
+    "cwe": 116,
+    "severity": "Low"
+  },
+  "Use_Of_Super_GLOBALS": {
+    "cwe": 766,
+    "severity": "Information"
+  },
+  "Use_Of_Uninitialized_Variables": {
+    "cwe": 457,
+    "severity": "Information"
+  },
+  "Use_Of_Weak_Hashing_Primitive": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Use_Of_getenv": {
+    "cwe": 589,
+    "severity": "Low"
+  },
+  "Use_Of_raw": {
+    "cwe": 116,
+    "severity": "Low"
+  },
+  "Use_of_Broken_or_Risky_Cryptographic_Algorithm": {
+    "cwe": 327,
+    "severity": "Low"
+  },
+  "Use_of_Client_Side_Authentication": {
+    "cwe": 603,
+    "severity": "Low"
+  },
+  "Use_of_Cryptographically_Weak_PRNG": {
+    "cwe": 338,
+    "severity": "Medium"
+  },
+  "Use_of_Dangerous_Functions": {
+    "cwe": 242,
+    "severity": "Low"
+  },
+  "Use_of_Deprecated_or_Obsolete_Functions": {
+    "cwe": 477,
+    "severity": "Low"
+  },
+  "Use_of_Hard_coded_Cryptographic_Key": {
+    "cwe": 321,
+    "severity": "Medium"
+  },
+  "Use_of_Hard_coded_Security_Constants": {
+    "cwe": 547,
+    "severity": "Low"
+  },
+  "Use_of_Hardcoded_Cryptographic_Key": {
+    "cwe": 321,
+    "severity": "Information"
+  },
+  "Use_of_Hardcoded_Password": {
+    "cwe": 259,
+    "severity": "Low"
+  },
+  "Use_of_Inner_Class_Containing_Sensitive_Data": {
+    "cwe": 492,
+    "severity": "Information"
+  },
+  "Use_of_Insufficiently_Random_Values": {
+    "cwe": 330,
+    "severity": "Low"
+  },
+  "Use_of_Native_Language": {
+    "cwe": 695,
+    "severity": "Medium"
+  },
+  "Use_of_Non_Cryptographic_Random": {
+    "cwe": 338
+  },
+  "Use_of_Obsolete_Functions": {
+    "cwe": 477,
+    "severity": "Low"
+  },
+  "Use_of_Potentially_Dangerous_Function": {
+    "cwe": 676,
+    "severity": "Information"
+  },
+  "Use_of_RSA_Algorithm_without_OAEP": {
+    "cwe": 780,
+    "severity": "Low"
+  },
+  "Use_of_Sizeof_On_a_Pointer_Type": {
+    "cwe": 467,
+    "severity": "Low"
+  },
+  "Use_of_System_Output_Stream": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Use_of_System_exit": {
+    "cwe": 382,
+    "severity": "Medium"
+  },
+  "Use_of_Two_Argument_Form_of_Open": {
+    "cwe": 77,
+    "severity": "Medium"
+  },
+  "Use_of_Uninitialized_Pointer": {
+    "cwe": 457,
+    "severity": "Medium"
+  },
+  "Use_of_Uninitialized_Variable": {
+    "cwe": 457,
+    "severity": "Medium"
+  },
+  "Use_of_WebView_AddJavascriptInterface": {
+    "cwe": 749,
+    "severity": "High"
+  },
+  "Use_of_Wrong_Operator_in_String_Comparison": {
+    "cwe": 597,
+    "severity": "Information"
+  },
+  "Use_of_Zero_Initialized_Pointer": {
+    "cwe": 457,
+    "severity": "Medium"
+  },
+  "Use_of_a_One_Way_Hash_with_a_Predictable_Salt": {
+    "cwe": 760,
+    "severity": "Medium"
+  },
+  "Use_of_a_One_Way_Hash_without_a_Salt": {
+    "cwe": 759,
+    "severity": "Medium"
+  },
+  "Using_Of_Index_Instead_Of_Key": {
+    "cwe": 398,
+    "severity": "Information"
+  },
+  "Using_Perl4_Package_Names": {
+    "cwe": 477,
+    "severity": "Information"
+  },
+  "Using_Referer_Field_for_Authentication": {
+    "cwe": 293,
+    "severity": "Low"
+  },
+  "Using_Subroutine_Prototypes": {
+    "cwe": 628,
+    "severity": "Information"
+  },
+  "VF_Remoting_Client_Potential_Code_Injection": {
+    "cwe": 94,
+    "severity": "Medium"
+  },
+  "VF_Remoting_Client_Potential_XSRF": {
+    "cwe": 352,
+    "severity": "Medium"
+  },
+  "VF_Remoting_Client_Potential_XSS": {
+    "cwe": 79,
+    "severity": "Medium"
+  },
+  "Value_Shadowing": {
+    "cwe": 233,
+    "severity": "Medium"
+  },
+  "Variables_Outside_The_Scope_of_a_Regex": {
+    "cwe": 824,
+    "severity": "Low"
+  },
+  "Verbose_Error_Reporting": {
+    "cwe": 209,
+    "severity": "Low"
+  },
+  "Visible_Fields": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Visible_Pointers": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Warn_About_Viewstate_Size_Limit": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Weak_Encryption": {
+    "cwe": 326,
+    "severity": "Medium"
+  },
+  "Weak_Mechanism": {
+    "cwe": 522,
+    "severity": "Medium"
+  },
+  "Weak_Password_Authentication": {
+    "cwe": 10710,
+    "severity": "Low"
+  },
+  "Weak_Randomness_Biased_Random_Sample": {
+    "cwe": 330,
+    "severity": "Medium"
+  },
+  "WebView_Cache_Information_Leak": {
+    "cwe": 524,
+    "severity": "Medium"
+  },
+  "Webview_DOM_XSS": {
+    "cwe": 79,
+    "severity": "Information"
+  },
+  "Workflow_sends_Emails": {
+    "cwe": 0,
+    "severity": "Information"
+  },
+  "Wrong_Memory_Allocation": {
+    "cwe": 131,
+    "severity": "Medium"
+  },
+  "Wrong_Size_t_Allocation": {
+    "cwe": 789,
+    "severity": "Medium"
+  },
+  "XML_External_Entity": {
+    "cwe": 611,
+    "severity": "Medium"
+  },
+  "XPath_Injection": {
+    "cwe": 643,
+    "severity": "High"
+  },
+  "XQuery_Injection": {
+    "cwe": 652,
+    "severity": "Medium"
+  },
+  "XSRF": {
+    "cwe": 352,
+    "severity": "Medium"
+  },
+  "XSRF_With_VF_Call": {
+    "cwe": 352,
+    "severity": "Medium"
+  },
+  "XSS_Evasion_Attack": {
+    "cwe": 79,
+    "severity": "Low"
+  },
+  "XS_Code_Injection": {
+    "cwe": 94,
+    "severity": "High"
+  },
+  "XS_Log_Injection": {
+    "cwe": 117,
+    "severity": "Low"
+  },
+  "XS_Open_Redirect": {
+    "cwe": 601,
+    "severity": "Medium"
+  },
+  "XS_Overly_Permissive_CORS": {
+    "cwe": 749,
+    "severity": "Low"
+  },
+  "XS_Parameter_Tampering": {
+    "cwe": 472,
+    "severity": "Medium"
+  },
+  "XS_Potentially_Vulnerable_To_Clickjacking": {
+    "cwe": 693,
+    "severity": "Low"
+  },
+  "XS_Reflected_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "XS_Response_Splitting": {
+    "cwe": 113,
+    "severity": "Medium"
+  },
+  "XS_SQL_Injection": {
+    "cwe": 89,
+    "severity": "High"
+  },
+  "XS_Second_Order_SQL_Injection": {
+    "cwe": 89,
+    "severity": "High"
+  },
+  "XS_Stored_Code_Injection": {
+    "cwe": 94,
+    "severity": "High"
+  },
+  "XS_Stored_XSS": {
+    "cwe": 79,
+    "severity": "High"
+  },
+  "XS_Unencrypted_Data_Transfer": {
+    "cwe": 319,
+    "severity": "Low"
+  },
+  "XS_Use_Of_Hardcoded_URL": {
+    "cwe": 798,
+    "severity": "Medium"
+  },
+  "XS_XSRF": {
+    "cwe": 352,
+    "severity": "Medium"
+  },
+  "clone_Method_Without_super_clone": {
+    "cwe": 580,
+    "severity": "Information"
+  },
+  "finalize_Method_Declared_Public": {
+    "cwe": 583,
+    "severity": "Information"
+  },
+  "finalize_Method_Without_super_finalize": {
+    "cwe": 568,
+    "severity": "Information"
+  },
+  "iOS_Improper_Resource_Release_Shutdown": {
+    "cwe": 404,
+    "severity": "Low"
+  },
+  "inputText_Ignoring_FLS": {
+    "cwe": 0,
+    "severity": "Medium"
+  }
+}

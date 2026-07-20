@@ -1,0 +1,42 @@
+{
+  "issues": [
+    {
+      "checkerName": "NULL_RETURNS",
+      "subcategory": "returned_null",
+      "checkerProperties": {
+        "cweCategory": "476",
+        "impact": "High",
+        "subcategoryLongDescription": "A null pointer dereference check on the return value of a function call.",
+        "subcategoryShortDescription": "Null pointer dereferences"
+      },
+      "mainEventFilePathname": "/src/utils/parser.c",
+      "mainEventLineNumber": 105,
+      "functionDisplayName": "parse_config",
+      "functionMangledName": "parse_config",
+      "occurrenceCountForMK": 1,
+      "events": [
+        {"tag": "returned_null", "description": "Function may return null", "filePathname": "/src/utils/parser.c", "lineNumber": 100},
+        {"tag": "dereference", "description": "Dereferencing null pointer", "filePathname": "/src/utils/parser.c", "lineNumber": 105}
+      ]
+    },
+    {
+      "checkerName": "RESOURCE_LEAK",
+      "subcategory": "leaked_handle",
+      "checkerProperties": {
+        "cweCategory": "404",
+        "impact": "Medium",
+        "subcategoryLongDescription": "A resource acquired is not released on all paths.",
+        "subcategoryShortDescription": "Resource leak"
+      },
+      "mainEventFilePathname": "/src/io/file_handler.c",
+      "mainEventLineNumber": 67,
+      "functionDisplayName": "read_file",
+      "functionMangledName": "read_file",
+      "occurrenceCountForMK": 1,
+      "events": [
+        {"tag": "alloc_fn", "description": "Resource acquired", "filePathname": "/src/io/file_handler.c", "lineNumber": 60},
+        {"tag": "leaked_handle", "description": "Resource not released", "filePathname": "/src/io/file_handler.c", "lineNumber": 67}
+      ]
+    }
+  ]
+}

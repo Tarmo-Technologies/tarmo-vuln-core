@@ -1,0 +1,285 @@
+- id: default-credentials
+  title: "Default Credentials in Use"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 521
+  owasp_id: "A07:2025"
+  methodology_items: ["AUTHN-02"]
+  aliases:
+    nessus_plugin: [70658]
+    cve: []
+  description: |
+    The application or device is configured with default, vendor-supplied
+    credentials that have not been changed. Default credentials are publicly
+    documented and tested by attackers as a first step during exploitation.
+  impact: |
+    An attacker can authenticate with full privileges using publicly known
+    credentials, gaining complete control over the application, device, or
+    underlying system without any additional exploitation.
+  remediation: |
+    Change all default credentials immediately upon deployment. Implement a
+    mandatory credential change workflow during first-time setup. Audit all
+    systems and devices for default credentials using tools such as Hydra or
+    Medusa against known default credential databases.
+  references:
+    - "https://cwe.mitre.org/data/definitions/521.html"
+    - "https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/"
+  steps:
+    - "Identify the application version and vendor from banners, headers, or page source."
+    - "Look up default credentials in DefaultCreds-cheat-sheet or CIRT.net."
+    - "Attempt login with the discovered default credentials."
+    - "Document successful authentication and the access level obtained."
+
+- id: missing-mfa
+  title: "Multi-Factor Authentication Not Enforced"
+  severity: HIGH
+  cvss_score: 8.6
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 308
+  owasp_id: "A07:2025"
+  methodology_items: ["AUTHN-09"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application does not enforce multi-factor authentication for user
+    accounts, particularly for privileged or administrative users. Single-
+    factor authentication (password only) is insufficient to protect accounts
+    from credential-based attacks.
+  impact: |
+    If credentials are compromised via phishing, credential stuffing, or
+    data breach exposure, an attacker can fully authenticate without any
+    additional verification. This is the primary attack vector for account
+    takeover in modern breaches.
+  remediation: |
+    Enforce MFA for all user accounts, with mandatory enforcement for
+    administrative and privileged accounts. Support TOTP (RFC 6238),
+    hardware security keys (FIDO2/WebAuthn), or push-based authentication.
+    Implement risk-based authentication for additional coverage.
+  references:
+    - "https://cwe.mitre.org/data/definitions/308.html"
+    - "https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/"
+    - "https://pages.nist.gov/800-63-3/sp800-63b.html"
+  steps:
+    - "Log in to the application with valid credentials only (no second factor)."
+    - "Confirm successful authentication without any MFA challenge."
+    - "Verify there is no MFA enrollment prompt or enforcement policy."
+    - "Document the login flow and absence of second-factor verification."
+
+- id: insecure-password-reset
+  title: "Insecure Password Reset Mechanism"
+  severity: HIGH
+  cvss_score: 8.6
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 640
+  owasp_id: "A07:2025"
+  methodology_items: ["AUTHN-09"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The password reset mechanism is insecure due to predictable or reusable
+    reset tokens, missing token expiry, lack of one-time use enforcement,
+    or insecure delivery channels. This allows an attacker to take over
+    accounts by abusing the reset flow.
+  impact: |
+    An attacker with access to the target's email or the ability to predict/
+    intercept reset tokens can reset any user's password and gain full control
+    of the account without knowing the current password.
+  remediation: |
+    Use cryptographically random reset tokens of at least 128 bits of entropy.
+    Set a short expiry (15–30 minutes). Invalidate tokens after use (one-time).
+    Do not expose tokens in URLs (use POST + session binding instead).
+    Notify users via email when a password reset is initiated.
+  references:
+    - "https://cwe.mitre.org/data/definitions/640.html"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html"
+  steps:
+    - "Request a password reset and capture the reset link/token."
+    - "Test if the token can be reused after successful reset."
+    - "Test if the token is valid beyond 30 minutes after issuance."
+    - "Test for predictability: request multiple tokens and compare entropy."
+    - "Document the token format, expiry, and any reuse vulnerability."
+
+- id: password-stored-plaintext
+  title: "Passwords Stored in Plaintext"
+  severity: HIGH
+  cvss_score: 8.6
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 256
+  owasp_id: "A04:2025"
+  methodology_items: ["CRYP-04"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    User passwords are stored in the database as plaintext or with weak,
+    reversible encoding (e.g., base64). If the database is compromised,
+    all user passwords are immediately exposed without any cracking effort.
+  impact: |
+    A database breach exposes all user passwords in cleartext, enabling
+    immediate account takeover on this platform and credential stuffing
+    attacks on other services where users reuse passwords. Regulatory
+    penalties apply under GDPR, PCI-DSS, and similar frameworks.
+  remediation: |
+    Store passwords using a strong, adaptive, memory-hard hashing algorithm:
+    Argon2id (preferred), bcrypt, or scrypt. Never use MD5, SHA-1, SHA-256,
+    or other general-purpose hash functions for passwords. Add a per-user salt
+    to prevent rainbow table attacks. Migrate existing plaintext passwords
+    on next user login.
+  references:
+    - "https://cwe.mitre.org/data/definitions/256.html"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html"
+  steps:
+    - "Gain read access to the user table (via SQLi, backup file, or direct DB access)."
+    - "Examine the password column — if values are readable text or clearly base64, they are stored insecurely."
+    - "Register a test account with a known password and check how it is stored."
+    - "Document the storage format and a sample (redacted) value as evidence."
+
+- id: session-not-invalidated
+  title: "Session Not Invalidated on Logout"
+  severity: HIGH
+  cvss_score: 7.1
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 613
+  owasp_id: "A07:2025"
+  methodology_items: ["SESS-06"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application does not invalidate server-side session tokens upon
+    logout. After a user logs out, previously issued session tokens remain
+    valid and can be replayed by an attacker who obtained them.
+  impact: |
+    If an attacker captures a session token (via XSS, network sniffing, or
+    browser access), they retain access even after the legitimate user has
+    logged out. This is particularly dangerous in shared device scenarios
+    (kiosks, shared workstations).
+  remediation: |
+    On logout, invalidate the session token server-side by removing it from
+    the session store. Issue new session tokens on login and privilege
+    elevation. Implement absolute session timeouts (e.g., 8 hours) and
+    idle timeouts (e.g., 30 minutes) in addition to explicit logout handling.
+  references:
+    - "https://cwe.mitre.org/data/definitions/613.html"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+  steps:
+    - "Log in and capture the session token (cookie or Bearer token)."
+    - "Log out of the application."
+    - "Replay the captured token in a new request to an authenticated endpoint."
+    - "Confirm whether the server accepts the token and returns authorized content."
+    - "Document the token value and the endpoint that accepts the invalidated token."
+
+- id: session-fixation
+  title: "Session Fixation"
+  severity: HIGH
+  cvss_score: 7.7
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 384
+  owasp_id: "A07:2025"
+  methodology_items: ["SESS-03"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application does not issue a new session token upon successful
+    authentication, reusing the pre-authentication session identifier.
+    An attacker who supplies a known session token can hijack the session
+    after the victim authenticates.
+  impact: |
+    An attacker who can set a known session token in the victim's browser
+    (e.g., via a URL parameter) can hijack the victim's authenticated
+    session without knowing their credentials, gaining full access to
+    the victim's account.
+  remediation: |
+    Issue a new, cryptographically random session token immediately upon
+    successful authentication, invalidating the pre-authentication token.
+    Never accept session identifiers from URL parameters. Use secure,
+    HttpOnly, SameSite cookies for session management.
+  references:
+    - "https://cwe.mitre.org/data/definitions/384.html"
+    - "https://owasp.org/www-community/attacks/Session_fixation"
+  steps:
+    - "Obtain a pre-authentication session token (e.g., from the login page response)."
+    - "Log in with valid credentials while retaining the original session token."
+    - "Check if the session token changes after authentication."
+    - "If the token is the same before and after login, session fixation is present."
+    - "Document the token values before and after authentication."
+
+- id: jwt-algorithm-confusion
+  title: "JWT Algorithm Confusion Attack"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 327
+  owasp_id: "A04:2025"
+  methodology_items: ["SESS-01"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application accepts JWTs signed with the 'none' algorithm or allows
+    algorithm confusion (e.g., RS256 public key used as HMAC-SHA256 secret).
+    An attacker can forge valid tokens without knowing the private key.
+  impact: |
+    An attacker can forge arbitrary JWT payloads (e.g., modify user ID or role
+    to 'admin') and authenticate as any user including administrators, achieving
+    full application compromise without credential knowledge.
+  remediation: |
+    Explicitly specify and enforce the expected JWT algorithm server-side —
+    never derive the algorithm from the token header. Reject tokens with
+    alg: none. Use separate key material for RS256 and HS256. Use a
+    well-maintained JWT library that defaults to secure algorithm handling.
+  references:
+    - "https://cwe.mitre.org/data/definitions/327.html"
+    - "https://portswigger.net/web-security/jwt/algorithm-confusion"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html"
+  steps:
+    - "Obtain a valid JWT from the application (login and capture the token)."
+    - "Decode the JWT header and payload using jwt.io or python-jwt."
+    - "Attempt alg:none attack: modify the header to 'alg':'none', re-encode without signature."
+    - "Attempt algorithm confusion: sign a modified payload with the RS256 public key as HMAC secret."
+    - "Submit the forged token and document whether the server accepts it."
+
+- id: brute-force-no-lockout
+  title: "No Account Lockout on Failed Authentication"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 307
+  owasp_id: "A07:2025"
+  methodology_items: ["AUTHN-03"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application does not implement account lockout, rate limiting, or
+    CAPTCHA after repeated failed authentication attempts. This permits
+    unlimited automated brute-force and credential stuffing attacks.
+  impact: |
+    An attacker can systematically attempt all passwords or a credential list
+    against user accounts without restriction, eventually gaining unauthorized
+    access to accounts with weak or breached passwords.
+  remediation: |
+    Implement progressive delays or account lockout after 5–10 consecutive
+    failed attempts. Apply CAPTCHA challenges after a threshold of failures.
+    Implement IP-based rate limiting at the WAF or load balancer layer.
+    Alert on and investigate mass authentication failure events.
+  references:
+    - "https://cwe.mitre.org/data/definitions/307.html"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+  steps:
+    - "Use Burp Intruder or Hydra to send 20+ failed login attempts in rapid succession."
+    - "Confirm the server continues to respond with a login prompt (not a lockout or CAPTCHA)."
+    - "Measure response times to detect throttling."
+    - "Document the number of attempts made without restriction and server response behavior."

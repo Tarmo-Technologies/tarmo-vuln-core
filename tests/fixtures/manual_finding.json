@@ -1,0 +1,15 @@
+[
+  {
+    "id": "sqli-user-search",
+    "title": "SQL Injection in User Search Endpoint",
+    "severity": "HIGH",
+    "cvss_score": 8.8,
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+    "cwe_id": 89,
+    "owasp_id": "A03:2021",
+    "affected_hosts": ["10.0.0.5"],
+    "description": "The /api/users endpoint passes the `q` parameter directly into a SQL query without parameterisation.",
+    "impact": "An authenticated attacker can exfiltrate the entire database or modify records.",
+    "remediation": "Use parameterised queries or an ORM. Never concatenate user input into SQL strings."
+  }
+]

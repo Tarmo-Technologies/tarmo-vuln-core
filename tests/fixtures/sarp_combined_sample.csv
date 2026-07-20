@@ -1,0 +1,3 @@
+ID,Type,Message,Tool CWE,CWE,Tool Severity,Scanner,Path,Line,Tool,Confidence,Exploit Maturity,Proposed Mitigation,Validator Justification,Mitigation CVSS Vector,Symbol,Language,Scoring Basis,DestPath,DestLine,DestSymbol
+1,SQL Injection,Tainted input reaches SQL execute,20,89,High,checkmarx,src/api/login.py,12,Checkmarx SAST,Confirmed,proof_of_concept,Use parameterized queries,,AV:N/AC:L/PR:N/UI:N,handle_login,Python,analyst,src/db/session.py,58,execute
+2,XSS,Reflected XSS in search,79,79,Medium,semgrep,src/views/search.py,15,Semgrep,Plausible,,Sanitize output,,,search_handler,Python,tool,,,

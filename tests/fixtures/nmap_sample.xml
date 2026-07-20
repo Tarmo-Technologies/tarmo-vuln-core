@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<nmaprun scanner="nmap" args="nmap -sV -oX nmap_sample.xml 10.0.0.0/30" start="1737000000"
+         version="7.94" xmloutputversion="1.05">
+  <scaninfo type="syn" protocol="tcp" numservices="1000" services="1-1000"/>
+  <verbose level="0"/>
+  <debugging level="0"/>
+
+  <host starttime="1737000001" endtime="1737000060">
+    <status state="up" reason="echo-reply"/>
+    <address addr="10.0.0.1" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="host1.example.com" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack"/>
+        <service name="ssh" product="OpenSSH" version="8.9" ostype="Linux"/>
+      </port>
+      <port protocol="tcp" portid="80">
+        <state state="open" reason="syn-ack"/>
+        <service name="http" product="Apache httpd" version="2.4.54"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack"/>
+        <service name="https" product="Apache httpd" version="2.4.54" tunnel="ssl"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Linux 5.x" accuracy="95"/>
+    </os>
+  </host>
+
+  <host starttime="1737000061" endtime="1737000120">
+    <status state="up" reason="echo-reply"/>
+    <address addr="10.0.0.2" addrtype="ipv4"/>
+    <hostnames/>
+    <ports>
+      <port protocol="tcp" portid="23">
+        <state state="open" reason="syn-ack"/>
+        <service name="telnet" product="Linux telnetd"/>
+      </port>
+    </ports>
+  </host>
+
+  <runstats>
+    <finished time="1737000180" timestr="2026-01-15 12:03:00" elapsed="180.00" summary="Nmap done"/>
+    <hosts up="2" down="2" total="4"/>
+  </runstats>
+</nmaprun>

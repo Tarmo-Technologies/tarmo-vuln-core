@@ -1,0 +1,35 @@
+name: SBOM Generation
+
+on:
+  release:
+    types: [published]
+  schedule:
+    - cron: "0 6 * * 1"  # Monday 06:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v7
+      - run: python -m venv .venv
+      - run: uv pip install --python .venv/bin/python "maturin>=1.7"
+      - run: .venv/bin/maturin develop --release
+      - run: uv pip install --python .venv/bin/python -e ".[dev]"
+      - run: uv pip install --python .venv/bin/python cyclonedx-bom
+      - run: .venv/bin/cyclonedx-py environment --output-format json -o sbom.cdx.json .venv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: sbom.cdx.json
+          retention-days: 365

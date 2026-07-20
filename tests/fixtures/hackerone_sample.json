@@ -1,0 +1,97 @@
+{
+  "data": [
+    {
+      "id": "1234567",
+      "type": "report",
+      "attributes": {
+        "title": "SQL Injection in User Login Endpoint",
+        "state": "resolved",
+        "severity_rating": "critical",
+        "vulnerability_information": "The login endpoint at /api/v1/auth is vulnerable to SQL injection. By injecting a single quote into the username field, an attacker can bypass authentication or extract sensitive data from the database.",
+        "weakness": {
+          "id": 89,
+          "name": "Improper Neutralization of Special Elements used in an SQL Command"
+        },
+        "structured_scope": {
+          "asset_identifier": "api.example.com",
+          "asset_type": "URL"
+        },
+        "cve_ids": ["CVE-2023-44974"]
+      },
+      "relationships": {
+        "severity": {
+          "data": {
+            "type": "severity",
+            "attributes": {
+              "rating": "critical",
+              "cvss_vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+              "score": 9.8
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "1234568",
+      "type": "report",
+      "attributes": {
+        "title": "Stored XSS in Profile Bio Field",
+        "state": "resolved",
+        "severity_rating": "high",
+        "vulnerability_information": "The profile bio field does not sanitize user input before rendering it on other users' profile pages, allowing stored cross-site scripting attacks.",
+        "weakness": {
+          "id": 79,
+          "name": "Improper Neutralization of Input During Web Page Generation"
+        },
+        "structured_scope": {
+          "asset_identifier": "www.example.com",
+          "asset_type": "URL"
+        },
+        "cve_ids": []
+      },
+      "relationships": {
+        "severity": {
+          "data": {
+            "type": "severity",
+            "attributes": {
+              "rating": "high",
+              "cvss_vector_string": "CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N",
+              "score": 5.4
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "1234569",
+      "type": "report",
+      "attributes": {
+        "title": "Insecure Direct Object Reference on Document Download",
+        "state": "triaged",
+        "severity_rating": "medium",
+        "vulnerability_information": "The document download endpoint accepts a document ID parameter without verifying the authenticated user owns the document, allowing horizontal privilege escalation.",
+        "weakness": {
+          "id": 284,
+          "name": "Improper Access Control"
+        },
+        "structured_scope": {
+          "asset_identifier": "files.example.com",
+          "asset_type": "URL"
+        },
+        "cve_ids": []
+      },
+      "relationships": {
+        "severity": {
+          "data": {
+            "type": "severity",
+            "attributes": {
+              "rating": "medium",
+              "cvss_vector_string": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+              "score": 6.5
+            }
+          }
+        }
+      }
+    }
+  ]
+}

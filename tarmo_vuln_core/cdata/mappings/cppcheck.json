@@ -1,0 +1,704 @@
+{
+  "AssignmentAddressToInteger": {
+    "confidence": "Inform",
+    "cwe": 758
+  },
+  "AssignmentIntegerToAddress": {
+    "confidence": "Inform",
+    "cwe": 758
+  },
+  "CastIntegerToAddressAtReturn": {
+    "confidence": "Inform",
+    "cwe": 758
+  },
+  "allocaCalled": {
+    "cwe": 676
+  },
+  "arithOperationsOnVoidPointer": {
+    "confidence": "Inform",
+    "cwe": 467
+  },
+  "arrayIndexOutOfBounds": {
+    "confidence": "Inform",
+    "cwe": 126
+  },
+  "arrayIndexOutOfBoundsCond": {
+    "confidence": "Inform",
+    "cwe": 126
+  },
+  "arrayIndexThenCheck": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "asctimeCalled": {
+    "confidence": "Inform",
+    "cwe": 477
+  },
+  "assertWithSideEffect": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "assignIfError": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "assignmentInAssert": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "autoVariables": {
+    "confidence": "Inform",
+    "cwe": 562
+  },
+  "autovarInvalidDeallocation": {
+    "confidence": "Inform",
+    "cwe": 590
+  },
+  "badBitmaskCheck": {
+    "confidence": "Inform",
+    "cwe": 571
+  },
+  "bitwiseOnBoolean": {
+    "cwe": 480
+  },
+  "catchExceptionByValue": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "clarifyCalculation": {
+    "confidence": "Inform",
+    "cwe": 783
+  },
+  "clarifyCondition": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "clarifyStatement": {
+    "confidence": "Inform",
+    "cwe": 783
+  },
+  "comparePointers": {
+    "confidence": "Inform",
+    "cwe": 570
+  },
+  "comparisonError": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "constParameter": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "constParameterCallback": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "constParameterPointer": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "constParameterReference": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "constStatement": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "constVariable": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "constVariablePointer": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "constVariableReference": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "containerOutOfBounds": {
+    "cwe": 710
+  },
+  "cstyleCast": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "ctuOneDefinitionRuleViolation": {
+    "confidence": "Inform",
+    "cwe": 758
+  },
+  "ctunullpointer": {
+    "cwe": 476
+  },
+  "ctunullpointerOutOfMemory": {
+    "confidence": "Inform",
+    "cwe": 476
+  },
+  "ctuuninitvar": {
+    "confidence": "Inform",
+    "cwe": 457
+  },
+  "dangerousTypeCast": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "danglingLifetime": {
+    "confidence": "Inform",
+    "cwe": 562
+  },
+  "deallocuse": {
+    "confidence": "Inform",
+    "cwe": 416
+  },
+  "duplInheritedMember": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "duplicateAssignExpression": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "duplicateBranch": {
+    "confidence": "Inform",
+    "cwe": 1041
+  },
+  "duplicateBreak": {
+    "confidence": "Inform",
+    "cwe": 561
+  },
+  "duplicateCondition": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "duplicateConditionalAssign": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "duplicateExpression": {
+    "confidence": "Inform",
+    "cwe": 1041
+  },
+  "duplicateExpressionTernary": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "duplicateValueTernary": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "exceptRethrowCopy": {
+    "confidence": "Inform",
+    "cwe": 460
+  },
+  "exceptThrowInDestructor": {
+    "confidence": "Inform",
+    "cwe": 460
+  },
+  "funcArgOrderDifferent": {
+    "confidence": "Inform",
+    "cwe": 683
+  },
+  "functionConst": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "functionStatic": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "getsCalled": {
+    "confidence": "Inform",
+    "cwe": 477
+  },
+  "identicalConditionAfterEarlyExit": {
+    "cwe": 710
+  },
+  "identicalInnerCondition": {
+    "cwe": 710
+  },
+  "ignoredReturnValue": {
+    "cwe": 252
+  },
+  "incorrectLogicOperator": {
+    "confidence": "Inform",
+    "cwe": 570
+  },
+  "incorrectStringBooleanError": {
+    "confidence": "Inform",
+    "cwe": 571
+  },
+  "initializerList": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "intToPointerCast": {
+    "confidence": "Inform",
+    "cwe": 681
+  },
+  "integerOverflow": {
+    "confidence": "Inform",
+    "cwe": 190
+  },
+  "integerOverflowCond": {
+    "confidence": "Inform",
+    "cwe": 190
+  },
+  "invalidFunctionArg": {
+    "confidence": "Inform",
+    "cwe": 628
+  },
+  "invalidLifetime": {
+    "confidence": "Inform",
+    "cwe": 562
+  },
+  "invalidPointerCast": {
+    "confidence": "Inform",
+    "cwe": 704
+  },
+  "invalidPrintfArgType_sint": {
+    "confidence": "Inform",
+    "cwe": 686
+  },
+  "invalidPrintfArgType_uint": {
+    "confidence": "Inform",
+    "cwe": 686
+  },
+  "invalidScanfArgType_int": {
+    "confidence": "Inform",
+    "cwe": 686
+  },
+  "invalidScanfFormatWidth": {
+    "cwe": 193
+  },
+  "invalidTestForOverflow": {
+    "confidence": "Inform",
+    "cwe": 252
+  },
+  "invalidscanf": {
+    "confidence": "Inform",
+    "cwe": 120
+  },
+  "iterateByValue": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "knownConditionTrueFalse": {
+    "confidence": "Inform",
+    "cwe": 571
+  },
+  "knownEmptyContainer": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "knownPointerToBool": {
+    "cwe": 570
+  },
+  "leakReturnValNotUsed": {
+    "cwe": 771
+  },
+  "legacyUninitvar": {
+    "confidence": "Inform",
+    "cwe": 457
+  },
+  "literalWithCharPtrCompare": {
+    "confidence": "Inform",
+    "cwe": 595
+  },
+  "memleak": {
+    "confidence": "Inform",
+    "cwe": 401
+  },
+  "memleakOnRealloc": {
+    "cwe": 401
+  },
+  "missingMemberCopy": {
+    "cwe": 1098
+  },
+  "missingOverride": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "missingReturn": {
+    "confidence": "Inform",
+    "cwe": 758
+  },
+  "moduloofone": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "multiCondition": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "negativeIndex": {
+    "confidence": "Inform",
+    "cwe": 786
+  },
+  "noConstructor": {
+    "cwe": 665
+  },
+  "noCopyConstructor": {
+    "cwe": 665
+  },
+  "noExplicitConstructor": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "noOperatorEq": {
+    "cwe": 665
+  },
+  "noValidConfiguration": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "nullPointer": {
+    "confidence": "Inform",
+    "cwe": 476
+  },
+  "nullPointerArithmetic": {
+    "confidence": "Inform",
+    "cwe": 252
+  },
+  "nullPointerArithmeticOutOfMemory": {
+    "confidence": "Inform",
+    "cwe": 252
+  },
+  "nullPointerArithmeticRedundantCheck": {
+    "confidence": "Inform",
+    "cwe": 252
+  },
+  "nullPointerOutOfMemory": {
+    "confidence": "Inform",
+    "cwe": 476
+  },
+  "nullPointerOutOfResources": {
+    "confidence": "Inform",
+    "cwe": 476
+  },
+  "nullPointerRedundantCheck": {
+    "confidence": "Inform",
+    "cwe": 476
+  },
+  "objectIndex": {
+    "confidence": "Inform",
+    "cwe": 758
+  },
+  "operatorEqVarError": {
+    "cwe": 665
+  },
+  "oppositeExpression": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "oppositeInnerCondition": {
+    "confidence": "Inform",
+    "cwe": 561
+  },
+  "passedByValue": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "passedByValueCallback": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "pointerOutOfBounds": {
+    "confidence": "Inform",
+    "cwe": 758
+  },
+  "pointerSize": {
+    "cwe": 467
+  },
+  "postfixOperator": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "preprocessorErrorDirective": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "publicAllocationError": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "readWriteOnlyFile": {
+    "confidence": "Inform",
+    "cwe": 401
+  },
+  "redundantAssignInSwitch": {
+    "confidence": "Inform",
+    "cwe": 563
+  },
+  "redundantAssignment": {
+    "confidence": "Inform",
+    "cwe": 563
+  },
+  "redundantCondition": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "redundantContinue": {
+    "confidence": "Inform",
+    "cwe": 561
+  },
+  "redundantCopyLocalConst": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "redundantIfRemove": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "redundantInitialization": {
+    "confidence": "Inform",
+    "cwe": 563
+  },
+  "redundantPointerOp": {
+    "cwe": 710
+  },
+  "resourceLeak": {
+    "confidence": "Inform",
+    "cwe": 775
+  },
+  "returnByReference": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "returnImplicitInt": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "selfAssignment": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "shadowArgument": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "shadowFunction": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "shadowVariable": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "shiftNegative": {
+    "confidence": "Inform",
+    "cwe": 758
+  },
+  "shiftNegativeLHS": {
+    "confidence": "Inform",
+    "cwe": 758
+  },
+  "shiftTooManyBits": {
+    "confidence": "Inform",
+    "cwe": 758
+  },
+  "shiftTooManyBitsSigned": {
+    "cwe": 758
+  },
+  "signConversion": {
+    "cwe": 195
+  },
+  "signConversionCond": {
+    "confidence": "Inform",
+    "cwe": 195
+  },
+  "sizeofsizeof": {
+    "confidence": "Inform",
+    "cwe": 252
+  },
+  "sprintfOverlappingData": {
+    "confidence": "Inform",
+    "cwe": 628
+  },
+  "staticFunction": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "staticStringCompare": {
+    "confidence": "Inform",
+    "cwe": 570
+  },
+  "stlFindInsert": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "subtractPointers": {
+    "confidence": "Inform",
+    "cwe": 570
+  },
+  "suspiciousFloatingPointCast": {
+    "cwe": 681
+  },
+  "suspiciousSemicolon": {
+    "cwe": 670
+  },
+  "syntaxError": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "templateRecursion": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "threadsafety-threadsafety": {
+    "confidence": "Inform",
+    "cwe": 362
+  },
+  "threadsafety-unsafe-call": {
+    "confidence": "Inform",
+    "cwe": 362
+  },
+  "throwInNoexceptFunction": {
+    "cwe": 460
+  },
+  "truncLongCastAssignment": {
+    "confidence": "Inform",
+    "cwe": 197
+  },
+  "truncLongCastReturn": {
+    "confidence": "Inform",
+    "cwe": 197
+  },
+  "unassignedVariable": {
+    "confidence": "Inform",
+    "cwe": 457
+  },
+  "uninitDerivedMemberVar": {
+    "cwe": 665
+  },
+  "uninitMemberVar": {
+    "cwe": 710
+  },
+  "uninitMemberVarPrivate": {
+    "cwe": 710
+  },
+  "uninitdata": {
+    "confidence": "Inform",
+    "cwe": 457
+  },
+  "uninitvar": {
+    "confidence": "Inform",
+    "cwe": 457
+  },
+  "unknownEvaluationOrder": {
+    "confidence": "Inform",
+    "cwe": 768
+  },
+  "unknownMacro": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "unreachableCode": {
+    "confidence": "Inform",
+    "cwe": 561
+  },
+  "unreadVariable": {
+    "confidence": "Inform",
+    "cwe": 563,
+    "severity": "Information"
+  },
+  "unsignedLessThanZero": {
+    "confidence": "Inform",
+    "cwe": 570
+  },
+  "unsignedPositive": {
+    "confidence": "Inform",
+    "cwe": 570
+  },
+  "unusedAllocatedMemory": {
+    "confidence": "Inform",
+    "cwe": 563
+  },
+  "unusedFunction": {
+    "confidence": "Inform",
+    "cwe": 561
+  },
+  "unusedLabel": {
+    "confidence": "Inform",
+    "cwe": 561
+  },
+  "unusedLabelConfiguration": {
+    "confidence": "Inform",
+    "cwe": 561
+  },
+  "unusedPrivateFunction": {
+    "confidence": "Inform",
+    "cwe": 561
+  },
+  "unusedStructMember": {
+    "confidence": "Inform",
+    "cwe": 563,
+    "severity": "Information"
+  },
+  "unusedVariable": {
+    "confidence": "Inform",
+    "cwe": 563
+  },
+  "useInitializationList": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "useStlAlgorithm": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "uselessAssignmentArg": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "uselessAssignmentPtrArg": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "uselessCallsEmpty": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "uselessCallsSubstr": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "uselessOverride": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "va_end_missing": {
+    "confidence": "Inform",
+    "cwe": 401
+  },
+  "va_list_usedBeforeStarted": {
+    "cwe": 401
+  },
+  "va_start_subsequentCalls": {
+    "confidence": "Inform",
+    "cwe": 401
+  },
+  "varFuncNullUB": {
+    "confidence": "Inform",
+    "cwe": 475
+  },
+  "variableScope": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "virtualCallInConstructor": {
+    "confidence": "Inform",
+    "cwe": 710
+  },
+  "wrongPrintfScanfArgNum": {
+    "confidence": "Inform",
+    "cwe": 685
+  },
+  "y2038-unsafe-call": {
+    "cwe": 190
+  },
+  "zerodivcond": {
+    "confidence": "Inform",
+    "cwe": 369
+  }
+}

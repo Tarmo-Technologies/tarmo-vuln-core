@@ -1,0 +1,165 @@
+name: Security Scanning
+
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * *"  # Daily at 06:00 UTC
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v4
+      - run: semgrep scan --config p/python --config p/security-audit --config p/owasp-top-ten --config p/secrets --sarif --output semgrep-results.sarif .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semgrep-sarif
+          path: semgrep-results.sarif
+
+  bandit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v7
+      - run: uv pip install --system "bandit[sarif,toml]"
+      - run: bandit -r tarmo_vuln_core/ -ll -f json -o bandit-results.json || true
+      - run: bandit -r tarmo_vuln_core/ -ll -f sarif -o bandit-results.sarif || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-results
+          path: |
+            bandit-results.json
+            bandit-results.sarif
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gitleaks-results
+          path: results.sarif
+
+  trufflehog:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trufflehog-results
+          path: trufflehog-results.json
+
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v7
+      - run: python -m venv .venv
+      - run: uv pip install --python .venv/bin/python "maturin>=1.7"
+      - run: .venv/bin/maturin develop --release
+      - run: uv pip install --python .venv/bin/python -e ".[dev]"
+      - run: uv pip install --python .venv/bin/python pip-audit
+      - run: .venv/bin/pip-audit --format=json --output pip-audit-results.json || true
+      - run: .venv/bin/pip-audit --format=cyclonedx-json --output pip-audit-cyclonedx.json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pip-audit-results
+          path: |
+            pip-audit-results.json
+            pip-audit-cyclonedx.json
+
+  dependency-review:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          deny-licenses: GPL-2.0, GPL-3.0, AGPL-3.0
+
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v7
+      - run: python -m venv .venv
+      - run: uv pip install --python .venv/bin/python "maturin>=1.7"
+      - run: .venv/bin/maturin develop --release
+      - run: uv pip install --python .venv/bin/python -e ".[dev]"
+      - run: uv pip install --python .venv/bin/python pip-licenses
+      - run: >-
+          .venv/bin/pip-licenses --allow-only="
+          MIT License;MIT;MIT OR Apache-2.0;MIT AND PSF-2.0;
+          BSD License;BSD;BSD-2-Clause;BSD-3-Clause;
+          Apache Software License;Apache-2.0;Apache-2.0 OR BSD-2-Clause;Apache-2.0 OR BSD-3-Clause;Apache Software License; BSD License;
+          ISC License (ISCL);
+          Python Software Foundation License;PSF-2.0;
+          Mozilla Public License 2.0 (MPL 2.0);
+          LGPL-3.0-only"
+      - run: .venv/bin/pip-licenses --format=csv --output-file=license-report.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: license-report
+          path: license-report.csv

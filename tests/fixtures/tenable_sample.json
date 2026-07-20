@@ -1,0 +1,169 @@
+{
+  "vulnerabilities": [
+    {
+      "asset": {
+        "device_type": "general-purpose",
+        "fqdn": "web.example.com",
+        "hostname": "web",
+        "id": "asset-uuid-1",
+        "ipv4": "10.0.0.1",
+        "operating_system": "Ubuntu 22.04"
+      },
+      "plugin": {
+        "id": 42873,
+        "name": "SSL Medium Strength Cipher Suites Supported (SWEET32)",
+        "family": "General",
+        "description": "The remote host supports the use of SSL ciphers that offer medium strength encryption.",
+        "solution": "Reconfigure the affected application, if possible, to avoid use of medium strength ciphers.",
+        "synopsis": "The remote service supports the use of medium strength SSL ciphers.",
+        "cvss_base_score": 5.0,
+        "cvss3_base_score": 7.5,
+        "cvss_vector": "CVSS2#AV:N/AC:M/Au:N/C:P/I:P/A:N",
+        "cvss3_vector": "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N",
+        "risk_factor": "Medium",
+        "cve": ["CVE-2016-2183"],
+        "xref": ["CWE-326"]
+      },
+      "port": {
+        "port": 443,
+        "protocol": "TCP",
+        "service": "https"
+      },
+      "severity": "medium",
+      "severity_id": 2,
+      "state": "OPEN"
+    },
+    {
+      "asset": {
+        "device_type": "general-purpose",
+        "fqdn": "db.example.com",
+        "hostname": "db",
+        "id": "asset-uuid-2",
+        "ipv4": "10.0.0.2",
+        "operating_system": "CentOS 7"
+      },
+      "plugin": {
+        "id": 42873,
+        "name": "SSL Medium Strength Cipher Suites Supported (SWEET32)",
+        "family": "General",
+        "description": "The remote host supports the use of SSL ciphers that offer medium strength encryption.",
+        "solution": "Reconfigure the affected application, if possible, to avoid use of medium strength ciphers.",
+        "synopsis": "The remote service supports the use of medium strength SSL ciphers.",
+        "cvss_base_score": 5.0,
+        "cvss3_base_score": 7.5,
+        "cvss_vector": "CVSS2#AV:N/AC:M/Au:N/C:P/I:P/A:N",
+        "cvss3_vector": "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N",
+        "risk_factor": "Medium",
+        "cve": ["CVE-2016-2183"],
+        "xref": ["CWE-326"]
+      },
+      "port": {
+        "port": 443,
+        "protocol": "TCP",
+        "service": "https"
+      },
+      "severity": "medium",
+      "severity_id": 2,
+      "state": "OPEN"
+    },
+    {
+      "asset": {
+        "device_type": "general-purpose",
+        "fqdn": "web.example.com",
+        "hostname": "web",
+        "id": "asset-uuid-1",
+        "ipv4": "10.0.0.1",
+        "operating_system": "Ubuntu 22.04"
+      },
+      "plugin": {
+        "id": 51192,
+        "name": "SSL Certificate Cannot Be Trusted",
+        "family": "General",
+        "description": "The server's SSL certificate cannot be trusted.",
+        "solution": "Purchase or generate a proper certificate for this service.",
+        "synopsis": "The SSL certificate for this service cannot be trusted.",
+        "cvss_base_score": 6.4,
+        "cvss3_base_score": null,
+        "cvss_vector": "CVSS2#AV:N/AC:L/Au:N/C:P/I:P/A:N",
+        "cvss3_vector": null,
+        "risk_factor": "Medium",
+        "cve": [],
+        "xref": []
+      },
+      "port": {
+        "port": 443,
+        "protocol": "TCP",
+        "service": "https"
+      },
+      "severity": "medium",
+      "severity_id": 2,
+      "state": "OPEN"
+    },
+    {
+      "asset": {
+        "device_type": "general-purpose",
+        "fqdn": "admin.example.com",
+        "hostname": "admin",
+        "id": "asset-uuid-3",
+        "ipv4": "10.0.0.3",
+        "operating_system": "Windows Server 2019"
+      },
+      "plugin": {
+        "id": 65821,
+        "name": "SSL RC4 Cipher Suites Supported (Bar Mitzvah)",
+        "family": "General",
+        "description": "The remote service supports the use of the RC4 cipher.",
+        "solution": "Reconfigure the affected application to avoid use of the RC4 cipher.",
+        "synopsis": "The remote service supports the use of the RC4 cipher.",
+        "cvss_base_score": 4.3,
+        "cvss3_base_score": null,
+        "cvss_vector": "CVSS2#AV:N/AC:M/Au:N/C:P/I:N/A:N",
+        "cvss3_vector": null,
+        "risk_factor": "Low",
+        "cve": [],
+        "xref": []
+      },
+      "port": {
+        "port": 8443,
+        "protocol": "TCP",
+        "service": "https"
+      },
+      "severity": "low",
+      "severity_id": 1,
+      "state": "OPEN"
+    },
+    {
+      "asset": {
+        "device_type": "general-purpose",
+        "fqdn": "web.example.com",
+        "hostname": "web",
+        "id": "asset-uuid-1",
+        "ipv4": "10.0.0.1",
+        "operating_system": "Ubuntu 22.04"
+      },
+      "plugin": {
+        "id": 10107,
+        "name": "HTTP Server Type and Version",
+        "family": "Web Servers",
+        "description": "This detects the HTTP Server's type and version.",
+        "solution": "Configure your server to use an alternate name or remove the version header.",
+        "synopsis": "A web server is running on the remote host.",
+        "cvss_base_score": null,
+        "cvss3_base_score": null,
+        "cvss_vector": null,
+        "cvss3_vector": null,
+        "risk_factor": "None",
+        "cve": [],
+        "xref": []
+      },
+      "port": {
+        "port": 80,
+        "protocol": "TCP",
+        "service": "http"
+      },
+      "severity": "info",
+      "severity_id": 0,
+      "state": "OPEN"
+    }
+  ]
+}

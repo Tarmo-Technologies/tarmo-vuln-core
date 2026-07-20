@@ -1,0 +1,793 @@
+- id: ssl-tls-weak-cipher
+  title: "Weak TLS Cipher Suites Enabled"
+  severity: HIGH
+  cvss_score: 8.2
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 326
+  owasp_id: "A04:2025"
+  attack_ids: ["T1557"]
+  attack_tactics: ["Collection"]
+  methodology_items: ["CRYP-01"]
+  aliases:
+    nessus_plugin: [42873, 65821]
+    cve: ["CVE-2016-2183", "CVE-2013-2566"]
+  description: |
+    The remote server supports cipher suites that use weak or deprecated
+    algorithms, reducing the confidentiality of transmitted data. Weak
+    ciphers include RC4, DES, 3DES (SWEET32), EXPORT-grade, and NULL ciphers.
+  impact: |
+    An attacker in a privileged network position may be able to decrypt
+    TLS-protected communications, exposing sensitive data in transit including
+    credentials, session tokens, and personal information.
+  remediation: |
+    Disable weak cipher suites (RC4, DES, 3DES, EXPORT, NULL) and enforce
+    TLS 1.2 or 1.3 only. Refer to Mozilla's SSL Configuration Generator
+    for server-specific guidance: https://ssl-config.mozilla.org/
+  references:
+    - "https://ssl-config.mozilla.org/"
+    - "https://cwe.mitre.org/data/definitions/326.html"
+    - "https://sweet32.info/"
+  compliance_refs:
+    - "PCI-DSS 6.3.2"
+    - "ISO27001 A.14.1.2"
+    - "NIST SP 800-52r2"
+  steps:
+    - "Run: nmap --script ssl-enum-ciphers -p 443 <host>"
+    - "Observe weak cipher suites (RC4, 3DES, EXPORT) in the output."
+    - "Confirm with: sslyze --regular <host>:443"
+    - "Cross-reference with Mozilla SSL Configuration Generator to identify deviations."
+
+- id: open-port-telnet
+  title: "Telnet Service Exposed"
+  severity: CRITICAL
+  cvss_score: 9.1
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 319
+  attack_ids: ["T1078", "T1040"]
+  attack_tactics: ["Defense Evasion", "Credential Access"]
+  aliases:
+    nessus_plugin: [10281]
+    cve: []
+  description: |
+    The Telnet service (TCP/23) is accessible from the network. Telnet
+    transmits all data, including credentials, in plaintext with no encryption
+    or integrity protection.
+  impact: |
+    An attacker on the same network segment can intercept Telnet sessions
+    and capture credentials or session data using passive network sniffing.
+    Remote code execution may be possible if default credentials are in use.
+  remediation: |
+    Disable the Telnet service and replace it with SSH (OpenSSH). If Telnet
+    is required for legacy device management, restrict access via firewall
+    rules to only known management IP addresses.
+  references:
+    - "https://cwe.mitre.org/data/definitions/319.html"
+    - "https://www.ssh.com/academy/ssh/telnet"
+  compliance_refs:
+    - "PCI-DSS 1.3.2"
+    - "ISO27001 A.13.1.3"
+    - "NIST SP 800-53 AC-17"
+  steps:
+    - "Run: nmap -sV -p 23 <host> to confirm Telnet is open and responsive."
+    - "Connect with: telnet <host> and observe the cleartext banner/login prompt."
+    - "Capture traffic with Wireshark on the same network segment to demonstrate plaintext credential exposure."
+    - "Verify no firewall restriction limits access to authorised IPs only."
+
+- id: ssh-weak-key-exchange
+  title: "SSH Weak Key Exchange Algorithms Enabled"
+  severity: HIGH
+  cvss_score: 8.2
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 326
+  aliases:
+    nessus_plugin: [70657, 153953]
+    cve: []
+  description: |
+    The SSH server advertises weak key exchange algorithms such as
+    diffie-hellman-group1-sha1 (Oakley Group 2, 1024-bit) or
+    diffie-hellman-group14-sha1. These algorithms are considered weak
+    and susceptible to Logjam and similar attacks.
+  impact: |
+    A passive eavesdropper with sufficient computational resources may
+    precompute discrete logarithms to decrypt SSH sessions negotiated
+    using these algorithms, exposing session contents and credentials.
+  remediation: |
+    Configure the SSH server to advertise only strong key exchange algorithms
+    such as curve25519-sha256, ecdh-sha2-nistp256, and
+    diffie-hellman-group14-sha256. Remove group1 and SHA-1-based algorithms
+    from the KexAlgorithms directive in sshd_config.
+  references:
+    - "https://cwe.mitre.org/data/definitions/326.html"
+    - "https://www.openssh.com/legacy.html"
+  compliance_refs:
+    - "PCI-DSS 6.3.2"
+    - "ISO27001 A.14.1.2"
+  steps:
+    - "Run: nmap --script ssh2-enum-algos -p 22 <host>"
+    - "Identify weak key exchange algorithms (group1, sha1-based) in the output."
+    - "Confirm: ssh -vvv <host> 2>&1 | grep 'kex: algorithm'"
+    - "Document which weak KEX algorithms the server offers."
+
+- id: snmp-default-community
+  title: "SNMP Default Community String"
+  severity: HIGH
+  cvss_score: 8.7
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 522
+  attack_ids: ["T1078", "T1590"]
+  attack_tactics: ["Defense Evasion", "Reconnaissance"]
+  aliases:
+    nessus_plugin: [41028, 10264]
+    cve: []
+  description: |
+    The network device is configured with default SNMP community strings
+    (e.g., 'public' for read-only, 'private' for read-write). SNMP community
+    strings function as passwords and the defaults are universally known.
+  impact: |
+    An attacker can enumerate the full device configuration, network topology,
+    ARP tables, routing tables, and interface information. With a read-write
+    community string, the attacker may modify device configuration, disrupt
+    network operations, or use the device as a pivot point.
+  remediation: |
+    Replace all default SNMP community strings with long, randomly generated
+    values. Prefer SNMPv3 with authentication and encryption over SNMPv1/v2c.
+    Restrict SNMP access to known management station IPs using ACLs.
+  references:
+    - "https://cwe.mitre.org/data/definitions/522.html"
+    - "https://www.cisecurity.org/controls/inventory-and-control-of-network-devices"
+  compliance_refs:
+    - "PCI-DSS 8.3.9"
+    - "ISO27001 A.9.4.3"
+    - "CIS Control 4.2"
+  steps:
+    - "Run: onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings.txt <host>"
+    - "If 'public' or 'private' is accepted, record the community string."
+    - "Run: snmpwalk -v2c -c public <host> to enumerate device information."
+    - "Document the MIB data retrieved, demonstrating information disclosure scope."
+
+- id: smb-signing-disabled
+  title: "SMB Signing Not Required"
+  severity: HIGH
+  cvss_score: 7.6
+  cvss_vector: "CVSS:4.0/AV:A/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 294
+  attack_ids: ["T1557", "T1187", "T1550.002"]
+  attack_tactics: ["Collection", "Credential Access", "Lateral Movement"]
+  aliases:
+    nessus_plugin: [57608]
+    cve: []
+  description: |
+    The remote SMB server does not require message signing. Without signing,
+    SMB sessions are vulnerable to relay attacks where an attacker intercepts
+    and forwards authentication messages to gain unauthorized access.
+  impact: |
+    An attacker on the network can perform NTLM relay attacks (e.g., with
+    Responder + ntlmrelayx) to authenticate to other hosts as the victim user,
+    potentially achieving lateral movement or privilege escalation within the domain.
+  remediation: |
+    Enable and require SMB signing on all Windows hosts via Group Policy:
+    Computer Configuration > Windows Settings > Security Settings > Local Policies >
+    Security Options > "Microsoft network server: Digitally sign communications (always)".
+    Apply the policy to both servers and workstations.
+  references:
+    - "https://cwe.mitre.org/data/definitions/294.html"
+    - "https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/microsoft-network-server-digitally-sign-communications-always"
+  compliance_refs:
+    - "PCI-DSS 4.2.1"
+    - "ISO27001 A.14.1.3"
+    - "CIS Control 3.10"
+  steps:
+    - "Run: nmap --script smb-security-mode -p 445 <host>"
+    - "Confirm 'message_signing: disabled' or 'not required' in output."
+    - "Run: crackmapexec smb <subnet>/24 --gen-relay-list unsigned_hosts.txt"
+    - "Document all hosts that do not require SMB signing."
+
+- id: anonymous-ftp
+  title: "Anonymous FTP Access Enabled"
+  severity: MEDIUM
+  cvss_score: 6.9
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 284
+  aliases:
+    nessus_plugin: [10079]
+    cve: []
+  description: |
+    The FTP server permits anonymous authentication, allowing any user to
+    log in without credentials. Anonymous FTP is commonly used to host
+    public files but is frequently misconfigured to expose sensitive data.
+  impact: |
+    An unauthenticated attacker can browse, download, and potentially upload
+    files to the FTP server. Sensitive files such as configuration files,
+    source code, or credentials may be inadvertently exposed in the anonymous
+    file tree.
+  remediation: |
+    Disable anonymous FTP access unless explicitly required for a public file
+    distribution service. If anonymous access is required, restrict it to a
+    dedicated read-only directory with no sensitive files. Replace FTP with
+    SFTP or FTPS for all authenticated transfers.
+  references:
+    - "https://cwe.mitre.org/data/definitions/284.html"
+    - "https://www.tenable.com/plugins/nessus/10079"
+  compliance_refs:
+    - "PCI-DSS 1.3.2"
+    - "ISO27001 A.9.4.1"
+    - "NIST SP 800-53 AC-3"
+  steps:
+    - "Run: nmap --script ftp-anon -p 21 <host>"
+    - "Confirm anonymous login is allowed: ftp <host> → user: anonymous"
+    - "List directory contents and document any sensitive files accessible."
+    - "Attempt file upload to assess write access."
+
+- id: rdp-without-nla
+  title: "RDP Network Level Authentication Not Enforced"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 287
+  attack_ids: ["T1021.001", "T1110"]
+  attack_tactics: ["Lateral Movement", "Credential Access"]
+  aliases:
+    nessus_plugin: [58435]
+    cve: []
+  description: |
+    The Remote Desktop Protocol (RDP) service is configured without Network
+    Level Authentication (NLA). Without NLA, authentication occurs after the
+    RDP session is established, exposing the Windows login screen to the
+    network and allowing pre-authentication exploitation.
+  impact: |
+    Without NLA, the host is exposed to pre-authentication vulnerabilities
+    such as BlueKeep (CVE-2019-0708) and DejaBlue. Attackers can reach the
+    Windows login screen without credentials, enabling brute-force attacks
+    and exploitation of RDP parsing vulnerabilities.
+  remediation: |
+    Enable Network Level Authentication (NLA) in System Properties >
+    Remote Desktop. Enforce NLA via Group Policy: Computer Configuration >
+    Administrative Templates > Windows Components > Remote Desktop Services >
+    Require NLA. Restrict RDP access to trusted IP ranges via firewall rules.
+  references:
+    - "https://cwe.mitre.org/data/definitions/287.html"
+    - "https://docs.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-allow-access"
+    - "https://nvd.nist.gov/vuln/detail/CVE-2019-0708"
+  compliance_refs:
+    - "PCI-DSS 8.4.2"
+    - "ISO27001 A.9.4.2"
+    - "HIPAA §164.312(d)"
+  steps:
+    - "Run: nmap --script rdp-enum-encryption -p 3389 <host>"
+    - "Confirm NLA is not required in the output."
+    - "Attempt connection: xfreerdp /v:<host> and observe if the login screen appears without NLA challenge."
+    - "Document the lack of NLA enforcement and exposure to pre-auth attack surface."
+
+- id: dns-zone-transfer
+  title: "DNS Zone Transfer Permitted"
+  severity: MEDIUM
+  cvss_score: 6.9
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 200
+  attack_ids: ["T1590.002", "T1018"]
+  attack_tactics: ["Reconnaissance", "Discovery"]
+  aliases:
+    nessus_plugin: [10595]
+    cve: []
+  description: |
+    The DNS server allows unauthorized zone transfer requests (AXFR). Zone
+    transfers are designed for replication between authoritative DNS servers
+    but when unrestricted, allow any client to download the complete DNS zone.
+  impact: |
+    An attacker can obtain a complete list of internal hostnames, IP addresses,
+    mail servers, and service records, significantly reducing reconnaissance
+    effort and enabling targeted attacks against internal infrastructure.
+  remediation: |
+    Restrict zone transfers to known secondary DNS server IP addresses using
+    the allow-transfer directive. Disable zone transfers entirely if secondary
+    DNS replication is not in use. Implement TSIG authentication for legitimate
+    zone transfer operations.
+  references:
+    - "https://cwe.mitre.org/data/definitions/200.html"
+    - "https://www.tenable.com/plugins/nessus/10595"
+  compliance_refs:
+    - "PCI-DSS 1.3.2"
+    - "ISO27001 A.13.1.3"
+  steps:
+    - "Identify the authoritative DNS server for the target domain."
+    - "Run: dig @<dns-server> <domain> AXFR"
+    - "Observe if a full zone listing is returned."
+    - "Document all discovered hostnames and IP addresses from the zone data."
+
+- id: icmp-timestamp-disclosure
+  title: "ICMP Timestamp Response Enabled"
+  severity: MEDIUM
+  cvss_score: 6.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 200
+  aliases:
+    nessus_plugin: [10114]
+    cve: []
+  description: |
+    The remote host responds to ICMP timestamp requests (type 13). The
+    response includes the host's current system time, which can be used
+    to fingerprint the operating system and infer patch levels.
+  impact: |
+    ICMP timestamp responses disclose the host's system time, aiding
+    OS fingerprinting and enabling time-based attacks such as timestamp
+    prediction for TCP sequence numbers on older systems.
+  remediation: |
+    Configure the firewall or host-based packet filter to block ICMP
+    timestamp requests (type 13) and replies (type 14). On Linux, add
+    an iptables rule: iptables -A INPUT -p icmp --icmp-type timestamp-request -j DROP
+  references:
+    - "https://cwe.mitre.org/data/definitions/200.html"
+    - "https://www.tenable.com/plugins/nessus/10114"
+  compliance_refs:
+    - "ISO27001 A.13.1.3"
+    - "CIS Control 4.8"
+  steps:
+    - "Run: nmap --script icmp-timestamp <host>"
+    - "Alternatively: hping3 --icmp --icmptype 13 <host>"
+    - "Confirm a timestamp reply is received with the host's system time."
+    - "Document the disclosed timestamp value."
+
+- id: ssl-self-signed-certificate
+  title: "SSL/TLS Self-Signed Certificate"
+  severity: HIGH
+  cvss_score: 7.6
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 295
+  owasp_id: "A04:2025"
+  methodology_items: ["CRYP-01"]
+  aliases:
+    nessus_plugin: [57582]
+    cve: []
+  description: |
+    The remote host presents an SSL/TLS certificate that is self-signed and
+    not issued by a trusted Certificate Authority (CA). Browsers and clients
+    will display trust warnings, and users cannot verify the server's identity.
+  impact: |
+    Without a trusted CA-signed certificate, users are vulnerable to
+    man-in-the-middle attacks. An attacker can present their own self-signed
+    certificate and intercept encrypted traffic if users accept the trust
+    warning. Certificate pinning and HSTS cannot be enforced.
+  remediation: |
+    Replace the self-signed certificate with one issued by a trusted CA.
+    For public-facing services, use a certificate from a publicly trusted CA
+    (e.g., Let's Encrypt for free DV certificates). For internal services,
+    deploy an internal PKI with the root CA distributed to all clients.
+  references:
+    - "https://cwe.mitre.org/data/definitions/295.html"
+    - "https://letsencrypt.org/"
+  compliance_refs:
+    - "PCI-DSS 6.3.2"
+    - "ISO27001 A.14.1.2"
+  steps:
+    - "Run: openssl s_client -connect <host>:443 2>/dev/null | openssl x509 -noout -text"
+    - "Check the Issuer and Subject fields — if they are identical, the cert is self-signed."
+    - "Verify: openssl verify -CAfile /etc/ssl/certs/ca-certificates.crt <cert.pem>"
+    - "Document the certificate details including subject, issuer, and expiry."
+
+- id: ssl-certificate-expired
+  title: "SSL/TLS Certificate Expired"
+  severity: HIGH
+  cvss_score: 7.6
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 295
+  owasp_id: "A04:2025"
+  methodology_items: ["CRYP-01"]
+  aliases:
+    nessus_plugin: [15901]
+    cve: []
+  description: |
+    The SSL/TLS certificate presented by the remote host has passed its
+    expiry date. Expired certificates indicate a failure in certificate
+    lifecycle management and may cause service disruptions and user trust errors.
+  impact: |
+    Clients will receive certificate validation errors and may be unable to
+    establish secure connections. Users who bypass the warning are exposed to
+    man-in-the-middle attacks. Expired certificates indicate immature
+    certificate management practices across the organization.
+  remediation: |
+    Renew the certificate immediately through the issuing CA. Implement
+    automated certificate renewal using tools such as certbot (Let's Encrypt)
+    or ACME protocol clients. Set up monitoring alerts for certificates
+    expiring within 30 days.
+  references:
+    - "https://cwe.mitre.org/data/definitions/295.html"
+    - "https://certbot.eff.org/"
+  compliance_refs:
+    - "PCI-DSS 6.3.2"
+    - "ISO27001 A.14.1.2"
+  steps:
+    - "Run: echo | openssl s_client -connect <host>:443 2>/dev/null | openssl x509 -noout -dates"
+    - "Confirm the notAfter date is in the past."
+    - "Check all services on the host for expired certificates across multiple ports."
+    - "Document the certificate subject, expiry date, and affected services."
+
+- id: ssl-v2-enabled
+  title: "SSL 2.0 (SSLv2) Enabled — Deprecated Protocol"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 326
+  owasp_id: "A04:2025"
+  aliases:
+    nessus_plugin: [20007]
+    cve: []
+  description: |
+    The remote server accepts SSL 2.0 connections. SSL 2.0 was deprecated in
+    RFC 6176 (2011) and is fundamentally broken — it suffers from weak
+    MAC construction, susceptibility to cipher-suite rollback attacks, and
+    no protection against connection truncation. All modern clients have
+    removed support for SSLv2.
+  impact: |
+    An attacker can exploit SSLv2 weaknesses to decrypt traffic, forge
+    messages, or force a connection downgrade. The DROWN attack (CVE-2016-0800)
+    allows cross-protocol attacks that decrypt TLS 1.2 sessions if a server
+    shares a private key with any SSLv2-enabled service.
+  remediation: |
+    Disable SSL 2.0 on all services. Configure TLS 1.2 and TLS 1.3 as the
+    minimum accepted protocol versions. On OpenSSL-based servers, add
+    `ssl_protocols TLSv1.2 TLSv1.3;` (nginx) or `SSLProtocol -all +TLSv1.2 +TLSv1.3`
+    (Apache). Rotate any private keys that were shared with SSLv2-enabled services.
+  references:
+    - "https://drownattack.com/"
+    - "https://tools.ietf.org/html/rfc6176"
+    - "https://cwe.mitre.org/data/definitions/326.html"
+  compliance_refs:
+    - "PCI-DSS 4.2.1"
+    - "ISO27001 A.14.1.2"
+    - "NIST SP 800-52r2"
+  steps:
+    - "Run: sslyze --sslv2 <host>:443 — confirm SSLv2 cipher suites are accepted."
+    - "Alternatively: nmap --script ssl-enum-ciphers -p 443 <host> and look for SSLv2 entries."
+    - "Document the cipher suites negotiated under SSLv2."
+
+- id: ssl-v3-enabled
+  title: "SSL 3.0 (SSLv3) Enabled — POODLE Vulnerable"
+  severity: HIGH
+  cvss_score: 7.6
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 326
+  owasp_id: "A04:2025"
+  aliases:
+    nessus_plugin: [35291]
+    cve: ["CVE-2014-3566"]
+  description: |
+    The remote server accepts SSL 3.0 connections. SSL 3.0 was deprecated in
+    RFC 7568 (2015) and is vulnerable to the POODLE attack (Padding Oracle On
+    Downgraded Legacy Encryption, CVE-2014-3566), which allows decryption of
+    HTTP cookies and other sensitive data.
+  impact: |
+    An active man-in-the-middle attacker can force a protocol downgrade to
+    SSLv3 and then use the POODLE padding oracle to decrypt session cookies
+    byte-by-byte, enabling session hijacking against web application users.
+  remediation: |
+    Disable SSL 3.0 on all services. Enforce TLS 1.2 or TLS 1.3 as the minimum
+    protocol version. Use TLS_FALLBACK_SCSV to prevent protocol downgrade attacks
+    on clients that still attempt SSLv3 fallback.
+  references:
+    - "https://poodle.io/"
+    - "https://tools.ietf.org/html/rfc7568"
+    - "https://cwe.mitre.org/data/definitions/326.html"
+  compliance_refs:
+    - "PCI-DSS 4.2.1"
+    - "ISO27001 A.14.1.2"
+    - "NIST SP 800-52r2"
+  steps:
+    - "Run: sslyze --sslv3 <host>:443 — confirm SSLv3 cipher suites are accepted."
+    - "Alternatively: nmap --script ssl-enum-ciphers -p 443 <host> and look for SSLv3 entries."
+    - "Document all cipher suites negotiated under SSLv3."
+
+- id: tls-1-0-enabled
+  title: "TLS 1.0 Enabled — Deprecated Protocol"
+  severity: HIGH
+  cvss_score: 8.2
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 326
+  owasp_id: "A04:2025"
+  aliases:
+    nessus_plugin: [104743]
+    cve: ["CVE-2011-3389"]
+  description: |
+    The remote server accepts TLS 1.0 connections. TLS 1.0 was deprecated in
+    RFC 8996 (2021) and is vulnerable to the BEAST attack (CVE-2011-3389) in
+    CBC mode. PCI-DSS 3.2 required TLS 1.0 to be disabled by June 2018 for
+    all payment systems.
+  impact: |
+    An active attacker can exploit TLS 1.0 weaknesses (BEAST, POODLE variant,
+    MAC-then-encrypt padding oracle issues) to decrypt application-layer data,
+    potentially exposing session tokens and sensitive user data.
+  remediation: |
+    Disable TLS 1.0 and configure TLS 1.2 as the minimum accepted protocol.
+    TLS 1.3 should be enabled and preferred. Use Mozilla's SSL Configuration
+    Generator to produce server-specific configuration directives.
+  references:
+    - "https://tools.ietf.org/html/rfc8996"
+    - "https://ssl-config.mozilla.org/"
+    - "https://cwe.mitre.org/data/definitions/326.html"
+  compliance_refs:
+    - "PCI-DSS 4.2.1"
+    - "ISO27001 A.14.1.2"
+    - "NIST SP 800-52r2"
+    - "HIPAA §164.312(e)(2)(ii)"
+  steps:
+    - "Run: sslyze --tlsv1 <host>:443 — confirm TLS 1.0 is accepted."
+    - "Alternatively: nmap --script ssl-enum-ciphers -p 443 <host>."
+    - "Document all cipher suites available under TLS 1.0."
+
+- id: tls-1-1-enabled
+  title: "TLS 1.1 Enabled — Deprecated Protocol"
+  severity: HIGH
+  cvss_score: 8.2
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 326
+  owasp_id: "A04:2025"
+  aliases:
+    nessus_plugin: [157288]
+    cve: []
+  description: |
+    The remote server accepts TLS 1.1 connections. TLS 1.1 was deprecated in
+    RFC 8996 (2021) along with TLS 1.0. While TLS 1.1 addressed BEAST by
+    requiring random IVs, it still uses older cryptographic primitives and
+    lacks the improvements present in TLS 1.2 (AEAD ciphers, SHA-256+ PRF).
+  impact: |
+    TLS 1.1 lacks support for AEAD cipher suites (GCM, ChaCha20-Poly1305)
+    and relies on older PRF construction. While not directly exploited by
+    known critical attacks, its presence expands the attack surface and
+    violates current compliance requirements.
+  remediation: |
+    Disable TLS 1.1 and configure TLS 1.2 as the minimum accepted protocol.
+    Enable TLS 1.3 for optimal security. Use Mozilla's SSL Configuration
+    Generator for server-specific directives.
+  references:
+    - "https://tools.ietf.org/html/rfc8996"
+    - "https://ssl-config.mozilla.org/"
+    - "https://cwe.mitre.org/data/definitions/326.html"
+  compliance_refs:
+    - "PCI-DSS 4.2.1"
+    - "ISO27001 A.14.1.2"
+    - "NIST SP 800-52r2"
+  steps:
+    - "Run: sslyze --tlsv1_1 <host>:443 — confirm TLS 1.1 is accepted."
+    - "Alternatively: nmap --script ssl-enum-ciphers -p 443 <host>."
+    - "Document cipher suites available under TLS 1.1."
+
+- id: openssl-heartbleed
+  title: "OpenSSL Heartbleed (CVE-2014-0160)"
+  severity: HIGH
+  cvss_score: 8.7
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 125
+  owasp_id: "A03:2025"
+  attack_ids: ["T1190"]
+  attack_tactics: ["Initial Access"]
+  aliases:
+    nessus_plugin: [73412]
+    cve: ["CVE-2014-0160"]
+  description: |
+    The remote host is running a version of OpenSSL vulnerable to the Heartbleed
+    bug (CVE-2014-0160). A missing bounds check in the TLS heartbeat extension
+    allows an attacker to read up to 64 KB of server process memory per request
+    without authentication.
+  impact: |
+    An attacker can repeatedly read 64 KB chunks of server memory, potentially
+    exposing private TLS keys, session tokens, usernames, passwords, and any
+    other data processed by the affected application. Exploitation requires no
+    authentication and leaves minimal log traces.
+  remediation: |
+    Upgrade OpenSSL to 1.0.1g or later (or apply the vendor patch).
+    After patching, revoke and reissue all TLS certificates on the affected
+    host, invalidate all active sessions, and change all credentials that may
+    have been processed by the vulnerable service.
+  references:
+    - "https://heartbleed.com/"
+    - "https://nvd.nist.gov/vuln/detail/CVE-2014-0160"
+    - "https://cwe.mitre.org/data/definitions/125.html"
+  compliance_refs:
+    - "PCI-DSS 6.3.3"
+    - "ISO27001 A.12.6.1"
+    - "NIST SP 800-53 SI-2"
+  steps:
+    - "Run: sslyze --heartbleed <host>:443 — confirms vulnerability."
+    - "Alternatively: nmap --script ssl-heartbleed -p 443 <host>."
+    - "Document OpenSSL version and confirm exploit response (memory leak data)."
+
+- id: openssl-ccs-injection
+  title: "OpenSSL CCS Injection (CVE-2014-0224)"
+  severity: CRITICAL
+  cvss_score: 9.1
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 295
+  owasp_id: "A04:2025"
+  aliases:
+    nessus_plugin: [74326]
+    cve: ["CVE-2014-0224"]
+  description: |
+    The remote host is running a version of OpenSSL vulnerable to the CCS
+    injection vulnerability (CVE-2014-0224). An early ChangeCipherSpec message
+    can be injected during TLS handshake, forcing the use of a weak keying
+    material that both client and server will accept.
+  impact: |
+    An active man-in-the-middle attacker can use CCS injection to decrypt
+    and modify TLS-protected communications. Exploiting this vulnerability
+    requires both the client and server to be running vulnerable OpenSSL
+    versions and a network position enabling MITM.
+  remediation: |
+    Upgrade OpenSSL to 0.9.8za, 1.0.0m, or 1.0.1h or later (versions that
+    include the fix for CVE-2014-0224). Update all software that bundles
+    OpenSSL, including web servers, mail servers, and VPN appliances.
+  references:
+    - "https://nvd.nist.gov/vuln/detail/CVE-2014-0224"
+    - "https://www.openssl.org/news/secadv/20140605.txt"
+    - "https://cwe.mitre.org/data/definitions/295.html"
+  compliance_refs:
+    - "PCI-DSS 6.3.3"
+    - "ISO27001 A.12.6.1"
+  steps:
+    - "Run: sslyze --openssl_ccs <host>:443 — confirms CCS injection vulnerability."
+    - "Document the OpenSSL version reported by the service banner."
+
+- id: tls-robot-attack
+  title: "TLS ROBOT Attack — RSA Key Exchange Padding Oracle"
+  severity: CRITICAL
+  cvss_score: 9.1
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 203
+  owasp_id: "A04:2025"
+  aliases:
+    nessus_plugin: [104743]
+    cve: ["CVE-2017-13099"]
+  description: |
+    The remote host is vulnerable to the ROBOT attack (Return Of Bleichenbacher's
+    Oracle Threat). The TLS implementation leaks timing or error information
+    during RSA PKCS#1 v1.5 decryption, allowing a padding oracle attack to
+    decrypt past TLS sessions or forge RSA signatures.
+  impact: |
+    An attacker with the ability to observe TLS handshakes and send crafted
+    messages can perform offline decryption of recorded RSA key-exchange sessions,
+    potentially recovering session keys and decrypting past or future traffic.
+  remediation: |
+    Disable RSA key exchange cipher suites and prefer (EC)DHE-based suites which
+    provide forward secrecy and are immune to ROBOT. Update the TLS library
+    (OpenSSL, NSS, SChannel) to a version that addresses ROBOT. Prioritize
+    ECDHE+AESGCM and CHACHA20 cipher suites.
+  references:
+    - "https://robotattack.org/"
+    - "https://nvd.nist.gov/vuln/detail/CVE-2017-13099"
+    - "https://cwe.mitre.org/data/definitions/203.html"
+  compliance_refs:
+    - "PCI-DSS 4.2.1"
+    - "ISO27001 A.14.1.2"
+  steps:
+    - "Run: sslyze --robot <host>:443 — reports VULNERABLE or NOT_VULNERABLE."
+    - "Document the ROBOT result value returned by SSLyze."
+
+- id: tls-crime-compression
+  title: "TLS Compression Enabled — CRIME Attack"
+  severity: MEDIUM
+  cvss_score: 6.0
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:P/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 311
+  owasp_id: "A04:2025"
+  aliases:
+    nessus_plugin: [62565]
+    cve: ["CVE-2012-4929"]
+  description: |
+    The remote server supports TLS-level compression. Combining compression
+    with encryption is vulnerable to the CRIME attack (Compression Ratio
+    Info-leak Made Easy, CVE-2012-4929), which exploits compression oracles
+    to recover secret values (e.g., session cookies) from encrypted traffic.
+  impact: |
+    An attacker who can inject chosen plaintext into the same TLS session
+    as the target secret (e.g., via JavaScript running in the victim's browser)
+    can recover session cookies byte-by-byte, enabling session hijacking.
+  remediation: |
+    Disable TLS-level compression on all servers. In OpenSSL, set
+    `ssl_comp_add_compression_method` to an empty list or configure
+    `OPENSSL_NO_COMP`. In nginx, use `ssl_comp off;`. Application-level
+    (HTTP) compression such as gzip is unaffected by this configuration.
+  references:
+    - "https://security.stackexchange.com/a/19914"
+    - "https://nvd.nist.gov/vuln/detail/CVE-2012-4929"
+    - "https://cwe.mitre.org/data/definitions/311.html"
+  compliance_refs:
+    - "PCI-DSS 4.2.1"
+    - "ISO27001 A.14.1.2"
+  steps:
+    - "Run: sslyze --compression <host>:443 — confirms TLS compression is supported."
+    - "Alternatively: nmap --script ssl-known-key -p 443 <host> (checks for known compression)."
+    - "Document the compression method advertised by the server."
+
+- id: tls-renegotiation-dos
+  title: "TLS Client-Initiated Renegotiation DoS"
+  severity: MEDIUM
+  cvss_score: 6.9
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 400
+  owasp_id: "A04:2025"
+  aliases:
+    nessus_plugin: [42880]
+    cve: ["CVE-2011-1473"]
+  description: |
+    The remote server permits client-initiated TLS renegotiation. An attacker
+    can repeatedly send renegotiation requests (TLS ClientHello), causing the
+    server to perform expensive asymmetric cryptographic operations without
+    being required to prove identity, enabling a denial of service condition
+    with low attacker resources.
+  impact: |
+    An unauthenticated attacker can exhaust server CPU resources by sending
+    a stream of TLS renegotiation requests, potentially causing the service
+    to become unresponsive to legitimate users. The attack is amplified by
+    the asymmetry between client (cheap request) and server (expensive RSA
+    operation) workloads.
+  remediation: |
+    Disable client-initiated renegotiation on the server. In OpenSSL-based
+    servers, this is controlled by `SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION`
+    or configuring `ssl_renegotiation off;` in nginx. If renegotiation is
+    required for client certificate authentication, rate-limit renegotiation
+    requests via firewall or application logic.
+  references:
+    - "https://nvd.nist.gov/vuln/detail/CVE-2011-1473"
+    - "https://cwe.mitre.org/data/definitions/400.html"
+  compliance_refs:
+    - "PCI-DSS 6.3.2"
+    - "ISO27001 A.14.1.2"
+  steps:
+    - "Run: sslyze --reneg <host>:443 — confirms client-initiated renegotiation is accepted."
+    - "Verify: openssl s_client -connect <host>:443 → type R <Enter> to trigger renegotiation."
+    - "Document the server response to the renegotiation request."
+
+- id: open-smtp-relay
+  title: "Open SMTP Relay"
+  severity: CRITICAL
+  cvss_score: 9.2
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:H/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 284
+  attack_ids: ["T1566.001", "T1598"]
+  attack_tactics: ["Initial Access", "Reconnaissance"]
+  aliases:
+    nessus_plugin: [10257]
+    cve: []
+  description: |
+    The SMTP server is configured as an open relay, allowing unauthenticated
+    external parties to send emails through it to arbitrary recipients. Open
+    relays are commonly exploited for spam and phishing campaigns.
+  impact: |
+    An attacker can send spam or phishing emails spoofed as the organization's
+    domain through this server. This leads to the server's IP being blacklisted,
+    degraded mail deliverability for legitimate communications, and reputational
+    damage to the organization.
+  remediation: |
+    Configure the SMTP server to reject mail from external senders destined
+    for external recipients. Implement sender authentication (SPF, DKIM, DMARC).
+    Restrict relay to authenticated users or known internal IP ranges only.
+  references:
+    - "https://cwe.mitre.org/data/definitions/284.html"
+    - "https://www.tenable.com/plugins/nessus/10257"
+  compliance_refs:
+    - "PCI-DSS 1.3.2"
+    - "ISO27001 A.13.1.3"
+  steps:
+    - "Run: nmap --script smtp-open-relay -p 25,465,587 <host>"
+    - "Alternatively, manually test: EHLO test; MAIL FROM:<test@external.com>; RCPT TO:<test@external.com>"
+    - "If the server accepts the relay attempt, it is an open relay."
+    - "Document the relay test sequence and server response."

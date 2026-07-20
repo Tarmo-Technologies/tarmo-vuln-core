@@ -1,0 +1,22 @@
+/lib/ld-linux.so.2
+libc.so.6
+printf
+malloc
+free
+__gmon_start__
+GLIBC_2.0
+http://api.internal.company.com/v1/devices
+http://firmware-update.example.com/latest
+admin@devices.local
+support@company.com
+password=factoryDefault123
+AKIA1234567890ABCDEF
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEA0Z3VS5JJcds3xfn/ygWyF8PbnGy5AoSz
+-----END RSA PRIVATE KEY-----
+postgresql://dbuser:dbpass@10.0.0.5:5432/firmware_db
+DEBUG_MODE
+/usr/bin/telnetd
+GET /api/health HTTP/1.1
+firmware_v2.3.1
+Copyright 2024 Example Corp

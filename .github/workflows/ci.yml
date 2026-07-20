@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v7
+      - run: uv pip install --system "ruff>=0.4"
+      - run: ruff check .
+      - run: ruff format --check .
+
+  cargo-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo check -p vuln-core-rs
+
+  smoke:
+    name: API Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v7
+      - run: python -m venv .venv
+      - run: uv pip install --python .venv/bin/python "maturin>=1.7"
+      - run: uv pip install --python .venv/bin/python -e ".[dev]"
+      - run: .venv/bin/maturin develop --release
+      - run: .venv/bin/pytest tests/test_smoke_all_exports.py -v
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ${{ github.event_name == 'pull_request' && fromJson('["3.11", "3.12"]') || fromJson('["3.12"]') }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v7
+      - run: python -m venv .venv
+      - run: uv pip install --python .venv/bin/python "maturin>=1.7"
+      - run: uv pip install --python .venv/bin/python -e ".[dev]"
+      - run: .venv/bin/maturin develop --release
+      - run: .venv/bin/pytest tests/ -n auto --cov=tarmo_vuln_core --cov-fail-under=80
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v7
+      - run: python -m venv .venv
+      - run: uv pip install --python .venv/bin/python "maturin>=1.7"
+      - run: uv pip install --python .venv/bin/python -e ".[dev]"
+      - run: .venv/bin/maturin develop --release
+      - run: .venv/bin/mypy tarmo_vuln_core/

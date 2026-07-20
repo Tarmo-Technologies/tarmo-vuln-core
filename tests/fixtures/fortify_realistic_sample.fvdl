@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FVDL xmlns="xmlns://www.fortifysoftware.com/schema/fvdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.12" xsi:type="FVDL">
+  <CreatedTS date="2024-02-20" time="05:34:11"/>
+  <WriteDate date="2024-02-20" time="05:34:11.770Z"/>
+  <UUID>404dd009-bf42-404e-9aa0-2c18a9ffa842</UUID>
+  <Build>
+    <Project>front_end_20240220_629_9_1361_6018341</Project>
+    <Version>front_end_20240220_629_9_1361_6018341</Version>
+    <BuildID>front_end_20240220_629_9_1361_6018341</BuildID>
+  </Build>
+  <Vulnerabilities>
+    <Vulnerability>
+      <ClassInfo>
+        <ClassID>114E5A67-3446-4DD5-B578-D0E6FDBB304E</ClassID>
+        <Kingdom>Encapsulation</Kingdom>
+        <Type>Cross-Site Request Forgery</Type>
+        <AnalyzerName>structural</AnalyzerName>
+        <DefaultSeverity>2.0</DefaultSeverity>
+      </ClassInfo>
+      <InstanceInfo>
+        <InstanceID>4A8CF94D2D4B9CC55BD79D90B6F03AAE</InstanceID>
+        <InstanceSeverity>2.0</InstanceSeverity>
+        <Confidence>2.5</Confidence>
+      </InstanceInfo>
+      <AnalysisInfo>
+        <Unified>
+          <Trace>
+            <Primary>
+              <Entry>
+                <Node>
+                  <SourceLocation path="public/category.html" line="222" lineEnd="222" colStart="26" colEnd="0" snippet="7641D0161774D6B74F68AC32B16229F2#public/category.html:222:222"/>
+                </Node>
+              </Entry>
+            </Primary>
+          </Trace>
+        </Unified>
+      </AnalysisInfo>
+    </Vulnerability>
+  </Vulnerabilities>
+</FVDL>

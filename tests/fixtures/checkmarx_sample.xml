@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CxXMLResults InitiatorName="admin" Owner="admin" ScanId="1000001" ProjectId="1" ProjectName="TestProject" TeamFullPathOnReportDate="CxServer" DeepLink="http://localhost" ScanStart="2024-01-15T10:00:00" Preset="Default" ScanTime="00:05:00" LinesOfCodeScanned="5000" FilesScanned="50" ReportCreationTime="2024-01-15T10:05:00" Team="CxServer" CheckmarxVersion="9.0">
+  <Query id="1" categories="" cweId="89" name="SQL_Injection" group="CSharp_High_Risk" Severity="High" Language="CSharp" LanguageHash="1234" LanguageChangeDate="2024-01-01T00:00:00" SeverityIndex="3" QueryPath="queries/csharp/sql_injection" QueryVersionCode="5678">
+    <Result NodeId="10001" FileName="src/controllers/UserController.cs" Status="New" Line="42" Column="15" FalsePositive="False" Severity="High" AssignToUser="" State="0" Remark="" DeepLink="http://localhost/result/1" SeverityIndex="3">
+      <Path ResultId="10001" PathId="1" SimilarityId="111111">
+        <PathNode>
+          <FileName>src/controllers/UserController.cs</FileName>
+          <Line>42</Line>
+          <Column>15</Column>
+          <NodeId>1</NodeId>
+          <Name>username</Name>
+          <Type>MethodInvokeExpr</Type>
+          <Length>8</Length>
+          <Snippet><Line><Number>42</Number><Code>var result = db.Query("SELECT * FROM users WHERE name = '" + username + "'");</Code></Line></Snippet>
+        </PathNode>
+        <PathNode>
+          <FileName>src/data/DbContext.cs</FileName>
+          <Line>88</Line>
+          <Column>20</Column>
+          <NodeId>2</NodeId>
+          <Name>Query</Name>
+          <Type>MethodInvokeExpr</Type>
+          <Length>5</Length>
+          <Snippet><Line><Number>88</Number><Code>public IEnumerable&lt;T&gt; Query(string sql) { ... }</Code></Line></Snippet>
+        </PathNode>
+      </Path>
+    </Result>
+  </Query>
+  <Query id="2" categories="" cweId="79" name="Reflected_XSS" group="CSharp_High_Risk" Severity="High" Language="CSharp" LanguageHash="1234" LanguageChangeDate="2024-01-01T00:00:00" SeverityIndex="3" QueryPath="queries/csharp/reflected_xss" QueryVersionCode="5679">
+    <Result NodeId="10002" FileName="src/views/SearchView.cs" Status="New" Line="23" Column="10" FalsePositive="False" Severity="High" AssignToUser="" State="0" Remark="" DeepLink="http://localhost/result/2" SeverityIndex="3">
+      <Path ResultId="10002" PathId="1" SimilarityId="222222">
+        <PathNode>
+          <FileName>src/views/SearchView.cs</FileName>
+          <Line>23</Line>
+          <Column>10</Column>
+          <NodeId>1</NodeId>
+          <Name>searchTerm</Name>
+          <Type>Param</Type>
+          <Length>10</Length>
+          <Snippet><Line><Number>23</Number><Code>Response.Write(searchTerm);</Code></Line></Snippet>
+        </PathNode>
+      </Path>
+    </Result>
+  </Query>
+</CxXMLResults>

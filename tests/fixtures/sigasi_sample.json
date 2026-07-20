@@ -1,0 +1,5 @@
+[
+  {"code": 1, "severity": "ERROR", "message": "Type mismatch: expected std_logic but got integer", "file": "src/top_level.vhd", "line": 45, "column": 12, "language": "vhdl"},
+  {"code": 5, "severity": "WARNING", "message": "Unused signal 'clk_en'", "file": "src/counter.vhd", "line": 23, "column": 8, "language": "vhdl"},
+  {"code": 1, "severity": "ERROR", "message": "Port width mismatch", "file": "src/alu.v", "line": 67, "column": 15, "language": "verilog"}
+]

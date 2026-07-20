@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "version": 1,
+    "type": "bloodhoundfinding"
+  },
+  "data": [
+    {
+      "FindingType": "Kerberoastable Accounts",
+      "Domain": "CORP.LOCAL",
+      "Severity": "High",
+      "AffectedNodes": ["svc_http@CORP.LOCAL", "svc_db@CORP.LOCAL"],
+      "Description": "Service accounts with SPNs are vulnerable to Kerberoasting. An attacker can request a Kerberos service ticket and attempt to crack the service account password offline.",
+      "Remediation": "Use Group Managed Service Accounts (gMSA) or ensure service accounts have strong, randomly generated passwords (>25 characters).",
+      "CWE": 287
+    },
+    {
+      "FindingType": "AS-REP Roastable Accounts",
+      "Domain": "CORP.LOCAL",
+      "Severity": "High",
+      "AffectedNodes": ["jsmith@CORP.LOCAL"],
+      "Description": "User accounts have Kerberos pre-authentication disabled. An attacker can request an AS-REP response for these accounts and attempt to crack the hash offline.",
+      "Remediation": "Enable Kerberos pre-authentication on all user accounts unless there is a specific technical requirement to disable it.",
+      "CWE": 287
+    },
+    {
+      "FindingType": "Unconstrained Delegation",
+      "Domain": "CORP.LOCAL",
+      "Severity": "Critical",
+      "AffectedNodes": ["WEB01.CORP.LOCAL", "APP01.CORP.LOCAL"],
+      "Description": "Computers are configured with unconstrained delegation. An attacker who compromises these hosts can capture Kerberos tickets for any user who authenticates to them, including Domain Admins.",
+      "Remediation": "Replace unconstrained delegation with resource-based constrained delegation (RBCD) or constrained delegation to limit the attack surface.",
+      "CWE": 295
+    },
+    {
+      "FindingType": "Domain Controllers Vulnerable to PrintNightmare",
+      "Domain": "CORP.LOCAL",
+      "Severity": "Critical",
+      "AffectedNodes": ["DC01.CORP.LOCAL"],
+      "Description": "The Print Spooler service is enabled on Domain Controllers. The PrintNightmare vulnerability (CVE-2021-34527) allows privilege escalation and remote code execution.",
+      "Remediation": "Disable the Print Spooler service on Domain Controllers. Apply Microsoft security patches KB5004945 or later.",
+      "CWE": 269,
+      "CVE": "CVE-2021-34527"
+    }
+  ]
+}

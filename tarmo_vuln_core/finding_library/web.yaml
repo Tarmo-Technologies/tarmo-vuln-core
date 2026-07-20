@@ -1,0 +1,1001 @@
+- id: reflected-xss
+  title: "Reflected Cross-Site Scripting (XSS)"
+  severity: HIGH
+  cvss_score: 8.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:N/VA:N/SC:H/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 79
+  owasp_id: "A05:2025"
+  attack_ids: ["T1185"]
+  attack_tactics: ["Collection"]
+  methodology_items: ["INPV-01"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  finding_guidance: |
+    Only include this finding if XSS was confirmed by successful payload
+    execution (e.g., alert() or DOM manipulation observed in browser).
+    Update affected_hosts to list the specific pages/parameters where
+    injection was confirmed, not just the host.
+  description: |
+    The application reflects user-supplied input in HTTP responses without
+    adequate sanitization or encoding. An attacker can craft a malicious URL
+    that, when visited by a victim, executes arbitrary JavaScript in the
+    victim's browser within the context of the affected application.
+  impact: |
+    An attacker can steal session cookies and authentication tokens, perform
+    actions on behalf of the victim (CSRF-equivalent), redirect users to
+    phishing sites, capture keystrokes and credentials, and deface pages
+    visible to specific users.
+  remediation: |
+    Apply context-aware output encoding for all user-controlled data rendered
+    in HTML, JavaScript, CSS, or URL contexts. Implement a Content Security
+    Policy (CSP) header with a strict script-src directive. Validate and
+    sanitize input at the application layer using an allowlist approach.
+  references:
+    - "https://owasp.org/www-community/attacks/xss/"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/79.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Identify an input parameter that is reflected in the response (e.g., a search field or URL parameter)."
+    - "Inject a benign probe such as <plaintext> or a unique string to confirm the reflection point."
+    - "Craft a payload: <script>alert(document.domain)</script> and append it to the parameter."
+    - "Load the crafted URL in a browser and observe that the JavaScript alert fires."
+    - "Document the vulnerable endpoint, parameter name, payload, and browser response."
+
+- id: sql-injection
+  title: "SQL Injection"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 89
+  owasp_id: "A05:2025"
+  attack_ids: ["T1190"]
+  attack_tactics: ["Initial Access"]
+  methodology_items: ["INPV-05"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application constructs database queries using user-supplied input
+    without proper sanitization or parameterization. An attacker can inject
+    malicious SQL statements to manipulate queries executed by the backend
+    database.
+  impact: |
+    An attacker can read sensitive data from the database (credentials,
+    PII, financial data), modify or delete records, execute administrative
+    operations, and in some configurations achieve OS-level command execution
+    or lateral movement to other database servers.
+  remediation: |
+    Use parameterized queries (prepared statements) for all database
+    interactions. Apply an ORM that enforces safe query construction.
+    Implement a web application firewall (WAF) as a defense-in-depth layer.
+    Apply the principle of least privilege to all database accounts.
+  references:
+    - "https://owasp.org/www-community/attacks/SQL_Injection"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/89.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+    - "HIPAA §164.312(a)(1)"
+  steps:
+    - "Identify an input parameter (form field, URL parameter, header) that interacts with a database."
+    - "Inject a single quote (') and observe whether the application returns a database error or behaves differently."
+    - "Test with a time-based payload: ' OR SLEEP(5)-- to confirm blind injection."
+    - "Use sqlmap: sqlmap -u '<url>' -p '<param>' --level=3 to enumerate tables and extract data."
+    - "Document the vulnerable parameter, injection type (error-based/blind/UNION), and extracted proof-of-concept data."
+
+- id: stored-xss
+  title: "Stored Cross-Site Scripting (XSS)"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:P/VC:H/VI:H/VA:N/SC:H/SI:H/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 79
+  owasp_id: "A05:2025"
+  attack_ids: ["T1185"]
+  attack_tactics: ["Collection"]
+  methodology_items: ["INPV-02"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application stores user-supplied input without adequate sanitization
+    and later renders it in HTML responses. Unlike reflected XSS, stored XSS
+    payloads persist in the application (e.g., database, file system) and
+    execute for every user who views the affected page.
+  impact: |
+    A low-privileged attacker can permanently inject malicious JavaScript
+    that executes in the browsers of all users who view the affected content,
+    including administrators. This enables session hijacking, credential
+    harvesting, defacement, and malware distribution at scale.
+  remediation: |
+    Apply output encoding when rendering stored user content. Sanitize input
+    on storage using an allowlist-based HTML sanitizer (e.g., DOMPurify).
+    Implement a strict Content Security Policy. Enforce the HttpOnly and
+    Secure flags on session cookies.
+  references:
+    - "https://owasp.org/www-community/attacks/xss/#stored-xss-attacks"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/79.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Identify a user-controlled input field whose data is stored and later displayed (e.g., comment, profile name, message)."
+    - "Submit a benign probe string (e.g., XSSTEST1234) and confirm it appears in subsequent page loads."
+    - "Submit the payload: <script>alert(document.domain)</script> in the same field."
+    - "Navigate to the page where the stored data is rendered and confirm execution."
+    - "Document the storage endpoint, retrieval endpoint, payload, and evidence of execution."
+
+- id: command-injection
+  title: "OS Command Injection"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 78
+  owasp_id: "A05:2025"
+  attack_ids: ["T1059", "T1190"]
+  attack_tactics: ["Execution", "Initial Access"]
+  methodology_items: ["INPV-12"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application passes user-supplied input to a system shell command
+    without sufficient sanitization. An attacker can inject OS commands
+    that execute with the privileges of the web application process.
+  impact: |
+    An attacker can execute arbitrary OS commands on the server, read
+    sensitive files and credentials, establish reverse shells, pivot to
+    internal network resources, and achieve complete server compromise.
+  remediation: |
+    Avoid passing user input to OS commands. Where shell interaction is
+    required, use language-native APIs with argument arrays (not shell
+    interpolation). Apply strict input validation using allowlists.
+    Run the web application process with minimal OS privileges.
+  references:
+    - "https://owasp.org/www-community/attacks/Command_Injection"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/78.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+    - "NIST SP 800-53 SI-10"
+  steps:
+    - "Identify parameters passed to system utilities (e.g., ping, nslookup, file conversion tools)."
+    - "Inject a time-based probe: ; sleep 5 and observe if the response is delayed by ~5 seconds."
+    - "Inject an output-based probe: ; id to check if command output appears in the response."
+    - "Confirm execution: ; cat /etc/passwd or ; whoami."
+    - "Document the vulnerable parameter, injection payload, and server command output."
+
+- id: path-traversal
+  title: "Path Traversal (Directory Traversal)"
+  severity: HIGH
+  cvss_score: 8.7
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 22
+  owasp_id: "A01:2025"
+  attack_ids: ["T1083"]
+  attack_tactics: ["Discovery"]
+  methodology_items: ["AUTHZ-01"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application uses user-controlled input to construct file paths without
+    adequate validation, allowing an attacker to traverse outside the intended
+    directory by injecting sequences such as ../
+  impact: |
+    An attacker can read arbitrary files from the server filesystem, including
+    application configuration files, source code, credentials (e.g., /etc/passwd,
+    /etc/shadow, .env files, SSH private keys), and sensitive application data.
+  remediation: |
+    Resolve file paths to their canonical form and verify they begin with the
+    expected base directory before use. Use allowlists for permitted filenames
+    and avoid passing user input directly to file system APIs. Apply the
+    principle of least privilege to file system permissions.
+  references:
+    - "https://owasp.org/www-community/attacks/Path_Traversal"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/22.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Identify parameters that reference file names or paths (e.g., ?file=, ?page=, ?template=)."
+    - "Submit: ?file=../../../../etc/passwd and observe the response."
+    - "Try URL-encoded variants: %2e%2e%2f%2e%2e%2f to bypass naive filters."
+    - "Confirm by retrieving a known file (e.g., /etc/hostname or web root configuration)."
+    - "Document the parameter, payload, and contents of the retrieved file."
+
+- id: xxe-injection
+  title: "XML External Entity (XXE) Injection"
+  severity: HIGH
+  cvss_score: 8.7
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 611
+  owasp_id: "A05:2025"
+  methodology_items: ["INPV-07"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application parses XML input with external entity processing enabled.
+    An attacker can include external entity references in submitted XML to
+    cause the XML parser to disclose internal files, make server-side requests,
+    or perform denial-of-service via entity expansion.
+  impact: |
+    An attacker can read arbitrary files from the server (e.g., /etc/passwd,
+    application configs), probe internal network services via SSRF, and in
+    some configurations achieve remote code execution or denial of service
+    via billion laughs entity expansion attacks.
+  remediation: |
+    Disable external entity processing in the XML parser. In Java, set
+    XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES = false. In PHP, use
+    libxml_disable_entity_loader(true). Prefer JSON over XML for data exchange
+    where possible.
+  references:
+    - "https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/611.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Identify an endpoint that accepts XML input (SOAP, file upload, REST with XML content-type)."
+    - "Inject a basic XXE payload: <!DOCTYPE foo [<!ENTITY xxe SYSTEM 'file:///etc/passwd'>]>"
+    - "Reference the entity: <data>&xxe;</data>"
+    - "Observe if /etc/passwd contents appear in the response."
+    - "Document the endpoint, XXE payload, and data returned."
+
+- id: ssrf
+  title: "Server-Side Request Forgery (SSRF)"
+  severity: CRITICAL
+  cvss_score: 9.2
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:H/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 918
+  owasp_id: "A05:2025"
+  attack_ids: ["T1090", "T1552"]
+  attack_tactics: ["Command and Control", "Credential Access"]
+  methodology_items: ["INPV-19"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application fetches remote resources based on user-supplied URLs or
+    hostnames without adequate validation. An attacker can supply internal
+    URLs, causing the server to make requests to internal services on the
+    attacker's behalf.
+  impact: |
+    An attacker can probe internal network services, access cloud metadata
+    endpoints (e.g., AWS IMDSv1 at 169.254.169.254), exfiltrate credentials
+    and IAM tokens, bypass firewall restrictions, and in some cases achieve
+    remote code execution via internal service exploitation.
+  remediation: |
+    Validate and allowlist permitted URL schemes (https only) and destinations.
+    Block requests to private IP ranges, loopback addresses, and cloud metadata
+    endpoints at the application and network layer. Use an egress proxy for
+    outbound application requests. Migrate to IMDSv2 on AWS.
+  references:
+    - "https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/918.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Identify parameters that accept URLs or hostnames (e.g., ?url=, ?webhook=, ?fetch=)."
+    - "Submit a URL to a Burp Collaborator or interactsh listener and confirm DNS/HTTP callback."
+    - "Attempt internal access: ?url=http://169.254.169.254/latest/meta-data/ (AWS IMDS)."
+    - "Probe internal services: ?url=http://internal-host:8080/admin"
+    - "Document the parameter, payload, and evidence of server-side request (e.g., metadata response)."
+
+- id: insecure-deserialization
+  title: "Insecure Deserialization"
+  severity: CRITICAL
+  cvss_score: 9.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 502
+  owasp_id: "A08:2025"
+  attack_ids: ["T1190", "T1059"]
+  attack_tactics: ["Initial Access", "Execution"]
+  methodology_items: ["INPV-04"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application deserializes user-supplied data using an unsafe
+    deserialization mechanism. Untrusted data is passed to a deserializer
+    that can instantiate arbitrary objects, execute gadget chains, or
+    trigger unintended logic during object reconstruction.
+  impact: |
+    An attacker can achieve remote code execution by crafting a malicious
+    serialized payload that triggers a gadget chain during deserialization.
+    This can result in complete server compromise, data exfiltration, and
+    lateral movement within the infrastructure.
+  remediation: |
+    Avoid deserializing data from untrusted sources. If deserialization is
+    required, implement integrity checks (HMAC/digital signatures) before
+    deserialization. Use type-safe, format-restricted serialization formats
+    (JSON with explicit schema validation). Apply Java deserialization filters
+    (JEP 290) or equivalent platform controls.
+  references:
+    - "https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/502.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Identify endpoints that accept serialized data (base64 blobs, binary data, Java serial headers 'rO0AB')."
+    - "Analyse the format: Java, PHP, Python pickle, .NET BinaryFormatter."
+    - "Use ysoserial (Java) or similar tools to generate a gadget chain payload: java -jar ysoserial.jar CommonsCollections6 'id' > payload.ser"
+    - "Submit the payload and observe command execution in the response or via out-of-band callback."
+    - "Document the endpoint, payload type, gadget chain used, and evidence of execution."
+
+- id: cors-misconfiguration
+  title: "Permissive CORS Policy"
+  severity: HIGH
+  cvss_score: 8.6
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 942
+  owasp_id: "A02:2025"
+  methodology_items: ["CLNT-07"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application's Cross-Origin Resource Sharing (CORS) policy is
+    misconfigured to reflect arbitrary origins or allow credentials with
+    wildcard origins, permitting cross-origin JavaScript to read API responses
+    and make authenticated requests on behalf of authenticated users.
+  impact: |
+    A malicious website can make cross-origin requests to the application's
+    API on behalf of an authenticated victim and read the responses. This
+    enables theft of sensitive data, account takeover, and unauthorized
+    actions via the victim's authenticated session.
+  remediation: |
+    Specify an explicit allowlist of trusted origins in the Access-Control-Allow-Origin
+    header. Never reflect the Origin header value without validation. Do not
+    combine Access-Control-Allow-Credentials: true with a wildcard or
+    reflective origin policy. Validate the Origin header against a strict allowlist.
+  references:
+    - "https://owasp.org/www-community/attacks/CORS_OriginHeaderScrutiny"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/CORS_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/942.html"
+  compliance_refs:
+    - "ISO27001 A.14.1.2"
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Send a request with: Origin: https://attacker.example.com"
+    - "Inspect the response for: Access-Control-Allow-Origin: https://attacker.example.com"
+    - "Check for: Access-Control-Allow-Credentials: true in the same response."
+    - "If both are present, demonstrate a cross-origin read using a browser-side PoC script."
+    - "Document the endpoint, origin reflection, and sensitive data accessible cross-origin."
+
+- id: clickjacking
+  title: "Clickjacking (UI Redressing)"
+  severity: MEDIUM
+  cvss_score: 5.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 1021
+  owasp_id: "A02:2025"
+  methodology_items: ["CLNT-09"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application does not implement X-Frame-Options or Content-Security-Policy
+    frame-ancestors directives, allowing the page to be embedded in an attacker-
+    controlled iframe. A victim can be tricked into clicking UI elements on the
+    target site while believing they are interacting with the attacker's page.
+  impact: |
+    An attacker can trick authenticated users into performing unintended actions
+    such as changing account settings, making purchases, deleting data, or
+    granting permissions. The attack can be combined with social engineering
+    for high-impact outcomes.
+  remediation: |
+    Add the X-Frame-Options: DENY or SAMEORIGIN header to all responses.
+    Implement Content-Security-Policy: frame-ancestors 'none' or 'self' as a
+    modern alternative. These controls prevent the page from being embedded
+    in frames on untrusted origins.
+  references:
+    - "https://owasp.org/www-community/attacks/Clickjacking"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/1021.html"
+  compliance_refs:
+    - "ISO27001 A.14.2.5"
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Check response headers: curl -I <url> | grep -i 'x-frame-options\\|content-security-policy'"
+    - "Confirm the absence of X-Frame-Options and frame-ancestors CSP directive."
+    - "Create a proof-of-concept HTML page embedding the target in an iframe."
+    - "Load the PoC in a browser and confirm the target page renders inside the iframe."
+    - "Document the missing headers and demonstrate the embedding."
+
+- id: missing-security-headers
+  title: "Missing HTTP Security Headers"
+  severity: MEDIUM
+  cvss_score: 6.9
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 693
+  owasp_id: "A02:2025"
+  methodology_items: ["CONF-07"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The web application is missing one or more security-relevant HTTP response
+    headers including Strict-Transport-Security (HSTS), Content-Security-Policy,
+    X-Content-Type-Options, Referrer-Policy, and Permissions-Policy.
+  impact: |
+    Missing security headers increase the attack surface for XSS, clickjacking,
+    MIME-type sniffing, downgrade attacks, and information leakage. While not
+    directly exploitable in isolation, absence of these headers removes
+    browser-level defenses that mitigate other vulnerabilities.
+  remediation: |
+    Configure the web server or application framework to send the following
+    headers on all responses: Strict-Transport-Security (max-age≥31536000),
+    Content-Security-Policy, X-Content-Type-Options: nosniff,
+    Referrer-Policy: strict-origin-when-cross-origin, Permissions-Policy.
+  references:
+    - "https://owasp.org/www-project-secure-headers/"
+    - "https://securityheaders.com/"
+    - "https://cwe.mitre.org/data/definitions/693.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.1.2"
+  steps:
+    - "Run: curl -I <url> and review all response headers."
+    - "Check against the OWASP Secure Headers Project checklist."
+    - "Use securityheaders.com to score the header configuration."
+    - "Document each missing header and its security function."
+
+- id: open-redirect
+  title: "Open Redirect"
+  severity: MEDIUM
+  cvss_score: 5.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:L/VI:L/VA:N/SC:L/SI:L/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 601
+  owasp_id: "A05:2025"
+  methodology_items: ["CLNT-04"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application redirects users to a URL specified in a request parameter
+    without validating that the destination is a trusted domain. An attacker
+    can craft URLs on the legitimate domain that redirect victims to malicious sites.
+  impact: |
+    An attacker can abuse the application's trusted domain to distribute
+    phishing links that redirect victims to credential-harvesting sites.
+    The trusted domain in the URL lends legitimacy to the phishing attempt,
+    increasing click-through rates. May also be chained with other vulnerabilities.
+  remediation: |
+    Avoid using user-supplied input to construct redirect targets. If redirects
+    are required, validate the destination against a strict allowlist of permitted
+    URLs or domains. Use indirect reference maps (numeric IDs that map to known
+    safe URLs) instead of passing URLs directly.
+  references:
+    - "https://owasp.org/www-community/attacks/Unvalidated_Redirects_and_Forwards_Cheat_Sheet"
+    - "https://cwe.mitre.org/data/definitions/601.html"
+  compliance_refs:
+    - "ISO27001 A.14.2.5"
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Identify redirect parameters in URLs and forms (e.g., ?redirect=, ?next=, ?returnUrl=)."
+    - "Inject an external URL: ?redirect=https://attacker.example.com"
+    - "Follow the redirect and confirm the browser lands on the external site."
+    - "Document the vulnerable parameter and the redirect chain."
+
+- id: csrf
+  title: "Cross-Site Request Forgery (CSRF)"
+  severity: HIGH
+  cvss_score: 8.7
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 352
+  owasp_id: "A01:2025"
+  methodology_items: ["SESS-05"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application performs state-changing operations without verifying that
+    requests originate from the application itself. An attacker can craft a
+    malicious page that, when visited by an authenticated victim, triggers
+    unauthorized actions using the victim's active session.
+  impact: |
+    An attacker can perform any action the victim is authorized to perform,
+    including changing account settings, transferring funds, deleting data,
+    adding administrative users, or modifying application configuration.
+    Impact is proportional to the victim's privileges.
+  remediation: |
+    Implement synchronizer token patterns (CSRF tokens) on all state-changing
+    requests. Validate the Origin or Referer header as a supplementary control.
+    Use SameSite=Strict or Lax on session cookies. Require re-authentication
+    for high-privilege operations.
+  references:
+    - "https://owasp.org/www-community/attacks/csrf"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/352.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Identify a state-changing request (POST/PUT/DELETE) without a CSRF token."
+    - "Capture the request with Burp Suite."
+    - "Use Burp's 'Generate CSRF PoC' or manually craft an HTML form that submits to the endpoint."
+    - "Open the PoC in a browser where the victim is authenticated and confirm the action is performed."
+    - "Document the endpoint, request, PoC HTML, and evidence of unauthorized action."
+
+- id: directory-listing
+  title: "Directory Listing Enabled"
+  severity: MEDIUM
+  cvss_score: 6.9
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 548
+  owasp_id: "A02:2025"
+  methodology_items: ["CONF-04"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The web server is configured to display directory listings when no index
+    file is present. This allows unauthenticated users to browse the web root
+    structure and enumerate files and directories.
+  impact: |
+    An attacker can enumerate backup files, configuration files, source code,
+    log files, and other sensitive resources that may be inadvertently stored
+    in web-accessible directories. This information aids in further targeted attacks.
+  remediation: |
+    Disable directory listing in the web server configuration (e.g., remove
+    Options Indexes from Apache, set autoindex off in Nginx). Ensure all
+    web-accessible directories contain an index file, and remove backup files
+    and sensitive data from the web root.
+  references:
+    - "https://cwe.mitre.org/data/definitions/548.html"
+    - "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/04-Review_Webserver_Metafiles_for_Information_Leakage"
+  compliance_refs:
+    - "ISO27001 A.9.4.1"
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Navigate to a directory URL that likely lacks an index file: https://<host>/images/ or /backup/"
+    - "Observe if a file listing is returned instead of a 403 or 404."
+    - "Document all sensitive files visible in the listing."
+    - "Attempt to download interesting files (e.g., .bak, .config, .log)."
+
+- id: sensitive-data-exposure
+  title: "Sensitive Data Exposed in HTTP Response"
+  severity: HIGH
+  cvss_score: 8.7
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 200
+  owasp_id: "A04:2025"
+  attack_ids: ["T1552", "T1530"]
+  attack_tactics: ["Credential Access", "Collection"]
+  methodology_items: ["INFO-05"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application returns sensitive data in HTTP responses that should not
+    be exposed to the requesting party. This includes credentials, API keys,
+    PII, session tokens, internal infrastructure details, or other confidential
+    information in response bodies, headers, or error messages.
+  impact: |
+    Exposed sensitive data can be directly exploited for account takeover,
+    unauthorized access to third-party services, identity theft, compliance
+    violations (GDPR, PCI-DSS), and reputational damage. The impact varies
+    based on the sensitivity of the exposed data.
+  remediation: |
+    Audit all API endpoints and pages for sensitive data in responses.
+    Implement data minimization — return only the fields required by the client.
+    Suppress detailed error messages in production. Remove sensitive data from
+    HTTP headers (server version, stack traces, internal IPs). Encrypt sensitive
+    fields at rest and in transit.
+  references:
+    - "https://owasp.org/Top10/A02_2021-Cryptographic_Failures/"
+    - "https://cwe.mitre.org/data/definitions/200.html"
+  compliance_refs:
+    - "PCI-DSS 3.4.1"
+    - "ISO27001 A.8.2.3"
+    - "HIPAA §164.312(a)(2)(iv)"
+    - "GDPR Art. 32"
+  steps:
+    - "Browse the application with Burp Suite logging all responses."
+    - "Search responses for patterns: API keys, tokens, email addresses, SSNs, credit card patterns."
+    - "Check error pages for stack traces, database query details, or internal hostnames."
+    - "Inspect HTTP response headers for server version strings and internal IP addresses."
+    - "Document each instance of sensitive data, its location, and the request that triggered it."
+
+# ── Nikto-specific findings ────────────────────────────────────────────────
+
+- id: missing-x-frame-options
+  title: "Missing X-Frame-Options Header"
+  severity: MEDIUM
+  cvss_score: 5.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 1021
+  owasp_id: "A02:2025"
+  attack_ids: ["T1185"]
+  attack_tactics: ["Collection"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The web server does not return an X-Frame-Options header. Without this
+    header an attacker can embed the page in an iframe on a malicious site
+    and perform clickjacking attacks, tricking users into clicking on UI
+    elements they cannot see.
+  impact: |
+    An attacker can overlay a transparent iframe on top of a legitimate
+    page to hijack clicks, steal credentials, authorise unintended actions,
+    or redirect users to attacker-controlled destinations.
+  remediation: |
+    Return the `X-Frame-Options: DENY` or `X-Frame-Options: SAMEORIGIN`
+    response header on all pages, or implement an equivalent Content Security
+    Policy `frame-ancestors` directive.
+  references:
+    - "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options"
+    - "https://owasp.org/www-community/attacks/Clickjacking"
+    - "https://cwe.mitre.org/data/definitions/1021.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Use a browser or curl to fetch the target page and inspect response headers."
+    - "Confirm that X-Frame-Options (or CSP frame-ancestors) is absent."
+    - "Embed the target URL in an iframe on an external page and confirm it renders."
+    - "Document the affected URLs and demonstrate a PoC clickjacking scenario."
+
+- id: missing-x-content-type-options
+  title: "Missing X-Content-Type-Options Header"
+  severity: MEDIUM
+  cvss_score: 6.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 693
+  owasp_id: "A02:2025"
+  attack_ids: []
+  attack_tactics: []
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The server does not send the `X-Content-Type-Options: nosniff` header.
+    Without this header, browsers may perform MIME-type sniffing and interpret
+    responses with a non-script content-type as executable JavaScript, enabling
+    cross-site scripting via MIME confusion attacks.
+  impact: |
+    An attacker who can influence response content (e.g., file upload) may
+    cause a browser to execute uploaded content as script, potentially leading
+    to stored XSS even when the server sends a non-script Content-Type.
+  remediation: |
+    Add the `X-Content-Type-Options: nosniff` response header to all HTTP
+    responses. In most frameworks this is a single middleware/filter change.
+  references:
+    - "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options"
+    - "https://owasp.org/www-project-secure-headers/"
+    - "https://cwe.mitre.org/data/definitions/693.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Fetch the target with curl and check for X-Content-Type-Options in the response headers."
+    - "Confirm the header is absent."
+    - "Document affected endpoints."
+
+- id: missing-content-security-policy
+  title: "Missing Content-Security-Policy Header"
+  severity: MEDIUM
+  cvss_score: 5.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:L/VI:L/VA:N/SC:L/SI:L/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 693
+  owasp_id: "A02:2025"
+  attack_ids: ["T1185"]
+  attack_tactics: ["Collection"]
+  methodology_items: ["CONF-08"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The application does not return a Content-Security-Policy (CSP) header.
+    Without CSP an attacker who achieves XSS injection has no browser-enforced
+    restriction on script sources, inline script execution, or data exfiltration
+    targets, significantly increasing the impact of any injection flaw.
+  impact: |
+    Absence of CSP amplifies the impact of XSS vulnerabilities: injected scripts
+    can load remote payloads, exfiltrate cookies and form data to arbitrary
+    origins, and persist via service-worker registration.
+  remediation: |
+    Define and deploy a strict Content-Security-Policy header. Start with a
+    report-only policy to identify violations, then enforce with
+    `Content-Security-Policy`. At minimum set `default-src 'self'` and restrict
+    `script-src` to known, trusted origins. Remove all `unsafe-inline` and
+    `unsafe-eval` directives from the final policy.
+  references:
+    - "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/693.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Fetch the target page and confirm no Content-Security-Policy header is present."
+    - "Attempt a basic XSS injection to demonstrate that inline script executes without restriction."
+    - "Document affected origins and recommend a starter CSP policy."
+
+- id: http-trace-enabled
+  title: "HTTP TRACE Method Enabled"
+  severity: MEDIUM
+  cvss_score: 5.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 16
+  owasp_id: "A02:2025"
+  attack_ids: ["T1040"]
+  attack_tactics: ["Credential Access"]
+  methodology_items: ["CONF-06"]
+  aliases:
+    nessus_plugin: []
+    cve: ["CVE-2003-1567"]
+  description: |
+    The web server has the HTTP TRACE method enabled. TRACE echoes the contents
+    of the request back to the client, including any headers added by
+    intermediate proxies. In combination with other vulnerabilities it can be
+    used in a Cross-Site Tracing (XST) attack to steal authentication tokens
+    or cookies marked HttpOnly.
+  impact: |
+    An attacker can combine TRACE with an XSS vector to steal HttpOnly cookie
+    values that are normally inaccessible to JavaScript, bypassing a key
+    defence against session hijacking.
+  remediation: |
+    Disable the TRACE method on the web server. In Apache, add
+    `TraceEnable Off`; in Nginx, add `error_page 405 @disallow; location @disallow { return 405; }`
+    for TRACE. Verify with: `curl -X TRACE https://<host>/ -v`.
+  references:
+    - "https://owasp.org/www-community/attacks/Cross_Site_Tracing"
+    - "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-1567"
+    - "https://cwe.mitre.org/data/definitions/16.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Send a TRACE request: `curl -X TRACE https://<host>/ -v`"
+    - "Confirm the server returns 200 OK and echoes the request."
+    - "Document the response and note any headers reflected in the body."
+
+- id: server-version-disclosure
+  title: "Web Server Version Disclosure"
+  severity: INFO
+  cvss_score: 0.0
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 200
+  owasp_id: "A02:2025"
+  attack_ids: ["T1592"]
+  attack_tactics: ["Reconnaissance"]
+  methodology_items: ["INFO-02"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The web server includes its software name and version number in the
+    `Server` response header (e.g., `Apache/2.4.41 (Ubuntu)`). This allows
+    an attacker to fingerprint the exact software version and search for
+    known CVEs affecting that version.
+  impact: |
+    Version disclosure enables targeted exploitation. An attacker can quickly
+    determine whether the server is unpatched and select exploits from public
+    databases (ExploitDB, NIST NVD, Metasploit) with confidence.
+  remediation: |
+    Suppress the server version string. In Apache set `ServerTokens Prod`
+    and `ServerSignature Off`; in Nginx set `server_tokens off`; in IIS
+    remove the `X-Powered-By` header via HTTP response headers in IIS Manager.
+  references:
+    - "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/02-Fingerprint_Web_Server"
+    - "https://cwe.mitre.org/data/definitions/200.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Send a GET request and inspect the `Server` and `X-Powered-By` response headers."
+    - "Record the version string and search NVD for known CVEs for that version."
+
+- id: default-file-exposed
+  title: "Default or Sample File Exposed"
+  severity: MEDIUM
+  cvss_score: 6.9
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 538
+  owasp_id: "A02:2025"
+  attack_ids: ["T1083"]
+  attack_tactics: ["Discovery"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    A default, sample, or test file shipped with the web server or application
+    framework is accessible on the production server. These files are not
+    intended for production use and may expose version information, provide
+    useful attack surface, or contain known vulnerabilities.
+  impact: |
+    Default files can reveal the server technology, version, and configuration;
+    provide scripts with known vulnerabilities; or serve as entry points for
+    further exploitation. Example files such as `/examples/` on Tomcat provide
+    servlet and JSP examples with known XSS vectors.
+  remediation: |
+    Remove all default, sample, example, and test files from the production
+    server. Review the server and application installation directories and
+    delete any files not required for the application to function.
+  references:
+    - "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/05-Enumerate_Infrastructure_and_Application_Admin_Interfaces"
+    - "https://cwe.mitre.org/data/definitions/538.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Browse to the detected default file URL and confirm it returns 200 OK."
+    - "Inspect the content for sensitive information or exploitable functionality."
+    - "Document the file path and server response."
+
+- id: http-put-method-enabled
+  title: "HTTP PUT Method Enabled"
+  severity: MEDIUM
+  cvss_score: 6.0
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 650
+  owasp_id: "A02:2025"
+  attack_ids: ["T1190"]
+  attack_tactics: ["Initial Access"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The web server permits the HTTP PUT method on at least one resource.
+    If accessible without authentication (or with weak credentials), an
+    attacker could upload arbitrary files including web shells to the server.
+  impact: |
+    Depending on the server configuration, an attacker may be able to upload
+    a web shell or backdoor, overwrite existing files, or place malicious
+    content that is subsequently served to other users.
+  remediation: |
+    Disable the PUT method unless explicitly required for a REST API endpoint.
+    Restrict PUT to authenticated, authorised principals only. Validate and
+    sanitise all uploaded content; store uploads outside the web root.
+  references:
+    - "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/06-Test_HTTP_Methods"
+    - "https://cwe.mitre.org/data/definitions/650.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Confirm PUT is allowed: `curl -X OPTIONS https://<host>/ -v` and check Allow header."
+    - "Attempt to PUT a test file to the server."
+    - "If successful, document the upload path and the server's response."
+
+- id: http-delete-method-enabled
+  title: "HTTP DELETE Method Enabled"
+  severity: MEDIUM
+  cvss_score: 6.0
+  cvss_vector: "CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 650
+  owasp_id: "A02:2025"
+  attack_ids: []
+  attack_tactics: []
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The web server advertises the HTTP DELETE method in the `Allow` response
+    header. If accessible to unauthorised clients, this could allow deletion
+    of server-side resources.
+  impact: |
+    An attacker could delete application files, configuration data, or
+    database content, causing service disruption or destroying forensic
+    evidence of prior compromise.
+  remediation: |
+    Disable DELETE for resources that do not require it. Restrict DELETE
+    to authenticated, authorised API consumers only.
+  references:
+    - "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/06-Test_HTTP_Methods"
+    - "https://cwe.mitre.org/data/definitions/650.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Confirm DELETE is listed in the Allow header from OPTIONS response."
+    - "Attempt to DELETE a non-critical resource; verify whether it succeeds."
+    - "Document the response and the resource path."
+
+- id: cookie-missing-httponly
+  title: "Session Cookie Missing HttpOnly Flag"
+  severity: MEDIUM
+  cvss_score: 5.3
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 1004
+  owasp_id: "A05:2021"
+  attack_ids: ["T1539"]
+  attack_tactics: ["Credential Access"]
+  methodology_items: ["SESS-02"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    A session or authentication cookie is set without the `HttpOnly` flag.
+    Without this flag, client-side JavaScript can access the cookie value,
+    enabling an attacker to steal it via XSS.
+  impact: |
+    If an XSS vulnerability exists anywhere on the same origin, an attacker
+    can steal the session cookie and impersonate the victim without needing
+    their credentials.
+  remediation: |
+    Set the `HttpOnly` attribute on all cookies that do not need to be
+    accessible from JavaScript. In most web frameworks this is a single
+    configuration option: e.g., `SESSION_COOKIE_HTTPONLY = True` in Django,
+    `cookie-httponly` in Spring Security.
+  references:
+    - "https://owasp.org/www-community/HttpOnly"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+    - "https://cwe.mitre.org/data/definitions/1004.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+    - "ISO27001 A.14.2.5"
+  steps:
+    - "Capture a login response with Burp Suite or browser developer tools."
+    - "Inspect Set-Cookie headers for the session cookie."
+    - "Confirm the HttpOnly flag is absent."
+    - "Demonstrate that `document.cookie` in the browser console returns the cookie value."
+
+- id: etag-inode-disclosure
+  title: "ETag Header Discloses Inode Number"
+  severity: INFO
+  cvss_score: 0.0
+  cvss_vector: "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:N/SI:N/SA:N"
+  cvss_version: "4.0"
+  cwe_id: 200
+  owasp_id: "A05:2021"
+  attack_ids: ["T1592"]
+  attack_tactics: ["Reconnaissance"]
+  aliases:
+    nessus_plugin: []
+    cve: []
+  description: |
+    The server's ETag response header is formatted as inode number, size, and
+    modification time (e.g., `"abcdef:12345:67890ab"`). On older Apache
+    configurations this leaks the inode number, which can assist NFS-based
+    attacks or give an attacker information about the server's filesystem layout.
+  impact: |
+    Inode disclosure is low severity but provides reconnaissance data that
+    can be combined with other vulnerabilities for NFS file handle prediction
+    or fingerprinting attacks.
+  remediation: |
+    In Apache, configure `FileETag MTime Size` (omit `INode`) in httpd.conf
+    or via `.htaccess` to prevent inode disclosure in ETags.
+  references:
+    - "https://httpd.apache.org/docs/current/mod/core.html#fileetag"
+    - "https://cwe.mitre.org/data/definitions/200.html"
+  compliance_refs:
+    - "PCI-DSS 6.2.4"
+  steps:
+    - "Fetch a static resource and inspect the ETag response header value."
+    - "Confirm the value contains three colon-separated hex fields (inode:size:mtime)."
+    - "Document the header value and the affected resource path."
