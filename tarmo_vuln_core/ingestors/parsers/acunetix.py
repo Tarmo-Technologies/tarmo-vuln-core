@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import contextlib
 import re
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from tarmo_vuln_core.ingestors._xml import parse_xml_file, xml_first_tag
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 
 _SEVERITY_MAP: dict[str, Severity] = {
     "high": Severity.HIGH,
@@ -40,6 +40,8 @@ def _module_slug(module_name: str) -> str:
 class AcunetixIngestor(BaseIngestor):
     """Parses Acunetix/Invicti XML export files (``ScanGroup`` format)."""
 
+    category = FindingCategory.DAST
+
     @property
     def supported_extensions(self) -> list[str]:
         """File extensions this ingestor handles."""
@@ -56,11 +58,9 @@ class AcunetixIngestor(BaseIngestor):
         if path.suffix.lower() != ".xml":
             return False
         try:
-            for _event, elem in ET.iterparse(str(path), events=("start",)):  # nosec B314
-                return elem.tag == "ScanGroup"
-        except ET.ParseError:
+            return xml_first_tag(path, fmt="Acunetix") == "ScanGroup"
+        except IngestorError:
             return False
-        return False
 
     def ingest(self, path: Path) -> list[Finding]:
         """Parse an Acunetix XML export and return normalised findings.
@@ -81,12 +81,7 @@ class AcunetixIngestor(BaseIngestor):
         """
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
-        try:
-            tree = ET.parse(str(path))  # nosec B314
-        except ET.ParseError as exc:
-            raise IngestorError(f"Failed to parse Acunetix XML: {exc}") from exc
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt="Acunetix")
         if root.tag != "ScanGroup":
             raise IngestorError(f"Expected ScanGroup root element, got {root.tag!r}")
 

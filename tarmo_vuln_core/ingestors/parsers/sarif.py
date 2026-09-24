@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify as _slugify
 
 _LEVEL_SEVERITY: dict[str, Severity] = {
@@ -144,6 +144,8 @@ def _extract_source_code_refs(result: dict) -> list[SourceCodeRef]:
 class SarifIngestor(BaseIngestor):
     """Parses SARIF 2.1.0 JSON output files."""
 
+    category = FindingCategory.SAST
+
     @property
     def supported_extensions(self) -> list[str]:
         """File extensions this ingestor handles."""
@@ -240,20 +242,28 @@ class SarifIngestor(BaseIngestor):
                 hosts = _extract_hosts(result)
                 source_refs = _extract_source_code_refs(result)
 
-                findings.append(
-                    Finding(
-                        id=f"sarif-{_slugify(rule_id or title)}",
-                        title=str(title),
-                        severity=severity,
-                        description=str(description),
-                        impact=_DEFAULT_IMPACT,
-                        remediation=str(remediation),
-                        cwe_id=cwe_id,
-                        affected_hosts=hosts,
-                        source_code_refs=source_refs,
-                        source_tool="sarif",
-                        raw_ref=rule_id or None,
-                    )
+                finding = Finding(
+                    id=f"sarif-{_slugify(rule_id or title)}",
+                    title=str(title),
+                    severity=severity,
+                    description=str(description),
+                    impact=_DEFAULT_IMPACT,
+                    remediation=str(remediation),
+                    cwe_id=cwe_id,
+                    affected_hosts=hosts,
+                    source_code_refs=source_refs,
+                    source_tool="sarif",
+                    raw_ref=rule_id or None,
                 )
+                findings.append(self._customize_finding(finding, result=result, rule=rule))
 
         return findings
+
+    def _customize_finding(self, finding: Finding, *, result: dict, rule: dict) -> Finding:
+        """Hook for tool-specific SARIF subclasses to enrich a generic finding.
+
+        Called once per SARIF result with the raw ``result`` object and its
+        resolved ``rule`` (``{}`` when the driver declares none). The default
+        returns *finding* unchanged.
+        """
+        return finding

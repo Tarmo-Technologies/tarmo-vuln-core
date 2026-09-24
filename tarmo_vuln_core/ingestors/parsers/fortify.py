@@ -3,18 +3,27 @@
 from __future__ import annotations
 
 import re
-import xml.etree.ElementTree as ET
 import zipfile
 from collections.abc import Iterable
 from os.path import basename
 from pathlib import Path
+from typing import IO
+from xml.etree.ElementTree import Element
 
+from tarmo_vuln_core.ingestors._xml import parse_xml_bytes, parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 _NS = "xmlns://www.fortifysoftware.com/schema/fvdl"
 _NSP = f"{{{_NS}}}"
+
+#: Default ceiling on the decompressed size of ``audit.fvdl`` inside an ``.fpr``
+#: archive (zip-bomb guard). Override per instance with
+#: ``FortifyIngestor(max_fvdl_bytes=...)``.
+MAX_FVDL_BYTES = 512 * 1024 * 1024
+
+_READ_CHUNK = 1024 * 1024
 
 _DEFAULT_IMPACT = "The vulnerability may allow an attacker to compromise the affected system."
 _DEFAULT_REMEDIATION = "Review and remediate the identified issue."
@@ -50,13 +59,41 @@ def _expanded_normalized_keys(value: str) -> set[str]:
     return {_normalize_key(candidate) for candidate in candidates if candidate}
 
 
-def _extract_fvdl_bytes(path: Path) -> bytes:
+def _read_bounded(fh: IO[bytes], *, max_bytes: int, label: str) -> bytes:
+    """Read *fh* in fixed-size chunks, refusing to buffer more than *max_bytes*.
+
+    Enforced on the bytes actually produced by the decompressor, so a zip
+    header that under-reports ``file_size`` cannot bypass the cap.
+    """
+    chunks: list[bytes] = []
+    total = 0
+    while True:
+        chunk = fh.read(min(_READ_CHUNK, max_bytes + 1 - total))
+        if not chunk:
+            break
+        total += len(chunk)
+        if total > max_bytes:
+            raise IngestorError(
+                f"Fortify {label} exceeds the decompressed size cap of {max_bytes} bytes"
+            )
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
+def _extract_fvdl_bytes(path: Path, max_bytes: int = MAX_FVDL_BYTES) -> bytes:
     if path.suffix.lower() == ".fpr" or zipfile.is_zipfile(path):
         try:
             with zipfile.ZipFile(path) as zf:
-                return zf.read("audit.fvdl")
-        except (zipfile.BadZipFile, KeyError) as e:
-            raise IngestorError(f"Failed to read FPR: {e}") from e
+                info = zf.getinfo("audit.fvdl")
+                if info.file_size > max_bytes:
+                    raise IngestorError(
+                        f"Fortify audit.fvdl in '{path.name}' declares {info.file_size} bytes, "
+                        f"which exceeds the decompressed size cap of {max_bytes} bytes"
+                    )
+                with zf.open(info) as fh:
+                    return _read_bounded(fh, max_bytes=max_bytes, label="audit.fvdl")
+        except (zipfile.BadZipFile, zipfile.LargeZipFile, KeyError, OSError, EOFError) as e:
+            raise IngestorError(f"Failed to read FPR '{path.name}': {e}") from e
 
     try:
         data = path.read_bytes()
@@ -66,11 +103,8 @@ def _extract_fvdl_bytes(path: Path) -> bytes:
     return data
 
 
-def _parse_fvdl_root(data: bytes) -> ET.Element:
-    try:
-        root = ET.fromstring(data)  # noqa: S314
-    except ET.ParseError as e:
-        raise IngestorError(f"Failed to parse FVDL XML: {e}") from e
+def _parse_fvdl_root(data: bytes, source: str) -> Element:
+    root = parse_xml_bytes(data, fmt="Fortify FVDL", source=source)
 
     if root.tag != f"{_NSP}FVDL":
         raise IngestorError("Unsupported Fortify XML root element")
@@ -78,7 +112,7 @@ def _parse_fvdl_root(data: bytes) -> ET.Element:
     return root
 
 
-def _iter_rule_groups(rule: ET.Element) -> Iterable[ET.Element]:
+def _iter_rule_groups(rule: Element) -> Iterable[Element]:
     meta = rule.find(f"{_NSP}MetaInfo")
     if meta is None:
         return ()
@@ -99,7 +133,20 @@ def _severity_from_float(val: float) -> Severity:
 
 
 class FortifyIngestor(BaseIngestor):
-    """Parses Fortify FPR files (ZIP containing audit.fvdl XML)."""
+    """Parses Fortify FPR files (ZIP containing audit.fvdl XML).
+
+    Args:
+        max_fvdl_bytes: Ceiling on the decompressed size of ``audit.fvdl``
+            (defaults to :data:`MAX_FVDL_BYTES`, 512 MiB).
+    """
+
+    category = FindingCategory.SAST
+
+    def __init__(self, max_fvdl_bytes: int | None = None) -> None:
+        cap = MAX_FVDL_BYTES if max_fvdl_bytes is None else max_fvdl_bytes
+        if cap <= 0:
+            raise ValueError(f"max_fvdl_bytes must be positive, got {cap}")
+        self._max_fvdl_bytes = cap
 
     @property
     def supported_extensions(self) -> list[str]:
@@ -112,17 +159,17 @@ class FortifyIngestor(BaseIngestor):
             if path.suffix.lower() == ".fpr" or zipfile.is_zipfile(path):
                 with zipfile.ZipFile(path) as zf:
                     return "audit.fvdl" in zf.namelist()
-            root = ET.parse(path).getroot()  # noqa: S314
-            return root.tag == f"{_NSP}FVDL"
-        except Exception:
-            pass
-        return False
+            return parse_xml_file(path, fmt="Fortify FVDL").tag == f"{_NSP}FVDL"
+        except (IngestorError, zipfile.BadZipFile, OSError, EOFError):
+            return False
 
     def ingest(self, path: Path) -> list[Finding]:
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
 
-        root = _parse_fvdl_root(_extract_fvdl_bytes(path))
+        root = _parse_fvdl_root(
+            _extract_fvdl_bytes(path, self._max_fvdl_bytes), source=f"'{path.name}'"
+        )
 
         # Build CWE map from Description/Rule elements
         cwe_map: dict[str, int | None] = {}

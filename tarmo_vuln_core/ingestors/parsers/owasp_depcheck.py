@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 from tarmo_vuln_core.utils import slugify
 
 _SEVERITY_MAP: dict[str, Severity] = {
@@ -39,6 +39,8 @@ def _parse_cwe_id(cwes: list[object]) -> int | None:
 
 class OwaspDepcheckIngestor(BaseIngestor):
     """Parses OWASP Dependency-Check JSON output files."""
+
+    category = FindingCategory.SCA
 
     @property
     def supported_extensions(self) -> list[str]:

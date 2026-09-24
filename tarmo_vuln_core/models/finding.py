@@ -81,6 +81,25 @@ class FindingStatus(StrEnum):
 _EVIDENCE_TYPE_BY_EXT: dict[str, EvidenceType] = {}  # populated after EvidenceType is defined
 
 
+class FindingCategory(StrEnum):
+    """Broad class of tool / technique that produced a finding.
+
+    Set per-ingestor via ``BaseIngestor.category`` and filled onto every
+    finding the ingestor returns unless the ingestor set one explicitly.
+    """
+
+    SAST = "sast"
+    DAST = "dast"
+    SCA = "sca"
+    SECRETS = "secrets"
+    FUZZ = "fuzz"
+    INFRASTRUCTURE = "infrastructure"
+    BINARY = "binary"
+    CONFIG = "config"
+    MANUAL = "manual"
+    OTHER = "other"
+
+
 class EvidenceType(StrEnum):
     """Type classification for a piece of evidence."""
 
@@ -155,6 +174,43 @@ class SourceCodeRef(BaseModel):
     repository: str = ""
     branch: str = ""
     commit_sha: str = ""
+
+
+class StackFrame(BaseModel):
+    """One frame of a crash stack. ``file`` is relative to the scanned source root."""
+
+    file: str | None = None
+    function: str | None = None
+    line: int | None = None
+
+
+class FuzzEvidence(BaseModel):
+    """Fuzzer-specific evidence attached to a dynamically confirmed finding.
+
+    ``stack`` holds project frames only (fuzzer runtime, harness, libc and
+    sanitizer frames are dropped by the ingestor). Paths are POSIX-relative to
+    the scanned source root; ``reproducer_path`` is relative to the fuzzer's
+    work directory.
+    """
+
+    engine: str
+    finding_id: str
+    rule_id: str | None = None
+    exception_name: str | None = None
+    sanitizer: str | None = None
+    classification: str | None = None
+    verdict: str | None = None
+    confidence: str | None = None
+    confirmation: str | None = None
+    harness_id: str | None = None
+    cluster_key: str | None = None
+    signature: str | None = None
+    member_ids: list[str] = []
+    stack: list[StackFrame] = []
+    reproducer_path: str | None = None
+    replay_command: str | None = None
+    prosthetics_used: bool | None = None
+    cwe_ids: list[int] = []
 
 
 class RuntimeTarget(BaseModel):
@@ -249,9 +305,11 @@ class Finding(BaseModel):
     cvss_v4_vector: str | None = None
     cwe_id: int | None = None
     owasp_id: str | None = None
+    category: FindingCategory | None = None
     affected_hosts: list[str] = []
     source_code_refs: list[SourceCodeRef] = []
     runtime_targets: list[RuntimeTarget] = []
+    fuzz: FuzzEvidence | None = None
     description: str = ""
     impact: str = ""
     remediation: str = ""

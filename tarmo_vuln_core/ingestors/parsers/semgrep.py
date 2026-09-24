@@ -6,11 +6,13 @@ import json
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.parsers.sarif import SarifIngestor
-from tarmo_vuln_core.models import Finding
+from tarmo_vuln_core.models import Finding, FindingCategory
 
 
 class SemgrepIngestor(SarifIngestor):
     """Parses Semgrep SARIF output, tagging findings with source_tool='semgrep'."""
+
+    category = FindingCategory.SAST
 
     @property
     def supported_extensions(self) -> list[str]:

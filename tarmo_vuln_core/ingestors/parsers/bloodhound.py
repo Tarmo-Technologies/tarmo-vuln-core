@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 from tarmo_vuln_core.utils import slugify as _slugify
 
 _SEVERITY_MAP: dict[str, Severity] = {
@@ -40,6 +40,8 @@ class BloodHoundIngestor(BaseIngestor):
     - ``CWE`` — optional integer CWE ID
     - ``CVE`` — optional CVE reference string
     """
+
+    category = FindingCategory.INFRASTRUCTURE
 
     @property
     def supported_extensions(self) -> list[str]:

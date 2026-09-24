@@ -1,6 +1,6 @@
 """Built-in parser registry for tarmo-vuln-core.
 
-Exports ``register_all()`` which populates a registry list with all 38 parsers
+Exports ``register_all()`` which populates a registry list with all 40 parsers
 in the canonical specificity order.
 """
 
@@ -9,6 +9,7 @@ from __future__ import annotations
 from tarmo_vuln_core.ingestors.base import BaseIngestor
 from tarmo_vuln_core.ingestors.parsers.acunetix import AcunetixIngestor
 from tarmo_vuln_core.ingestors.parsers.bandit import BanditIngestor
+from tarmo_vuln_core.ingestors.parsers.bhf import BhfIngestor, BhfStaticIngestor
 from tarmo_vuln_core.ingestors.parsers.binary_analyzer import BinwalkIngestor, StringsIngestor
 from tarmo_vuln_core.ingestors.parsers.bloodhound import BloodHoundIngestor
 from tarmo_vuln_core.ingestors.parsers.burp import BurpIngestor
@@ -50,6 +51,11 @@ from tarmo_vuln_core.ingestors.parsers.zap import ZapIngestor
 #   - GnatSasIngestor before SarifIngestor (SARIF subclass with stricter can_handle)
 #   - SarpIngestor and PragmaticIngestor before CsvFindingIngestor (more specific CSV)
 #   - FortifyIngestor and CheckmarxIngestor early (highly specific file formats)
+#   - BhfIngestor before every CSV/JSON catch-all (Pragmatic, Sarp, CsvFinding,
+#     Manual): it sniffs the exact BHF findings.csv header / finding.json keys
+#     and is the only ingestor that accepts a directory (a BHF work dir)
+#   - BhfStaticIngestor before SemgrepIngestor/GnatSasIngestor/SarifIngestor so
+#     BHF's static-report.sarif is not swallowed by the generic SARIF parser
 # ManualIngestor is last — it accepts any YAML/JSON.
 DEFAULT_REGISTRY_ORDER: list[type[BaseIngestor]] = [
     NessusIngestor,
@@ -66,6 +72,8 @@ DEFAULT_REGISTRY_ORDER: list[type[BaseIngestor]] = [
     WpscanIngestor,
     SslyzeIngestor,
     TenableIngestor,
+    BhfIngestor,
+    BhfStaticIngestor,
     FortifyIngestor,
     CheckmarxIngestor,
     SrmIngestor,
@@ -95,6 +103,8 @@ DEFAULT_REGISTRY_ORDER: list[type[BaseIngestor]] = [
 __all__ = [
     "AcunetixIngestor",
     "BanditIngestor",
+    "BhfIngestor",
+    "BhfStaticIngestor",
     "BinwalkIngestor",
     "BloodHoundIngestor",
     "BurpIngestor",
@@ -138,6 +148,6 @@ __all__ = [
 
 
 def register_all(registry: list[BaseIngestor]) -> None:
-    """Instantiate and append all 38 built-in parsers to *registry*."""
+    """Instantiate and append all 40 built-in parsers to *registry*."""
     for cls in DEFAULT_REGISTRY_ORDER:
         registry.append(cls())

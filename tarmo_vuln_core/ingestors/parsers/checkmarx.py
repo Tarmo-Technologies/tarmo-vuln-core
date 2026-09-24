@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from tarmo_vuln_core.cdata import default_registry
+from tarmo_vuln_core.ingestors._xml import parse_xml_bytes, parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 _DEFAULT_IMPACT = "The vulnerability may allow an attacker to compromise the affected system."
@@ -24,6 +24,8 @@ _SEVERITY_MAP: dict[str, Severity] = {
 class CheckmarxIngestor(BaseIngestor):
     """Parses Checkmarx SAST XML output files (CxXMLResults)."""
 
+    category = FindingCategory.SAST
+
     @property
     def supported_extensions(self) -> list[str]:
         return [".xml"]
@@ -32,15 +34,14 @@ class CheckmarxIngestor(BaseIngestor):
         if not path.exists():
             return False
         try:
-            tree = ET.parse(path)  # noqa: S314
-            return tree.getroot().tag == "CxXMLResults"
-        except Exception:
+            return parse_xml_file(path, fmt="Checkmarx").tag == "CxXMLResults"
+        except IngestorError:
             return False
 
     def extract_scanner_version(self, raw: bytes) -> str | None:
         try:
-            root = ET.fromstring(raw)  # noqa: S314
-        except ET.ParseError:
+            root = parse_xml_bytes(raw, fmt="Checkmarx")
+        except IngestorError:
             return None
         v = root.attrib.get("CheckmarxVersion")
         return str(v) if v else None
@@ -49,12 +50,7 @@ class CheckmarxIngestor(BaseIngestor):
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
 
-        try:
-            tree = ET.parse(path)  # noqa: S314
-        except ET.ParseError as e:
-            raise IngestorError(f"Failed to parse Checkmarx XML: {e}") from e
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt="Checkmarx")
         findings: list[Finding] = []
         registry = default_registry()
 

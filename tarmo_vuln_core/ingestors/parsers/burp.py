@@ -5,10 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-import defusedxml.ElementTree as ET
-
+from tarmo_vuln_core.ingestors._xml import parse_xml_bytes, parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Instance, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Instance, Severity
 from tarmo_vuln_core.utils import get_xml_text as _get_text
 from tarmo_vuln_core.utils import slugify as _slugify
 
@@ -34,6 +33,8 @@ _BURP_DEFAULT_REMEDIATION = (
 class BurpIngestor(BaseIngestor):
     """Parses Burp Suite XML export files (Scanner issues)."""
 
+    category = FindingCategory.DAST
+
     @property
     def supported_extensions(self) -> list[str]:
         """File extensions this ingestor handles."""
@@ -47,16 +48,14 @@ class BurpIngestor(BaseIngestor):
         if not path.exists():
             return False
         try:
-            tree = ET.parse(path)
-            root = tree.getroot()
-            return root.tag == "issues"
-        except ET.ParseError:
+            return parse_xml_file(path, fmt="Burp").tag == "issues"
+        except IngestorError:
             return False
 
     def extract_scanner_version(self, raw: bytes) -> str | None:
         try:
-            root = ET.fromstring(raw)
-        except ET.ParseError:
+            root = parse_xml_bytes(raw, fmt="Burp")
+        except IngestorError:
             return None
         v = root.attrib.get("burpVersion")
         return str(v) if v else None
@@ -78,12 +77,7 @@ class BurpIngestor(BaseIngestor):
         """
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
-        try:
-            tree = ET.parse(path)
-        except ET.ParseError as e:
-            raise IngestorError(f"Failed to parse Burp XML: {e}") from e
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt="Burp")
 
         # name -> metadata dict with accumulated hosts and instances
         name_data: dict[str, dict[str, object]] = {}

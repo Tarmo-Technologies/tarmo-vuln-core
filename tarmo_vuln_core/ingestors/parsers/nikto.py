@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from xml.etree.ElementTree import Element
 
-import defusedxml.ElementTree as ET
-
-from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.ingestors._xml import parse_xml_bytes, parse_xml_file
+from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError, UnsafeXmlError
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 from tarmo_vuln_core.utils import slugify as _slugify
 
 _NIKTO_DEFAULT_IMPACT = (
@@ -84,8 +84,35 @@ def _repair_truncated_xml(path: Path) -> str:
     return stripped
 
 
+def _parse_nikto_root(path: Path) -> Element:
+    """Parse Nikto XML, retrying once with repaired closing tags if truncated.
+
+    A forbidden construct (entity declaration / external reference) is never
+    retried — it is re-raised as :class:`UnsafeXmlError` immediately.
+    """
+    try:
+        return parse_xml_file(path, fmt="Nikto")
+    except UnsafeXmlError:
+        raise
+    except IngestorError as first:
+        try:
+            repaired = _repair_truncated_xml(path)
+        except OSError as exc:
+            raise IngestorError(f"Cannot read Nikto XML '{path}': {exc}") from exc
+        try:
+            return parse_xml_bytes(repaired, fmt="Nikto", source=f"'{path.name}' (repaired)")
+        except UnsafeXmlError:
+            raise
+        except IngestorError as exc:
+            raise IngestorError(
+                f"Failed to parse Nikto XML: {first}; repair failed: {exc}"
+            ) from exc
+
+
 class NiktoIngestor(BaseIngestor):
     """Parses Nikto web server scanner XML output files."""
+
+    category = FindingCategory.DAST
 
     @property
     def supported_extensions(self) -> list[str]:
@@ -105,16 +132,9 @@ class NiktoIngestor(BaseIngestor):
         if not path.exists():
             return False
         try:
-            tree = ET.parse(path)
-            root = tree.getroot()
-            return root.tag == "niktoscan"
-        except ET.ParseError:
-            try:
-                repaired = _repair_truncated_xml(path)
-                root = ET.fromstring(repaired)
-                return root.tag == "niktoscan"
-            except ET.ParseError:
-                return False
+            return _parse_nikto_root(path).tag == "niktoscan"
+        except IngestorError:
+            return False
 
     def ingest(self, path: Path) -> list[Finding]:
         """Parse Nikto XML and return deduplicated findings.
@@ -134,15 +154,7 @@ class NiktoIngestor(BaseIngestor):
         """
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
-        try:
-            tree = ET.parse(path)
-            root = tree.getroot()
-        except ET.ParseError:
-            try:
-                repaired = _repair_truncated_xml(path)
-                root = ET.fromstring(repaired)
-            except ET.ParseError as exc:
-                raise IngestorError(f"Failed to parse Nikto XML: {exc}") from exc
+        root = _parse_nikto_root(path)
 
         # (nikto_id, description) -> accumulated data dict
         item_data: dict[tuple[str, str], dict] = {}

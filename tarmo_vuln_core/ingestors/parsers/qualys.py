@@ -11,10 +11,9 @@ import logging
 from pathlib import Path
 from xml.etree.ElementTree import Element
 
-import defusedxml.ElementTree as ET
-
+from tarmo_vuln_core.ingestors._xml import parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 from tarmo_vuln_core.utils import slugify as _slugify_base
 
 logger = logging.getLogger(__name__)
@@ -60,6 +59,8 @@ class QualysIngestor(BaseIngestor):
     CVEs) is sourced from the ``GLOSSARY/VULN_DETAILS_LIST`` section.
     """
 
+    category = FindingCategory.INFRASTRUCTURE
+
     @property
     def supported_extensions(self) -> list[str]:
         """File extensions this ingestor handles."""
@@ -72,10 +73,8 @@ class QualysIngestor(BaseIngestor):
         if path.suffix.lower() != ".xml":
             return False
         try:
-            tree = ET.parse(path)
-            root = tree.getroot()
-            return root.tag == "ASSET_DATA_REPORT"
-        except ET.ParseError:
+            return parse_xml_file(path, fmt="Qualys").tag == "ASSET_DATA_REPORT"
+        except IngestorError:
             return False
 
     def ingest(self, path: Path) -> list[Finding]:
@@ -92,12 +91,7 @@ class QualysIngestor(BaseIngestor):
         """
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
-        try:
-            tree = ET.parse(path)
-        except ET.ParseError as exc:
-            raise IngestorError(f"Cannot parse Qualys XML {path}: {exc}") from exc
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt="Qualys")
         if root.tag != "ASSET_DATA_REPORT":
             raise IngestorError(f"Not a valid Qualys ASSET_DATA_REPORT file: {path}")
 

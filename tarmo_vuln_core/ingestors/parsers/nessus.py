@@ -6,10 +6,9 @@ import logging
 from pathlib import Path
 from typing import cast
 
-import defusedxml.ElementTree as ET
-
+from tarmo_vuln_core.ingestors._xml import parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Host, HostProperty, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Host, HostProperty, Severity
 from tarmo_vuln_core.utils import get_xml_text as _get_text
 
 logger = logging.getLogger(__name__)
@@ -36,6 +35,8 @@ _NESSUS_DEFAULT_REMEDIATION = (
 class NessusIngestor(BaseIngestor):
     """Parses Nessus .nessus XML export files."""
 
+    category = FindingCategory.INFRASTRUCTURE
+
     @property
     def supported_extensions(self) -> list[str]:
         """File extensions this ingestor handles."""
@@ -51,10 +52,8 @@ class NessusIngestor(BaseIngestor):
         if path.suffix.lower() != ".nessus":
             return False
         try:
-            tree = ET.parse(path)
-            root = tree.getroot()
-            return root.tag == "NessusClientData_v2"
-        except ET.ParseError:
+            return parse_xml_file(path, fmt=".nessus").tag == "NessusClientData_v2"
+        except IngestorError:
             return False
 
     def ingest(self, path: Path) -> list[Finding]:
@@ -76,12 +75,7 @@ class NessusIngestor(BaseIngestor):
             raise IngestorError(f"File not found: {path}")
         if path.suffix.lower() != ".nessus":
             raise IngestorError(f"Expected .nessus suffix, got: {path.suffix}")
-        try:
-            tree = ET.parse(path)
-        except ET.ParseError as e:
-            raise IngestorError(f"Failed to parse .nessus XML: {e}") from e
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt=".nessus")
 
         # plugin_id -> metadata dict including accumulated hosts list
         plugin_data: dict[str, dict[str, object]] = {}
@@ -187,11 +181,9 @@ class NessusIngestor(BaseIngestor):
         if not path.exists() or path.suffix.lower() != ".nessus":
             return []
         try:
-            tree = ET.parse(path)
-        except ET.ParseError:
+            root = parse_xml_file(path, fmt=".nessus")
+        except IngestorError:
             return []
-
-        root = tree.getroot()
         hosts: list[Host] = []
 
         for report in root.findall("Report"):

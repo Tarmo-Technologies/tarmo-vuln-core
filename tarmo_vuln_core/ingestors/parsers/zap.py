@@ -7,10 +7,9 @@ from pathlib import Path
 from typing import cast
 from urllib.parse import urlparse
 
-import defusedxml.ElementTree as ET
-
+from tarmo_vuln_core.ingestors._xml import parse_xml_bytes, parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Instance, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Instance, Severity
 from tarmo_vuln_core.utils import get_xml_text as _get_text
 from tarmo_vuln_core.utils import slugify as _slugify
 
@@ -42,6 +41,8 @@ def _parse_uri_to_instance(uri: str) -> Instance | None:
 class ZapIngestor(BaseIngestor):
     """Parses OWASP ZAP XML report files."""
 
+    category = FindingCategory.DAST
+
     @property
     def supported_extensions(self) -> list[str]:
         """File extensions this ingestor handles."""
@@ -55,16 +56,14 @@ class ZapIngestor(BaseIngestor):
         if not path.exists():
             return False
         try:
-            tree = ET.parse(path)
-            root = tree.getroot()
-            return root.tag == "OWASPZAPReport"
-        except ET.ParseError:
+            return parse_xml_file(path, fmt="ZAP").tag == "OWASPZAPReport"
+        except IngestorError:
             return False
 
     def extract_scanner_version(self, raw: bytes) -> str | None:
         try:
-            root = ET.fromstring(raw)
-        except ET.ParseError:
+            root = parse_xml_bytes(raw, fmt="ZAP")
+        except IngestorError:
             return None
         v = root.attrib.get("version")
         return str(v) if v else None
@@ -86,12 +85,7 @@ class ZapIngestor(BaseIngestor):
         """
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
-        try:
-            tree = ET.parse(path)
-        except ET.ParseError as e:
-            raise IngestorError(f"Failed to parse ZAP XML: {e}") from e
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt="ZAP")
 
         # pluginid -> metadata dict with accumulated instances
         plugin_data: dict[str, dict[str, object]] = {}

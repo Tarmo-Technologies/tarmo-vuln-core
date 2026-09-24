@@ -14,11 +14,14 @@ from tarmo_vuln_core.models.finding import (
     Evidence,
     EvidenceType,
     Finding,
+    FindingCategory,
     FindingStatus,
+    FuzzEvidence,
     Instance,
     RuntimeTarget,
     Severity,
     SourceCodeRef,
+    StackFrame,
 )
 from tarmo_vuln_core.models.host import Host, HostProperty
 
@@ -29,7 +32,9 @@ __all__ = [
     "Evidence",
     "EvidenceType",
     "Finding",
+    "FindingCategory",
     "FindingStatus",
+    "FuzzEvidence",
     "Host",
     "HostProperty",
     "Instance",
@@ -41,4 +46,5 @@ __all__ = [
     "SharedCredential",
     "SharedExploitMetadata",
     "SourceCodeRef",
+    "StackFrame",
 ]

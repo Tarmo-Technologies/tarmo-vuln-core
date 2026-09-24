@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.parsers.sarif import SarifIngestor
-from tarmo_vuln_core.models import Finding
+from tarmo_vuln_core.models import Finding, FindingCategory
 
 _DEFAULT_IMPACT = "The vulnerability may allow an attacker to compromise the affected system."
 _DEFAULT_REMEDIATION = "Review and remediate the identified issue."
@@ -14,6 +14,8 @@ _DEFAULT_REMEDIATION = "Review and remediate the identified issue."
 
 class GnatSasIngestor(SarifIngestor):
     """Parses GNAT SAS / CodePeer SARIF output files (Ada-specific)."""
+
+    category = FindingCategory.SAST
 
     @property
     def supported_extensions(self) -> list[str]:

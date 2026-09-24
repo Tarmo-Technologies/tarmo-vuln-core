@@ -17,11 +17,11 @@ import shutil
 from pathlib import Path
 
 import pytest
-from tarmo_vuln_core.ingestors.parsers.bhf import BhfIngestor, BhfStaticIngestor
 
 from tarmo_vuln_core import FindingCategory, Severity, StackFrame, auto_detect, get_by_format
 from tarmo_vuln_core.ingestors.base import IngestorError
 from tarmo_vuln_core.ingestors.parsers import DEFAULT_REGISTRY_ORDER
+from tarmo_vuln_core.ingestors.parsers.bhf import BhfIngestor, BhfStaticIngestor
 from tarmo_vuln_core.ingestors.parsers.csv_finding import CsvFindingIngestor
 from tarmo_vuln_core.ingestors.parsers.gnatsas import GnatSasIngestor
 from tarmo_vuln_core.ingestors.parsers.manual import ManualIngestor
@@ -96,6 +96,13 @@ class TestBhfCanHandle:
 
     def test_auto_detect_work_directory(self) -> None:
         assert isinstance(auto_detect(WORK), BhfIngestor)
+
+    def test_auto_detect_unrelated_directory_is_rejected_not_crashed(self, tmp_path: Path) -> None:
+        # Every probe must tolerate a directory (XML probes used to raise
+        # IsADirectoryError out of auto_detect).
+        (tmp_path / "notes.txt").write_text("hi")
+        with pytest.raises(IngestorError, match="No ingestor could handle"):
+            auto_detect(tmp_path)
 
     def test_auto_detect_single_finding_json(self) -> None:
         detected = auto_detect(WORK / "findings" / F0000 / "finding.json")
@@ -211,7 +218,12 @@ class TestBhfIngestCsv:
         assert f.cwe_id == 122
         assert f.fuzz is not None
         assert f.fuzz.cwe_ids == [122, 787]
-        assert f.fuzz.stack == [StackFrame(file="parse.c", function="sum_table", line=17)]
+        # BHF's exception.stack appends ASAN's "allocated by" frames after the crash
+        # frames; the allocation site (parse.c:14) is a project frame and is kept.
+        assert f.fuzz.stack == [
+            StackFrame(file="parse.c", function="sum_table", line=17),
+            StackFrame(file="parse.c", function="sum_table", line=14),
+        ]
 
     def test_f0003_sink_falls_back_to_csv_columns(self, findings: list) -> None:
         # finding.json for F-0003 has no actionability.sink; the CSV row does.

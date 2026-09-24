@@ -6,10 +6,9 @@ from pathlib import Path
 from typing import cast
 from xml.etree.ElementTree import Element
 
-import defusedxml.ElementTree as ET
-
+from tarmo_vuln_core.ingestors._xml import parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Host, HostProperty, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Host, HostProperty, Severity
 
 _NMAP_IMPACT = (
     "An open port exposes the running service to network-level attacks. "
@@ -55,6 +54,8 @@ def _looks_like_http(svc_el: Element, port_el: Element) -> bool:
 class NmapIngestor(BaseIngestor):
     """Parses Nmap XML output files (nmap -oX)."""
 
+    category = FindingCategory.INFRASTRUCTURE
+
     @property
     def supported_extensions(self) -> list[str]:
         """File extensions this ingestor handles."""
@@ -68,10 +69,8 @@ class NmapIngestor(BaseIngestor):
         if not path.exists():
             return False
         try:
-            tree = ET.parse(path)
-            root = tree.getroot()
-            return root.tag == "nmaprun"
-        except ET.ParseError:
+            return parse_xml_file(path, fmt="Nmap").tag == "nmaprun"
+        except IngestorError:
             return False
 
     def ingest(self, path: Path) -> list[Finding]:
@@ -91,12 +90,7 @@ class NmapIngestor(BaseIngestor):
         """
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
-        try:
-            tree = ET.parse(path)
-        except ET.ParseError as e:
-            raise IngestorError(f"Failed to parse Nmap XML: {e}") from e
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt="Nmap")
 
         # (protocol, portid) -> {hosts, service_name, product, version}
         port_data: dict[tuple[str, str], dict[str, object]] = {}
@@ -193,11 +187,9 @@ class NmapIngestor(BaseIngestor):
         if not path.exists():
             return []
         try:
-            tree = ET.parse(path)
-        except ET.ParseError:
+            root = parse_xml_file(path, fmt="Nmap")
+        except IngestorError:
             return []
-
-        root = tree.getroot()
         hosts: list[Host] = []
 
         for host_el in root.findall("host"):

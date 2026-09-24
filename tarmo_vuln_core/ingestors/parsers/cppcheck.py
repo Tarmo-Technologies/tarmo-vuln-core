@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from tarmo_vuln_core.cdata import default_registry
+from tarmo_vuln_core.ingestors._xml import parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 _SEVERITY_MAP: dict[str, Severity] = {
@@ -47,6 +47,8 @@ _NOISE_IDS: set[str] = {
 class CppcheckIngestor(BaseIngestor):
     """Parses cppcheck XML output files."""
 
+    category = FindingCategory.SAST
+
     @property
     def supported_extensions(self) -> list[str]:
         return [".xml"]
@@ -56,25 +58,19 @@ class CppcheckIngestor(BaseIngestor):
         if not path.exists():
             return False
         try:
-            tree = ET.parse(path)  # noqa: S314
-            root = tree.getroot()
-            if root.tag != "results":
-                return False
-            return root.find("cppcheck") is not None
-        except Exception:
+            root = parse_xml_file(path, fmt="cppcheck")
+        except IngestorError:
             return False
+        if root.tag != "results":
+            return False
+        return root.find("cppcheck") is not None
 
     def ingest(self, path: Path) -> list[Finding]:
         """Parse a cppcheck XML file and return a list of Finding objects."""
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
 
-        try:
-            tree = ET.parse(path)  # noqa: S314
-        except ET.ParseError as e:
-            raise IngestorError(f"Failed to parse cppcheck XML: {e}") from e
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt="cppcheck")
 
         # Group by (error_id, msg) to deduplicate
         groups: dict[tuple[str, str], dict] = {}

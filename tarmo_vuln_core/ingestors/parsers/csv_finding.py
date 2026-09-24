@@ -7,7 +7,7 @@ import logging
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 from tarmo_vuln_core.utils import slugify as _slugify_base
 
 logger = logging.getLogger(__name__)
@@ -72,6 +72,8 @@ class CsvFindingIngestor(BaseIngestor):
     Multi-value columns (``affected_hosts``, ``compliance_refs``, ``steps``)
     accept comma- or semicolon-delimited values within a single cell.
     """
+
+    category = FindingCategory.MANUAL
 
     @property
     def supported_extensions(self) -> list[str]:

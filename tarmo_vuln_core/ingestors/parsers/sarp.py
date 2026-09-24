@@ -7,7 +7,7 @@ import warnings
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 
 _SEVERITY_MAP: dict[str, Severity] = {
     "Critical": Severity.CRITICAL,
@@ -78,6 +78,8 @@ class SarpSchemaError(ValueError):
 
 class SarpIngestor(BaseIngestor):
     """Parses SARP CSV output files."""
+
+    category = FindingCategory.SAST
 
     def __init__(self) -> None:
         # Reset on every ingest() call — reflects the most recent file.

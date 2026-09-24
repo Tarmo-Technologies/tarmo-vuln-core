@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 from tarmo_vuln_core.utils import slugify as _slugify
 
 _SEVERITY_MAP: dict[str, Severity] = {
@@ -43,6 +43,8 @@ class HackerOneIngestor(BaseIngestor):
     - ``attributes.cve_ids`` — optional list of CVE strings
     - ``relationships.severity.data.attributes`` — optional CVSS details
     """
+
+    category = FindingCategory.MANUAL
 
     @property
     def supported_extensions(self) -> list[str]:
