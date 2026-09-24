@@ -61,9 +61,54 @@ class TestFindingCategoryField:
         f = Finding(title="t", severity=Severity.LOW, category=FindingCategory.SCA)
         assert f.model_dump(mode="json")["category"] == "sca"
 
-    def test_rejects_unknown_category(self) -> None:
-        with pytest.raises(ValueError, match="category"):
-            Finding(title="t", severity=Severity.LOW, category="quantum")
+    @pytest.mark.parametrize(
+        ("raw", "expected"),
+        [
+            ("SAST", FindingCategory.SAST),
+            ("Dast", FindingCategory.DAST),
+            ("  Fuzz  ", FindingCategory.FUZZ),
+            (FindingCategory.CONFIG, FindingCategory.CONFIG),
+        ],
+    )
+    def test_case_and_whitespace_insensitive(self, raw: object, expected: FindingCategory) -> None:
+        f = Finding(title="t", severity=Severity.LOW, category=raw)
+        assert f.category is expected
+        assert f.extra_fields == {}
+
+    def test_unknown_string_becomes_none_and_is_preserved(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Free-text categories (accepted-and-dropped before the enum existed)
+        must not reject the finding; the raw value survives in extra_fields."""
+        with caplog.at_level("WARNING", logger="tarmo_vuln_core.models.finding"):
+            f = Finding(title="t", severity=Severity.LOW, category="Web Application")
+        assert f.category is None
+        assert f.extra_fields == {"category": "Web Application"}
+        assert "Web Application" in caplog.text
+        assert "category" in caplog.text
+
+    def test_unknown_value_does_not_clobber_existing_extra_field(self) -> None:
+        f = Finding.model_validate(
+            {
+                "title": "t",
+                "severity": "LOW",
+                "category": "quantum",
+                "extra_fields": {"category": "kept", "team": "red"},
+            }
+        )
+        assert f.category is None
+        assert f.extra_fields == {"category": "kept", "team": "red"}
+
+    @pytest.mark.parametrize("raw", [["web", "api"], 7, {"k": "v"}])
+    def test_non_string_category_becomes_none(self, raw: object) -> None:
+        f = Finding.model_validate({"title": "t", "severity": "LOW", "category": raw})
+        assert f.category is None
+        assert f.extra_fields == {"category": raw}
+
+    def test_explicit_none_stays_none_without_extra_field(self) -> None:
+        f = Finding(title="t", severity=Severity.LOW, category=None)
+        assert f.category is None
+        assert f.extra_fields == {}
 
 
 _EXPECTED_CATEGORY: dict[str, FindingCategory] = {

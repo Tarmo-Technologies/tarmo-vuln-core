@@ -11,19 +11,26 @@ the stdlib ParseError path never produces.
 from __future__ import annotations
 
 import resource
+import struct
 import time
+import tracemalloc
 import zipfile
 from pathlib import Path
 
 import pytest
 
 from tarmo_vuln_core import auto_detect
+from tarmo_vuln_core.ingestors._xml import parse_xml_bytes, parse_xml_file, xml_first_tag
 from tarmo_vuln_core.ingestors.base import IngestorError
 from tarmo_vuln_core.ingestors.parsers.acunetix import AcunetixIngestor
 from tarmo_vuln_core.ingestors.parsers.burp import BurpIngestor
 from tarmo_vuln_core.ingestors.parsers.checkmarx import CheckmarxIngestor
 from tarmo_vuln_core.ingestors.parsers.cppcheck import CppcheckIngestor
-from tarmo_vuln_core.ingestors.parsers.fortify import MAX_FVDL_BYTES, FortifyIngestor
+from tarmo_vuln_core.ingestors.parsers.fortify import (
+    MAX_FVDL_BYTES,
+    MAX_FVDL_COMPRESSION_RATIO,
+    FortifyIngestor,
+)
 from tarmo_vuln_core.ingestors.parsers.metasploit import MetasploitIngestor
 from tarmo_vuln_core.ingestors.parsers.nessus import NessusIngestor
 from tarmo_vuln_core.ingestors.parsers.nexpose import NexposeIngestor
@@ -275,8 +282,11 @@ def _fvdl_body(n_vulns: int = 1) -> str:
 
 @pytest.mark.unit
 class TestFortifyDecompressionCap:
-    def test_default_cap_is_512_mib(self) -> None:
-        assert MAX_FVDL_BYTES == 512 * 1024 * 1024
+    def test_default_cap_is_64_mib(self) -> None:
+        assert MAX_FVDL_BYTES == 64 * 1024 * 1024
+
+    def test_default_compression_ratio_limit_is_200(self) -> None:
+        assert MAX_FVDL_COMPRESSION_RATIO == 200
 
     def test_fpr_under_cap_ingests(self, tmp_path: Path) -> None:
         fpr = tmp_path / "ok.fpr"
@@ -316,8 +326,241 @@ class TestFortifyDecompressionCap:
         """The chunked reader itself stops at the cap, whatever the header claimed."""
         import io
 
-        from tarmo_vuln_core.ingestors.parsers.fortify import _read_bounded
+        from tarmo_vuln_core.ingestors.parsers.fortify import _BoundedReader
 
-        with pytest.raises(IngestorError, match="exceeds"):
-            _read_bounded(io.BytesIO(b"A" * 5000), max_bytes=4096, label="audit.fvdl")
-        assert _read_bounded(io.BytesIO(b"A" * 4096), max_bytes=4096, label="x") == b"A" * 4096
+        over = _BoundedReader(io.BytesIO(b"A" * 5000), max_bytes=4096, label="audit.fvdl")
+        with pytest.raises(IngestorError, match=r"audit\.fvdl exceeds the decompressed size cap"):
+            while over.read(1024):
+                pass
+        assert over.total == 4097  # stopped one byte past the cap, not at EOF
+        exact = _BoundedReader(io.BytesIO(b"A" * 4096), max_bytes=4096, label="x")
+        assert exact.read() == b"A" * 4096
+
+
+# ── Fortify: compression-ratio guard and streaming parse (zip-bomb memory) ────
+
+_FVDL_OPEN_ROOT = f'<FVDL xmlns="{_FVDL_NS}">'
+
+
+def _element_bomb(n_bytes: int) -> bytes:
+    """A well-formed FVDL whose body is *n_bytes* of dense empty elements."""
+    return _FVDL_OPEN_ROOT.encode() + b"<a/>" * (n_bytes // 4) + b"</FVDL>"
+
+
+def _patch_declared_size_field(fpr: Path, real: int, fake: int) -> None:
+    """Rewrite a 32-bit size field in both the local and central headers."""
+    raw = fpr.read_bytes()
+    real_b, fake_b = struct.pack("<I", real), struct.pack("<I", fake)
+    assert raw.count(real_b) >= 2
+    fpr.write_bytes(raw.replace(real_b, fake_b))
+
+
+#: Streaming parse peaks at ~0.85 MiB whatever the input size; the old
+#: whole-tree parse needed ~43 MiB for a 2 MiB element bomb.
+_BOMB_BYTES = 2 * 1024 * 1024
+_PEAK_BOUND = 1536 * 1024
+
+
+def _traced_peak(fn: object) -> tuple[object, int]:
+    tracemalloc.start()
+    try:
+        tracemalloc.reset_peak()
+        result = fn()  # type: ignore[operator]
+        _current, peak = tracemalloc.get_traced_memory()
+    finally:
+        tracemalloc.stop()
+    return result, peak
+
+
+@pytest.mark.unit
+class TestFortifyZipBombMemory:
+    def test_high_ratio_fpr_rejected_up_front(self, tmp_path: Path) -> None:
+        """16 MiB of <a/> deflates ~1000:1 -- refused from the header, before inflating."""
+        body = _element_bomb(16 * 1024 * 1024)
+        fpr = tmp_path / "bomb.fpr"
+        with zipfile.ZipFile(fpr, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("audit.fvdl", body)
+        assert fpr.stat().st_size < 64 * 1024
+        started = time.monotonic()
+        _none, peak = _traced_peak(lambda: _expect_ingest_error(fpr, _RATIO_MSG))
+        assert time.monotonic() - started < 2.0
+        assert peak < 1024 * 1024, f"peak {peak} bytes while refusing a ratio bomb"
+
+    def test_lying_compress_size_cannot_dodge_ratio_guard(self, tmp_path: Path) -> None:
+        """Over-reporting compress_size must not shrink the computed ratio: the
+        denominator is clamped to the archive's real size."""
+        body = _element_bomb(4 * 1024 * 1024)
+        fpr = tmp_path / "liar.fpr"
+        with zipfile.ZipFile(fpr, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("audit.fvdl", body)
+        real_csize = zipfile.ZipFile(fpr).getinfo("audit.fvdl").compress_size
+        _patch_declared_size_field(fpr, real_csize, 10 * 1024 * 1024)
+        assert zipfile.ZipFile(fpr).getinfo("audit.fvdl").compress_size == 10 * 1024 * 1024
+        _expect_ingest_error(fpr, _RATIO_MSG)
+
+    def test_streaming_reader_enforces_ratio(self) -> None:
+        """Defence in depth: the chunked reader re-checks the ratio on the bytes
+        the decompressor actually produced, whatever the header declared."""
+        import io
+
+        from tarmo_vuln_core.ingestors.parsers.fortify import _BoundedReader
+
+        reader = _BoundedReader(
+            io.BytesIO(b"A" * (3 * 1024 * 1024)),
+            max_bytes=64 * 1024 * 1024,
+            label="audit.fvdl",
+            compressed_size=4096,
+            max_ratio=200,
+        )
+        with pytest.raises(IngestorError, match=_RATIO_MSG):
+            while reader.read(16 * 1024):
+                pass
+        # Under the grace floor nothing trips, even at an absurd ratio.
+        small = _BoundedReader(
+            io.BytesIO(b"A" * (512 * 1024)),
+            max_bytes=64 * 1024 * 1024,
+            label="audit.fvdl",
+            compressed_size=1,
+            max_ratio=200,
+        )
+        total = 0
+        while chunk := small.read(16 * 1024):
+            total += len(chunk)
+        assert total == 512 * 1024
+
+    def test_small_high_ratio_entry_below_grace_floor_still_ingests(self, tmp_path: Path) -> None:
+        """Tiny, very compressible reports are not false positives of the ratio guard."""
+        vulns = (
+            "<Vulnerability><ClassInfo><Type>SQL Injection</Type>"
+            "<DefaultSeverity>4.0</DefaultSeverity></ClassInfo></Vulnerability>"
+        ) * 5000
+        body = f"{_FVDL_OPEN_ROOT}<Vulnerabilities>{vulns}</Vulnerabilities></FVDL>".encode()
+        assert len(body) < 1024 * 1024
+        fpr = tmp_path / "dense.fpr"
+        with zipfile.ZipFile(fpr, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("audit.fvdl", body)
+        info = zipfile.ZipFile(fpr).getinfo("audit.fvdl")
+        assert info.file_size / info.compress_size > 200
+        findings = FortifyIngestor().ingest(fpr)
+        assert len(findings) == 5000
+        assert findings[4999].title == "SQL Injection"
+
+    def test_stored_element_bomb_parsed_in_bounded_memory(self, tmp_path: Path) -> None:
+        """Ratio 1:1 (ZIP_STORED) passes the ratio guard; the streaming parser
+        must still keep peak allocations far below the document size (the old
+        whole-tree parse needed ~24 bytes of memory per input byte)."""
+        body = _element_bomb(_BOMB_BYTES)
+        fpr = tmp_path / "stored.fpr"
+        with zipfile.ZipFile(fpr, "w", compression=zipfile.ZIP_STORED) as zf:
+            zf.writestr("audit.fvdl", body)
+        findings, peak = _traced_peak(lambda: FortifyIngestor().ingest(fpr))
+        assert findings == []
+        assert peak < _PEAK_BOUND < len(body), f"peak {peak} bytes for a {len(body)}-byte FVDL"
+
+    def test_standalone_fvdl_element_bomb_parsed_in_bounded_memory(self, tmp_path: Path) -> None:
+        body = _element_bomb(_BOMB_BYTES)
+        fvdl = tmp_path / "bomb.fvdl"
+        fvdl.write_bytes(body)
+        findings, peak = _traced_peak(lambda: FortifyIngestor().ingest(fvdl))
+        assert findings == []
+        assert peak < _PEAK_BOUND < len(body), f"peak {peak} bytes for a {len(body)}-byte FVDL"
+
+    def test_bomb_nested_inside_vulnerability_bounded(self, tmp_path: Path) -> None:
+        """Junk inside a retained Vulnerability subtree is discarded as it streams."""
+        junk = b"<a/>" * (_BOMB_BYTES // 8)
+        body = (
+            _FVDL_OPEN_ROOT.encode()
+            + b"<Vulnerabilities><Vulnerability><ClassInfo><Type>Path Manipulation</Type>"
+            + b"<DefaultSeverity>5.0</DefaultSeverity>"
+            + junk
+            + b"</ClassInfo>"
+            + junk
+            + b"</Vulnerability></Vulnerabilities></FVDL>"
+        )
+        fvdl = tmp_path / "nested.fvdl"
+        fvdl.write_bytes(body)
+        findings, peak = _traced_peak(lambda: FortifyIngestor().ingest(fvdl))
+        assert [f.title for f in findings] == ["Path Manipulation"]  # type: ignore[union-attr]
+        assert peak < _PEAK_BOUND < len(body), f"peak {peak} bytes for a {len(body)}-byte FVDL"
+
+    def test_wrong_root_rejected_before_reading_whole_document(self, tmp_path: Path) -> None:
+        body = b"<NotFVDL>" + b"<a/>" * (4 * 1024 * 1024) + b"</NotFVDL>"
+        fpr = tmp_path / "wrong.fpr"
+        with zipfile.ZipFile(fpr, "w", compression=zipfile.ZIP_STORED) as zf:
+            zf.writestr("audit.fvdl", body)
+        _none, peak = _traced_peak(
+            lambda: _expect_ingest_error(fpr, "Unsupported Fortify XML root element")
+        )
+        assert peak < 1024 * 1024, f"peak {peak} bytes while refusing a non-FVDL root"
+
+
+_RATIO_MSG = r"audit\.fvdl.*compression ratio.*exceeds.*200"
+
+
+def _expect_ingest_error(path: Path, match: str) -> None:
+    with pytest.raises(IngestorError, match=match):
+        FortifyIngestor().ingest(path)
+
+
+# ── Encoding declarations pyexpat cannot use must not escape as ValueError ────
+
+_BAD_ENCODINGS = [
+    pytest.param("shift_jis", id="multibyte-shift_jis"),
+    pytest.param("euc-jp", id="multibyte-euc-jp"),
+    pytest.param("big5", id="multibyte-big5"),
+    pytest.param("x-bogus-enc", id="unknown-encoding"),
+]
+
+
+def _encoded_doc(encoding: str, root: str = "nmaprun") -> bytes:
+    return f'<?xml version="1.0" encoding="{encoding}"?><{root}/>'.encode()
+
+
+@pytest.mark.unit
+class TestUnusableEncodingDeclarations:
+    @pytest.mark.parametrize("encoding", _BAD_ENCODINGS)
+    def test_parse_xml_file_raises_ingestor_error(self, tmp_path: Path, encoding: str) -> None:
+        path = tmp_path / "scan.xml"
+        path.write_bytes(_encoded_doc(encoding))
+        with pytest.raises(IngestorError, match=r"Failed to parse Nmap XML 'scan\.xml'"):
+            parse_xml_file(path, fmt="Nmap")
+
+    @pytest.mark.parametrize("encoding", _BAD_ENCODINGS)
+    def test_parse_xml_bytes_raises_ingestor_error(self, encoding: str) -> None:
+        with pytest.raises(IngestorError, match=r"Failed to parse Burp XML <bytes>"):
+            parse_xml_bytes(_encoded_doc(encoding, "issues"), fmt="Burp")
+
+    @pytest.mark.parametrize("encoding", _BAD_ENCODINGS)
+    def test_xml_first_tag_raises_ingestor_error(self, tmp_path: Path, encoding: str) -> None:
+        path = tmp_path / "scan.xml"
+        path.write_bytes(_encoded_doc(encoding, "NexposeReport"))
+        with pytest.raises(IngestorError, match=r"Failed to parse Nexpose XML 'scan\.xml'"):
+            xml_first_tag(path, fmt="Nexpose")
+
+    @pytest.mark.parametrize("encoding", _BAD_ENCODINGS)
+    def test_auto_detect_raises_ingestor_error(self, tmp_path: Path, encoding: str) -> None:
+        path = tmp_path / "scan.xml"
+        path.write_bytes(_encoded_doc(encoding))
+        with pytest.raises(IngestorError, match=r"No ingestor could handle 'scan\.xml'"):
+            auto_detect(path)
+
+    @pytest.mark.parametrize("encoding", _BAD_ENCODINGS)
+    def test_auto_detect_fvdl_named_file(self, tmp_path: Path, encoding: str) -> None:
+        path = tmp_path / "audit.fvdl"
+        path.write_bytes(_encoded_doc(encoding, "FVDL"))
+        with pytest.raises(IngestorError, match=r"No ingestor could handle 'audit\.fvdl'"):
+            auto_detect(path)
+
+    @pytest.mark.parametrize("encoding", _BAD_ENCODINGS)
+    def test_scanner_version_returns_none(self, encoding: str) -> None:
+        raw = _encoded_doc(encoding, 'CxXMLResults CheckmarxVersion="9.0"')
+        assert CheckmarxIngestor().extract_scanner_version(raw) is None
+        assert BurpIngestor().extract_scanner_version(_encoded_doc(encoding, "issues")) is None
+
+    @pytest.mark.parametrize("encoding", _BAD_ENCODINGS)
+    def test_fortify_ingest_fpr_raises_ingestor_error(self, tmp_path: Path, encoding: str) -> None:
+        fpr = tmp_path / "enc.fpr"
+        with zipfile.ZipFile(fpr, "w") as zf:
+            zf.writestr("audit.fvdl", _encoded_doc(encoding, f'FVDL xmlns="{_FVDL_NS}"'))
+        with pytest.raises(IngestorError, match=r"Failed to parse Fortify FVDL XML 'enc\.fpr'"):
+            FortifyIngestor().ingest(fpr)
