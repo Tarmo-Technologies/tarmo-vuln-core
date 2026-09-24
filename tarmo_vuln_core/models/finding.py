@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import uuid
 from datetime import date, datetime
 from pathlib import Path
@@ -77,6 +78,8 @@ class FindingStatus(StrEnum):
     PROVISIONAL = "provisional"
     POTENTIAL = "potential"
 
+
+logger = logging.getLogger(__name__)
 
 _EVIDENCE_TYPE_BY_EXT: dict[str, EvidenceType] = {}  # populated after EvidenceType is defined
 
@@ -343,6 +346,43 @@ class Finding(BaseModel):
     remediation_due: date | None = None
     sla_days: int | None = None
     provisional_until: date | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _lenient_category(cls, data: Any) -> Any:
+        """Normalise ``category`` and never let an unrecognised value reject a finding.
+
+        Matching is case- and whitespace-insensitive (``"SAST"`` → ``sast``),
+        like ``severity``. Before :class:`FindingCategory` existed a free-text
+        ``category`` key (e.g. ``"Web Application"`` in a manual YAML finding)
+        was silently ignored, so an unknown value is dropped to ``None`` (the
+        ingestor's default category then applies) and the raw value is kept in
+        ``extra_fields["category"]`` unless that key is already set.
+        """
+        if not isinstance(data, dict) or data.get("category") is None:
+            return data
+        raw = data["category"]
+        if isinstance(raw, FindingCategory):
+            return data
+        if isinstance(raw, str):
+            try:
+                return {**data, "category": FindingCategory(raw.strip().lower())}
+            except ValueError:
+                pass
+        logger.warning(
+            "Unrecognised finding category %r for finding %r; expected one of %s. "
+            "Leaving category unset and keeping the value in extra_fields['category'].",
+            raw,
+            data.get("title"),
+            ", ".join(c.value for c in FindingCategory),
+        )
+        out = {**data, "category": None}
+        extra = data.get("extra_fields")
+        if extra is None:
+            out["extra_fields"] = {"category": raw}
+        elif isinstance(extra, dict) and "category" not in extra:
+            out["extra_fields"] = {**extra, "category": raw}
+        return out
 
     @field_validator("cvss_score", "cvss_v4_score")
     @classmethod
