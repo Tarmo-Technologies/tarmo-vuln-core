@@ -1,0 +1,85 @@
+{
+  "actionability": {
+    "confidence": "low",
+    "cwe": [
+      "CWE-78"
+    ],
+    "cwe_name": "OS command injection via controlled argv/cmdline",
+    "entry_path": {
+      "attacker_reachable": true,
+      "kind": "harness",
+      "source": "testcase.bin",
+      "target": "H-C0004-8B1AE7C6"
+    },
+    "explanation": "While processing a crafted input, the program hit a fault in the affected code and stopped. At minimum this lets an attacker who can supply this input crash the program; the underlying defect should be reviewed. Triggered by the attached test input (`testcase.bin`).",
+    "impact": "critical",
+    "mode": "reporting",
+    "patch_hints": [
+      {
+        "guidance": "Pass an argv array or a validated enum command instead of building a shell string from input bytes.",
+        "rule_id": "BHF-304",
+        "title": "Avoid shell command strings"
+      }
+    ],
+    "prosthetics": {
+      "used": false
+    },
+    "source": {
+      "entry": "H-C0004-8B1AE7C6",
+      "kind": "harness",
+      "testcase": "testcase.bin"
+    },
+    "verdict": "likely_reachable"
+  },
+  "build": {
+    "sandbox": {
+      "mode": "none",
+      "strict": false
+    }
+  },
+  "classification": "oracle_hit",
+  "cluster_fallback": false,
+  "cluster_key": "3f479217c3974c3b",
+  "cluster_key_full": "3f479217c3974c3b3a191300f86908049a5d63e11c60ddb89928cfd12ccd1f88",
+  "cluster_normalized_frames": [
+    "command-injection-ada",
+    "system"
+  ],
+  "confirmation": "runtime",
+  "dialect": "unknown",
+  "exception": {
+    "message": "shell metacharacters observed in a runtime command string",
+    "name": "ORACLE_COMMAND_INJECTION_ADA"
+  },
+  "fixture_path": "/work/bhf/harnesses/H-C0004-8B1AE7C6/main",
+  "harness_id": "H-C0004-8B1AE7C6",
+  "id": "F-0003-77f37013",
+  "input_reachability": "attacker_reachable",
+  "oracle": {
+    "api": "system",
+    "category": "logic-bug",
+    "evidence": [
+      {
+        "key": "command",
+        "value": "ls s__s]\nls__s = \"ls %s\"\n[ls__s]\nls__s = \"ls %s\"\n"
+      }
+    ],
+    "message": "shell metacharacters observed in a runtime command string",
+    "name": "command-injection-ada"
+  },
+  "paths": {
+    "decoded": "decoded.json",
+    "finding": "finding.json",
+    "testcase": "testcase.bin"
+  },
+  "rule_id": "BHF-304",
+  "runtime_mode": {
+    "env_injected": {},
+    "pass": "empty"
+  },
+  "sandbox": {
+    "mode": "none",
+    "strict": false
+  },
+  "signature": "77f370135f74a32107398ac61c5d1a727d8aee54c290cfa4f2b9e9cdd2d3ba98"
+}

@@ -1,0 +1,137 @@
+{
+  "actionability": {
+    "confidence": "medium",
+    "cwe": [
+      "CWE-122",
+      "CWE-125"
+    ],
+    "cwe_name": "Heap-based Buffer Overflow",
+    "entry_path": {
+      "attacker_reachable": true,
+      "kind": "harness",
+      "source": "testcase.bin",
+      "target": "H-C0005-3B81D475"
+    },
+    "explanation": "This is a buffer overflow: while processing a crafted input, `parse_record` read or wrote past the end of a memory buffer. Out-of-bounds access can corrupt memory, leak data, crash the program, and in some cases be steered into running attacker code. Triggered by the attached test input (`testcase.bin`).",
+    "fix_location": {
+      "line": 9,
+      "path": "/work/src/parse.c",
+      "reason": "sanitizer_top_non_runtime_frame"
+    },
+    "impact": "critical",
+    "mode": "reporting",
+    "next_steps": [
+      "Inspect /work/src/parse.c as the primary fix location."
+    ],
+    "patch_hints": [
+      {
+        "guidance": "Bounds-check the index/length before the access at `/work/src/parse.c:9` (`parse_record`): validate it against the buffer size before reading or writing.",
+        "rule_id": "BHF-201",
+        "title": "Bounds-check before the access"
+      }
+    ],
+    "prosthetics": {
+      "used": false
+    },
+    "sink": {
+      "file": "/work/src/parse.c",
+      "function": "parse_record",
+      "line": 9
+    },
+    "source": {
+      "entry": "H-C0005-3B81D475",
+      "kind": "harness",
+      "testcase": "testcase.bin"
+    },
+    "verdict": "likely_reachable"
+  },
+  "build": {
+    "sandbox": {
+      "mode": "none",
+      "strict": false
+    }
+  },
+  "classification": "unhandled",
+  "cluster_fallback": false,
+  "cluster_key": "cc6b46c403134e69",
+  "cluster_key_full": "cc6b46c403134e693084f5d9a286b25c4a16a43ac42e5b4a61d2fde5ba8eb1ee",
+  "cluster_normalized_frames": [
+    "parse_record"
+  ],
+  "dialect": "unknown",
+  "exception": {
+    "message": "ERROR: AddressSanitizer: heap-buffer-overflow on address 0x502000000039 at pc 0x5886692362b6 bp 0x7fff2922beb0 sp 0x7fff2922b670 (READ of size 65)",
+    "name": "ASAN_HEAP_BUFFER_OVERFLOW",
+    "sanitizer": "asan",
+    "stack": [
+      {
+        "function": "__asan_memcpy"
+      },
+      {
+        "file": "/work/src/parse.c",
+        "function": "parse_record",
+        "line": 9
+      },
+      {
+        "file": "/work/bhf/harnesses/H-C0005-3B81D475/main.c",
+        "function": "bhf_run_one",
+        "line": 78
+      },
+      {
+        "file": "/opt/bhf/c_runtime/bhf_driver.c",
+        "function": "bhf_run_one_bytes",
+        "line": 436
+      },
+      {
+        "file": "/opt/bhf/c_runtime/bhf_driver.c",
+        "function": "bhf_run_file",
+        "line": 453
+      },
+      {
+        "file": "/opt/bhf/c_runtime/bhf_driver.c",
+        "function": "main",
+        "line": 522
+      },
+      {
+        "file": "csu/../sysdeps/nptl/libc_start_call_main.h",
+        "function": "__libc_start_call_main",
+        "line": 58
+      },
+      {
+        "file": "csu/../csu/libc-start.c",
+        "function": "__libc_start_main",
+        "line": 360
+      },
+      {
+        "function": "_start"
+      },
+      {
+        "function": "malloc"
+      },
+      {
+        "file": "/opt/bhf/c_runtime/bhf_driver.c",
+        "function": "bhf_run_file",
+        "line": 448
+      }
+    ]
+  },
+  "fixture_path": "/work/bhf/harnesses/H-C0005-3B81D475/main",
+  "harness_id": "H-C0005-3B81D475",
+  "id": "F-0000-c0dca483",
+  "input_reachability": "attacker_reachable",
+  "paths": {
+    "decoded": "decoded.json",
+    "finding": "finding.json",
+    "testcase": "testcase.bin"
+  },
+  "rule_id": "BHF-201",
+  "runtime_mode": {
+    "env_injected": {},
+    "pass": "empty"
+  },
+  "sandbox": {
+    "mode": "none",
+    "strict": false
+  },
+  "signature": "c0dca483634e97eccb8dc392359e31df7161004c60335111725d0d7033c4428b"
+}

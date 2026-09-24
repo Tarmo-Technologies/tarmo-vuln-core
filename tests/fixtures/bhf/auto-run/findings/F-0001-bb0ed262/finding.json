@@ -1,0 +1,135 @@
+{
+  "actionability": {
+    "confidence": "medium",
+    "cwe": [
+      "CWE-122",
+      "CWE-787"
+    ],
+    "cwe_name": "Heap-based Buffer Overflow",
+    "entry_path": {
+      "attacker_reachable": true,
+      "kind": "harness",
+      "source": "testcase.bin",
+      "target": "H-C000D-EC9148C8"
+    },
+    "explanation": "This is a buffer overflow: while processing a crafted input, `sum_table` read or wrote past the end of a memory buffer. Out-of-bounds access can corrupt memory, leak data, crash the program, and in some cases be steered into running attacker code. Triggered by the attached test input (`testcase.bin`).",
+    "fix_location": {
+      "line": 17,
+      "path": "/work/src/parse.c",
+      "reason": "sanitizer_top_non_runtime_frame"
+    },
+    "impact": "critical",
+    "mode": "reporting",
+    "next_steps": [
+      "Inspect /work/src/parse.c as the primary fix location."
+    ],
+    "patch_hints": [
+      {
+        "guidance": "Bounds-check the index/length before the access at `/work/src/parse.c:17` (`sum_table`): validate it against the buffer size before reading or writing.",
+        "rule_id": "BHF-201",
+        "title": "Bounds-check before the access"
+      }
+    ],
+    "prosthetics": {
+      "used": false
+    },
+    "sink": {
+      "file": "/work/src/parse.c",
+      "function": "sum_table",
+      "line": 17
+    },
+    "source": {
+      "entry": "H-C000D-EC9148C8",
+      "kind": "harness",
+      "testcase": "testcase.bin"
+    },
+    "verdict": "likely_reachable"
+  },
+  "build": {
+    "sandbox": {
+      "mode": "none",
+      "strict": false
+    }
+  },
+  "classification": "unhandled",
+  "cluster_fallback": false,
+  "cluster_key": "b725bb74ae4ac5f7",
+  "cluster_key_full": "b725bb74ae4ac5f7e6b877a15d85d59e21f04114d7fd526690a5139787a814b1",
+  "cluster_normalized_frames": [
+    "sum_table",
+    "sum_table"
+  ],
+  "dialect": "unknown",
+  "exception": {
+    "message": "ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000144 at pc 0x5e4a57ee2b24 bp 0x7ffd0a9de160 sp 0x7ffd0a9de158 (WRITE of size 4)",
+    "name": "ASAN_HEAP_BUFFER_OVERFLOW",
+    "sanitizer": "asan",
+    "stack": [
+      {
+        "file": "/work/src/parse.c",
+        "function": "sum_table",
+        "line": 17
+      },
+      {
+        "file": "/work/bhf/harnesses/H-C000D-EC9148C8/main.c",
+        "function": "bhf_run_one",
+        "line": 78
+      },
+      {
+        "file": "/opt/bhf/c_runtime/bhf_driver.c",
+        "function": "bhf_run_one_bytes",
+        "line": 436
+      },
+      {
+        "file": "/opt/bhf/c_runtime/bhf_driver.c",
+        "function": "bhf_run_file",
+        "line": 453
+      },
+      {
+        "file": "/opt/bhf/c_runtime/bhf_driver.c",
+        "function": "main",
+        "line": 522
+      },
+      {
+        "file": "csu/../sysdeps/nptl/libc_start_call_main.h",
+        "function": "__libc_start_call_main",
+        "line": 58
+      },
+      {
+        "file": "csu/../csu/libc-start.c",
+        "function": "__libc_start_main",
+        "line": 360
+      },
+      {
+        "function": "_start"
+      },
+      {
+        "function": "malloc"
+      },
+      {
+        "file": "/work/src/parse.c",
+        "function": "sum_table",
+        "line": 14
+      }
+    ]
+  },
+  "fixture_path": "/work/bhf/harnesses/H-C000D-EC9148C8/main",
+  "harness_id": "H-C000D-EC9148C8",
+  "id": "F-0001-bb0ed262",
+  "input_reachability": "attacker_reachable",
+  "paths": {
+    "decoded": "decoded.json",
+    "finding": "finding.json",
+    "testcase": "testcase.bin"
+  },
+  "rule_id": "BHF-201",
+  "runtime_mode": {
+    "env_injected": {},
+    "pass": "empty"
+  },
+  "sandbox": {
+    "mode": "none",
+    "strict": false
+  },
+  "signature": "bb0ed2629e2b9f0eea503c86da6f76b93dcb08b8f61552ed2505c561cd69f802"
+}

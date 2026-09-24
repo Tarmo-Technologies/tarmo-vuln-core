@@ -66,10 +66,10 @@ class TestParserRegistry:
 
         registry: list = []
         register_all(registry)
-        # 27 original + 11 new = 38
-        assert len(registry) == 38
+        # 27 original + 11 SAST + 2 BHF (fuzz + static) = 40
+        assert len(registry) == 40
 
     def test_total_registry_count(self) -> None:
         from tarmo_vuln_core.ingestors.parsers import DEFAULT_REGISTRY_ORDER
 
-        assert len(DEFAULT_REGISTRY_ORDER) == 38
+        assert len(DEFAULT_REGISTRY_ORDER) == 40

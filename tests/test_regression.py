@@ -48,8 +48,8 @@ class TestParserStability:
     If any of these change, a parser was modified in a breaking way.
     """
 
-    def test_registry_has_38_parsers(self) -> None:
-        assert len(DEFAULT_REGISTRY_ORDER) == 38
+    def test_registry_has_40_parsers(self) -> None:
+        assert len(DEFAULT_REGISTRY_ORDER) == 40
 
     def test_nessus_real_produces_12_findings(self) -> None:
         from tarmo_vuln_core.ingestors.parsers.nessus import NessusIngestor

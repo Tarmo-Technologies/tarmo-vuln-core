@@ -1,0 +1,86 @@
+{
+  "actionability": {
+    "confidence": "low",
+    "cwe": [
+      "CWE-78"
+    ],
+    "cwe_name": "Fuzz-controlled command reached a process-execution API",
+    "entry_path": {
+      "attacker_reachable": true,
+      "kind": "harness",
+      "source": "testcase.bin",
+      "target": "H-C0004-8B1AE7C6"
+    },
+    "explanation": "While processing a crafted input, the program hit a fault in the affected code and stopped. At minimum this lets an attacker who can supply this input crash the program; the underlying defect should be reviewed. Triggered by the attached test input (`testcase.bin`).",
+    "impact": "critical",
+    "mode": "reporting",
+    "prosthetics": {
+      "used": false
+    },
+    "source": {
+      "entry": "H-C0004-8B1AE7C6",
+      "kind": "harness",
+      "testcase": "testcase.bin"
+    },
+    "verdict": "likely_reachable"
+  },
+  "build": {
+    "sandbox": {
+      "mode": "none",
+      "strict": false
+    }
+  },
+  "classification": "oracle_hit",
+  "cluster_fallback": false,
+  "cluster_key": "6835322d83bff5fd",
+  "cluster_key_full": "6835322d83bff5fd2207faa45289d01f257d4177a8bfadb5a4b79585b52a4344",
+  "cluster_normalized_frames": [
+    "command-controlled-runtime",
+    "system"
+  ],
+  "confirmation": "runtime",
+  "dialect": "unknown",
+  "exception": {
+    "message": "fuzz-controlled command reached a shell-execution API during fuzz execution",
+    "name": "ORACLE_COMMAND_CONTROLLED_RUNTIME"
+  },
+  "fixture_path": "/work/bhf/harnesses/H-C0004-8B1AE7C6/main",
+  "harness_id": "H-C0004-8B1AE7C6",
+  "id": "F-0004-8fb10837",
+  "input_reachability": "attacker_reachable",
+  "oracle": {
+    "api": "system",
+    "category": "logic-bug",
+    "evidence": [
+      {
+        "key": "command",
+        "value": "ls \u0011þâ"
+      },
+      {
+        "key": "controlled",
+        "value": "true"
+      },
+      {
+        "key": "taint_path",
+        "value": "fuzz_input[2..] → system(command)"
+      }
+    ],
+    "message": "fuzz-controlled command reached a shell-execution API during fuzz execution",
+    "name": "command-controlled-runtime"
+  },
+  "paths": {
+    "decoded": "decoded.json",
+    "finding": "finding.json",
+    "testcase": "testcase.bin"
+  },
+  "rule_id": "BHF-431",
+  "runtime_mode": {
+    "env_injected": {},
+    "pass": "empty"
+  },
+  "sandbox": {
+    "mode": "none",
+    "strict": false
+  },
+  "signature": "8fb10837abdf8c7f10ae2429c8bcb732db89cf772604d35c6aa6283eaad6fdb5"
+}
