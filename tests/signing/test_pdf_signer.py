@@ -2,17 +2,25 @@
 
 from __future__ import annotations
 
+import io
 import shutil
 from pathlib import Path
 
 import pytest
 import responses as responses_lib
 
-from tarmo_vuln_core.signing import ReportSigner, SigningConfig, VerificationResult
+from tarmo_vuln_core.signing import (
+    ReportSigner,
+    ReportSigningError,
+    SigningConfig,
+    SigningPolicy,
+    VerificationResult,
+)
 from tarmo_vuln_core.signing.keygen import ensure_keys_exist
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 MINIMAL_PDF = FIXTURES_DIR / "minimal.pdf"
+TSA_URL = "http://tsa.test.invalid/tsr"
 
 
 @pytest.fixture()
@@ -28,7 +36,7 @@ def signer(signing_dir: Path) -> ReportSigner:
     cfg = SigningConfig(
         key_path=signing_dir / "signing.key.pem",
         cert_path=signing_dir / "signing.cert.pem",
-        tsa_url="https://freetsa.org/tsr",
+        tsa_url=TSA_URL,
     )
     return ReportSigner.from_config(cfg)
 
@@ -49,7 +57,7 @@ class TestPdfSigningWithMockedTsa:
         # For testing, we mock the TSA to fail gracefully (falls back to PAdES-B)
         responses_lib.add(
             responses_lib.POST,
-            "https://freetsa.org/tsr",
+            TSA_URL,
             status=500,
             body=b"",
         )
@@ -63,7 +71,7 @@ class TestPdfSigningWithMockedTsa:
         """Signed PDF should pass verify()."""
         responses_lib.add(
             responses_lib.POST,
-            "https://freetsa.org/tsr",
+            TSA_URL,
             status=500,
             body=b"",
         )
@@ -79,7 +87,7 @@ class TestPdfSigningWithMockedTsa:
     ) -> None:
         responses_lib.add(
             responses_lib.POST,
-            "https://freetsa.org/tsr",
+            TSA_URL,
             status=500,
             body=b"",
         )
@@ -93,7 +101,7 @@ class TestPdfSigningWithMockedTsa:
         """Modifying a signed PDF should invalidate the signature."""
         responses_lib.add(
             responses_lib.POST,
-            "https://freetsa.org/tsr",
+            TSA_URL,
             status=500,
             body=b"",
         )
@@ -112,7 +120,7 @@ class TestPdfSigningWithMockedTsa:
         """TSA failure should not prevent signing — falls back to PAdES-B (no timestamp)."""
         responses_lib.add(
             responses_lib.POST,
-            "https://freetsa.org/tsr",
+            TSA_URL,
             status=503,
             body=b"Service Unavailable",
         )
@@ -127,7 +135,7 @@ class TestPdfSigningWithMockedTsa:
         """PAdES-B fallback (no TST) should still produce a verifiable signature."""
         responses_lib.add(
             responses_lib.POST,
-            "https://freetsa.org/tsr",
+            TSA_URL,
             status=503,
             body=b"Service Unavailable",
         )
@@ -149,3 +157,99 @@ class TestPdfSigningWithMockedTsa:
         result = signer.verify(pdf_copy)
         assert result.valid is False
         assert result.error is not None
+
+
+class TestPdfTsaPolicy:
+    def test_no_tsa_call_when_unset(self, signing_dir: Path, pdf_copy: Path) -> None:
+        cfg = SigningConfig(
+            key_path=signing_dir / "signing.key.pem",
+            cert_path=signing_dir / "signing.cert.pem",
+        )
+        with responses_lib.RequestsMock(assert_all_requests_are_fired=False) as rsps:
+            result = ReportSigner.from_config(cfg).sign(pdf_copy)
+            assert len(rsps.calls) == 0
+        assert result.signed is True
+        assert result.tsa is False
+
+    def test_required_tsa_failure_raises(self, signing_dir: Path, pdf_copy: Path) -> None:
+        cfg = SigningConfig(
+            policy=SigningPolicy.REQUIRED,
+            key_path=signing_dir / "signing.key.pem",
+            cert_path=signing_dir / "signing.cert.pem",
+            tsa_url=TSA_URL,
+        )
+        original = pdf_copy.read_bytes()
+        with responses_lib.RequestsMock() as rsps:
+            rsps.add(responses_lib.POST, TSA_URL, status=503, body=b"")
+            with pytest.raises(ReportSigningError, match="report.pdf"):
+                ReportSigner.from_config(cfg).sign(pdf_copy)
+            assert len(rsps.calls) == 1
+        # never silently downgraded to PAdES-B-B
+        assert pdf_copy.read_bytes() == original
+
+    def test_best_effort_tsa_failure_downgrades_and_reports(
+        self, signing_dir: Path, pdf_copy: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        cfg = SigningConfig(
+            key_path=signing_dir / "signing.key.pem",
+            cert_path=signing_dir / "signing.cert.pem",
+            tsa_url=TSA_URL,
+        )
+        with responses_lib.RequestsMock() as rsps:
+            rsps.add(responses_lib.POST, TSA_URL, status=503, body=b"")
+            result = ReportSigner.from_config(cfg).sign(pdf_copy)
+        assert result.signed is True
+        assert result.tsa is False
+        assert any("TSA" in rec.getMessage() for rec in caplog.records)
+
+
+class TestPdfVerifyTrust:
+    def test_verify_untrusted_signature_is_invalid(
+        self, signer: ReportSigner, pdf_copy: Path, tmp_path: Path
+    ) -> None:
+        signer.sign(pdf_copy)
+        other_dir = tmp_path / "other"
+        ensure_keys_exist(other_dir)
+        verifier = ReportSigner(
+            SigningConfig(
+                key_path=other_dir / "signing.key.pem",
+                cert_path=other_dir / "signing.cert.pem",
+                trust_bundle_path=other_dir / "signing.cert.pem",
+            )
+        )
+        result = verifier.verify(pdf_copy)
+        assert result.valid is False
+        assert result.error is not None
+        assert "not trusted" in result.error
+
+    def test_verify_with_explicit_trust_bundle_valid(
+        self, signer: ReportSigner, signing_dir: Path, pdf_copy: Path, tmp_path: Path
+    ) -> None:
+        signer.sign(pdf_copy)
+        other_dir = tmp_path / "other"
+        ensure_keys_exist(other_dir)
+        verifier = ReportSigner(
+            SigningConfig(
+                key_path=other_dir / "signing.key.pem",
+                cert_path=other_dir / "signing.cert.pem",
+                trust_bundle_path=signing_dir / "signing.cert.pem",
+            )
+        )
+        assert verifier.verify(pdf_copy).valid is True
+
+    def test_verify_rejects_unsigned_incremental_update(
+        self, signer: ReportSigner, pdf_copy: Path
+    ) -> None:
+        from pyhanko.pdf_utils import generic
+        from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
+
+        signer.sign(pdf_copy)
+        with pdf_copy.open("rb") as fh:
+            writer = IncrementalPdfFileWriter(fh)
+            writer.root["/Tampered"] = generic.BooleanObject(True)
+            writer.update_root()
+            buf = io.BytesIO()
+            writer.write(buf)
+        pdf_copy.write_bytes(buf.getvalue())
+        result = signer.verify(pdf_copy)
+        assert result.valid is False
