@@ -194,7 +194,9 @@ def _verify(
         reasons.append("content does not match the signature")
     if not crypto_valid:
         reasons.append("signature cryptographically invalid")
-    if not trusted:
+    if not trusted and intact and crypto_valid:
+        # pyHanko reports trusted=False whenever the signature itself fails, so
+        # only blame the certificate path when content and signature check out.
         reasons.append("signer certificate not trusted or revoked")
     signed_at = status.signer_reported_dt.isoformat() if status.signer_reported_dt else None
     return CmsVerifyResult(

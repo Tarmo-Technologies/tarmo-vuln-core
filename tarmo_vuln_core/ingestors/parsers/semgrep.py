@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.parsers.sarif import SarifIngestor
 from tarmo_vuln_core.models import Finding, FindingCategory
+
+_SEMGREP_DRIVER = re.compile(r"semgrep(?: (?:oss|pro|ce))?", re.IGNORECASE)
 
 
 class SemgrepIngestor(SarifIngestor):
@@ -28,7 +31,8 @@ class SemgrepIngestor(SarifIngestor):
             if not runs:
                 return False
             driver_name = runs[0].get("tool", {}).get("driver", {}).get("name", "")
-            return bool(driver_name.lower() == "semgrep")
+            # Semgrep <1.x wrote "semgrep"; 1.160 writes "Semgrep OSS".
+            return bool(_SEMGREP_DRIVER.fullmatch(str(driver_name).strip()))
         except Exception:
             return False
 
@@ -41,7 +45,10 @@ class SemgrepIngestor(SarifIngestor):
         if not runs or not isinstance(runs, list):
             return None
         driver = runs[0].get("tool", {}).get("driver", {}) if isinstance(runs[0], dict) else {}
-        v = driver.get("version") if isinstance(driver, dict) else None
+        if not isinstance(driver, dict):
+            return None
+        # Semgrep writes SARIF driver.semanticVersion; older/other emitters use version.
+        v = driver.get("semanticVersion") or driver.get("version")
         return str(v) if v else None
 
     def ingest(self, path: Path) -> list[Finding]:
