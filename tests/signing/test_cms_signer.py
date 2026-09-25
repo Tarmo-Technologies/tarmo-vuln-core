@@ -260,6 +260,21 @@ class TestCmsVerifyDetached:
         assert result.intact is False
         assert result.valid is False
 
+    def test_tampered_content_error_does_not_blame_signer_trust(
+        self, pki: Pki, report: Path
+    ) -> None:
+        """A trusted signer over altered content is a tamper, not a trust failure."""
+        p7s = sign_detached(report, _config(pki))
+        report.write_text('{"version": "2.1.0", "runs": ["tampered"]}\n')
+        result = verify_detached(
+            report, p7s, trust_roots=[pki.ca_cert_path], crls=[], revocation_mode="soft-fail"
+        )
+        assert result.valid is False
+        assert result.error is not None
+        assert "content does not match the signature" in result.error
+        assert "not trusted" not in result.error
+        assert "revoked" not in result.error
+
     def test_verify_never_opens_socket(
         self, tmp_path: Path, report: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:

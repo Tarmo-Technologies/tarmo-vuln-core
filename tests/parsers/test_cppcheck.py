@@ -168,3 +168,46 @@ class TestCppcheckIngestor:
         findings = self.ingestor.ingest(path)
 
         assert findings[0].cwe_id == 758
+
+    def test_cwe_attribute_used_when_cdata_has_none(self, tmp_path: Path) -> None:
+        """cppcheck's own cwe= attribute backs up the CData registry."""
+        report = """<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+  <cppcheck version="2.17.1"/>
+  <errors>
+    <error id="bufferAccessOutOfBounds" severity="error" msg="Out of bounds: buf" cwe="788">
+      <location file="csrc/parse.c" line="9"/>
+    </error>
+    <error id="deallocDealloc" severity="error" msg="Dealloc twice: ip" cwe="0">
+      <location file="csrc/parse.c" line="20"/>
+    </error>
+    <error id="someNewCheck" severity="warning" msg="odd" cwe="not-a-number">
+      <location file="csrc/parse.c" line="30"/>
+    </error>
+  </errors>
+</results>
+"""
+        path = tmp_path / "cwe.xml"
+        path.write_text(report, encoding="utf-8")
+
+        by_ref = {f.raw_ref: f for f in self.ingestor.ingest(path)}
+
+        assert by_ref["bufferAccessOutOfBounds"].cwe_id == 788
+        assert by_ref["deallocDealloc"].cwe_id is None
+        assert by_ref["someNewCheck"].cwe_id is None
+
+    def test_cdata_cwe_wins_over_cwe_attribute(self, tmp_path: Path) -> None:
+        report = """<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+  <cppcheck version="2.17.1"/>
+  <errors>
+    <error id="ctunullpointer" severity="warning" msg="Null pointer dereference: arg" cwe="999">
+      <location file="src/main.cc" line="12"/>
+    </error>
+  </errors>
+</results>
+"""
+        path = tmp_path / "ctu.xml"
+        path.write_text(report, encoding="utf-8")
+
+        assert self.ingestor.ingest(path)[0].cwe_id == 476

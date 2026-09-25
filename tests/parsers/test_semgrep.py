@@ -19,6 +19,27 @@ class TestSemgrepIngestor:
 
     # -- can_handle() tests ------------------------------------------------------
 
+    def test_can_handle_semgrep_oss_driver_name(self, tmp_path: Path) -> None:
+        """Semgrep 1.160 names its SARIF driver 'Semgrep OSS'."""
+        path = tmp_path / "out.sarif"
+        path.write_text(
+            '{"version": "2.1.0", "$schema": "https://json.schemastore.org/sarif-2.1.0.json",'
+            ' "runs": [{"tool": {"driver": {"name": "Semgrep OSS",'
+            ' "semanticVersion": "1.160.0", "rules": []}}, "results": []}]}',
+            encoding="utf-8",
+        )
+        assert self.ingestor.can_handle(path) is True
+
+    def test_cannot_handle_other_driver_containing_semgrep(self, tmp_path: Path) -> None:
+        path = tmp_path / "out.sarif"
+        path.write_text(
+            '{"version": "2.1.0", "$schema": "https://json.schemastore.org/sarif-2.1.0.json",'
+            ' "runs": [{"tool": {"driver": {"name": "NotSemgrepWrapper", "rules": []}},'
+            ' "results": []}]}',
+            encoding="utf-8",
+        )
+        assert self.ingestor.can_handle(path) is False
+
     def test_can_handle_semgrep_sarif(self) -> None:
         assert self.ingestor.can_handle(FIXTURES / "semgrep_real.sarif") is True
 
