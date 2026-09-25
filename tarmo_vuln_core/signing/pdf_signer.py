@@ -1,138 +1,192 @@
-"""PAdES-T PDF signing and verification via pyhanko."""
+"""PAdES PDF signing and verification via pyHanko.
+
+A timestamp (PAdES-B-T) is requested only when ``config.tsa_url`` is set. Under
+``REQUIRED`` a TSA failure raises and the file is left untouched; it is never
+silently downgraded to PAdES-B-B. Under ``BEST_EFFORT`` the downgrade is logged.
+"""
 
 from __future__ import annotations
 
 import io
 import logging
+import os
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
-from tarmo_vuln_core.signing.config import SigningConfig
+from cryptography.hazmat.primitives import serialization
+
+from tarmo_vuln_core.signing.cms_signer import build_validation_context, run_coroutine_sync
+from tarmo_vuln_core.signing.config import (
+    ReportSigningError,
+    SigningConfig,
+    SigningConfigError,
+    SigningMaterial,
+    SigningPolicy,
+)
 
 logger = logging.getLogger(__name__)
 
 
-def sign_pdf(path: Path, config: SigningConfig) -> None:
-    """Sign a PDF file in-place using PAdES-B-T (with RFC 3161 timestamp).
-
-    Falls back to PAdES-B (no timestamp) if the TSA is unreachable.
-    Never raises — logs and returns on error.
-    """
-    try:
-        _do_sign_pdf(path, config)
-    except Exception:
-        logger.warning("Failed to sign PDF %s", path, exc_info=True)
+@dataclass(frozen=True)
+class PdfSignOutcome:
+    signer_fp: str
+    tsa: bool
 
 
-def _do_sign_pdf(path: Path, config: SigningConfig) -> None:
+def _pyhanko_signer(material: SigningMaterial) -> Any:
+    from asn1crypto import keys as asn1_keys
+    from asn1crypto import x509 as asn1_x509
+    from pyhanko.sign.signers import SimpleSigner
+    from pyhanko_certvalidator.registry import SimpleCertificateStore
+
+    signing_cert = asn1_x509.Certificate.load(
+        material.cert.public_bytes(serialization.Encoding.DER)
+    )
+    signing_key = asn1_keys.PrivateKeyInfo.load(
+        material.key.private_bytes(
+            serialization.Encoding.DER,
+            serialization.PrivateFormat.PKCS8,
+            serialization.NoEncryption(),
+        )
+    )
+    chain = [
+        asn1_x509.Certificate.load(c.public_bytes(serialization.Encoding.DER))
+        for c in material.chain
+    ]
+    return SimpleSigner(
+        signing_cert=signing_cert,
+        signing_key=signing_key,
+        cert_registry=SimpleCertificateStore.from_certs([signing_cert, *chain]),
+    )
+
+
+def _sign_bytes(pdf_bytes: bytes, signer: Any, timestamper: Any) -> bytes:
     from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
-    from pyhanko.sign.signers import PdfSignatureMetadata, SimpleSigner
+    from pyhanko.sign.signers import PdfSignatureMetadata
     from pyhanko.sign.signers import sign_pdf as pyhanko_sign_pdf
+
+    writer = IncrementalPdfFileWriter(io.BytesIO(pdf_bytes))
+    out_buf = io.BytesIO()
+    pyhanko_sign_pdf(
+        writer,
+        PdfSignatureMetadata(field_name="Sig1"),
+        signer,
+        timestamper=timestamper,
+        output=out_buf,
+    )
+    return out_buf.getvalue()
+
+
+def sign_pdf(
+    path: Path,
+    config: SigningConfig,
+    *,
+    policy: SigningPolicy | None = None,
+    material: SigningMaterial | None = None,
+) -> PdfSignOutcome:
+    """Sign a PDF in place with an embedded PAdES signature.
+
+    Raises:
+        SigningConfigError: the key material cannot be loaded.
+        ReportSigningError: a TSA failure under ``REQUIRED``.
+        Exception: pyHanko errors for a malformed PDF propagate; the caller applies
+            the signing policy.
+    """
     from pyhanko.sign.timestamps import HTTPTimeStamper
+    from pyhanko.sign.timestamps.common_utils import TimestampRequestError
 
-    key_path = config.resolved_key_path()
-    cert_path = config.resolved_cert_path()
+    effective = policy or config.policy
+    material = material or config.load_material()
+    signer = _pyhanko_signer(material)
+    pdf_bytes = path.read_bytes()
 
-    signer = SimpleSigner.load(str(key_path), str(cert_path))
-
-    # Try RFC 3161 timestamp
-    timestamper: HTTPTimeStamper | None = None
-    try:
-        timestamper = HTTPTimeStamper(config.tsa_url)
-        # Probe connectivity with a small test — pyhanko will use it during sign_pdf
-    except Exception:
-        logger.warning("Could not initialise TSA at %s — signing without timestamp", config.tsa_url)
-        timestamper = None
-
-    sig_meta = PdfSignatureMetadata(field_name="Sig1")
-
-    with open(path, "rb") as f:
-        writer = IncrementalPdfFileWriter(f)
-        out_buf = io.BytesIO()
+    tsa_used = False
+    if config.tsa_url is None:
+        signed = _sign_bytes(pdf_bytes, signer, None)
+    else:
         try:
-            pyhanko_sign_pdf(
-                writer,
-                sig_meta,
-                signer,
-                timestamper=timestamper,
-                output=out_buf,
+            signed = _sign_bytes(pdf_bytes, signer, HTTPTimeStamper(config.tsa_url))
+            tsa_used = True
+        except (TimestampRequestError, OSError) as exc:  # OSError covers requests errors
+            if effective is SigningPolicy.REQUIRED:
+                raise ReportSigningError(
+                    f"{path.name}: TSA request to {config.tsa_url} failed: {exc}"
+                ) from exc
+            logger.warning(
+                "TSA request to %s failed while signing %s; downgrading to PAdES-B-B",
+                config.tsa_url,
+                path.name,
+                exc_info=True,
             )
-        except Exception:
-            if timestamper is None:
-                raise
-            # TSA failed during signing — retry without timestamp
-            logger.warning("TSA request failed during PDF signing — falling back to PAdES-B")
-            with open(path, "rb") as f2:
-                writer2 = IncrementalPdfFileWriter(f2)
-                out_buf = io.BytesIO()
-                pyhanko_sign_pdf(writer2, sig_meta, signer, timestamper=None, output=out_buf)
+            signed = _sign_bytes(pdf_bytes, signer, None)
 
-    path.write_bytes(out_buf.getvalue())
+    tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    tmp.write_bytes(signed)
+    os.replace(tmp, path)
+    return PdfSignOutcome(signer_fp=material.fingerprint, tsa=tsa_used)
 
 
 def verify_pdf(path: Path, config: SigningConfig) -> tuple[bool, str | None, dict[str, object]]:
-    """Verify a PAdES signature on a PDF.
+    """Verify every embedded PAdES signature on a PDF.
+
+    Valid only when every signature is intact, cryptographically valid and trusted
+    against the configured trust roots, and the last signature covers the whole
+    file. Never fetches revocation data over the network.
 
     Returns (valid, error_message, metadata_dict).
     """
     try:
         return _do_verify_pdf(path, config)
-    except Exception as exc:
+    except SigningConfigError as exc:
+        return False, str(exc), {}
+    except Exception as exc:  # verification fails closed on any pyHanko/parse error
         return False, f"Verification error: {exc}", {}
 
 
 def _do_verify_pdf(path: Path, config: SigningConfig) -> tuple[bool, str | None, dict[str, object]]:
-    from asn1crypto import x509 as asn1_x509
     from pyhanko.pdf_utils.reader import PdfFileReader
-    from pyhanko.sign.validation import validate_pdf_signature
-    from pyhanko_certvalidator import ValidationContext
+    from pyhanko.sign.validation.pdf_embedded import async_validate_pdf_signature
+    from pyhanko.sign.validation.status import SignatureCoverageLevel
 
-    cert_path = config.resolved_cert_path()
-    cert_der = cert_path.read_bytes()
-    # cert.pem -> load as DER via asn1crypto (works with DER; pem needs stripping)
-    # Use the .der file if available, else convert pem
-    cert_der_path = cert_path.parent / "signing.cert.der"
-    if cert_der_path.exists():
-        asn1_cert = asn1_x509.Certificate.load(cert_der_path.read_bytes())
-    else:
-        # Strip PEM headers
-        from cryptography import x509 as cryptography_x509
-        from cryptography.hazmat.primitives import serialization
+    trust_roots = config.load_trust_roots()
 
-        crypt_cert = cryptography_x509.load_pem_x509_certificate(cert_der)
-        asn1_cert = asn1_x509.Certificate.load(crypt_cert.public_bytes(serialization.Encoding.DER))
-
-    vc = ValidationContext(trust_roots=[asn1_cert], allow_fetching=False)
-
-    with open(path, "rb") as f:
+    with path.open("rb") as f:
         reader = PdfFileReader(f)
         sigs = reader.embedded_regular_signatures
 
         if not sigs:
             return False, "No embedded signatures found in PDF", {}
 
-        # Validate the first signature
-        status = validate_pdf_signature(sigs[0], signer_validation_context=vc)
+        reasons: list[str] = []
+        meta: dict[str, object] = {}
+        for index, sig in enumerate(sigs):
+            vc = build_validation_context(trust_roots, config.crl_paths, config.revocation_mode)
+            status = run_coroutine_sync(
+                async_validate_pdf_signature(sig, signer_validation_context=vc)
+            )
+            label = f"signature {index + 1}" if len(sigs) > 1 else "signature"
+            if not status.intact:
+                reasons.append(f"{label}: document modified after signing")
+            if not status.valid:
+                reasons.append(f"{label}: signature cryptographically invalid")
+            if not status.trusted:
+                reasons.append(f"{label}: signer certificate not trusted")
+            if not status.bottom_line:
+                reasons.append(f"{label}: signature status not acceptable")
+            if index == len(sigs) - 1:
+                if status.coverage != SignatureCoverageLevel.ENTIRE_FILE:
+                    reasons.append(f"{label}: content was appended after the last signature")
+                meta = {
+                    "intact": status.intact,
+                    "valid": status.valid,
+                    "trusted": status.trusted,
+                    "has_timestamp": status.timestamp_validity is not None,
+                    "cert_subject": str(status.signing_cert.subject.human_friendly),
+                    "cert_fingerprint": f"sha256:{status.signing_cert.sha256.hex()}",
+                }
 
-        has_timestamp = status.timestamp_validity is not None
-
-        meta: dict[str, object] = {
-            "intact": status.intact,
-            "valid": status.valid,
-            "trusted": status.trusted,
-            "has_timestamp": has_timestamp,
-            "cert_subject": str(status.signing_cert.subject.human_friendly),
-            "cert_fingerprint": f"sha256:{status.signing_cert.sha256_fingerprint}",
-        }
-
-        if status.intact and status.valid:
-            return True, None, meta
-
-        reasons = []
-        if not status.intact:
-            reasons.append("document modified after signing")
-        if not status.valid:
-            reasons.append("signature cryptographically invalid")
-        if not status.trusted:
-            reasons.append("signer certificate not trusted")
-
-        return False, "; ".join(reasons) or "signature invalid", meta
+    if reasons:
+        # de-duplicate while keeping order
+        return False, "; ".join(dict.fromkeys(reasons)), meta
+    return True, None, meta

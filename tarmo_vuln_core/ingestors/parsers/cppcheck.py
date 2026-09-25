@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from tarmo_vuln_core.cdata import default_registry
-from tarmo_vuln_core.ingestors._xml import parse_xml_file
+from tarmo_vuln_core.ingestors._xml import parse_xml_bytes, parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
 from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
@@ -44,6 +44,17 @@ _NOISE_IDS: set[str] = {
 }
 
 
+def _parse_cwe_attr(value: str | None) -> int | None:
+    """Return a positive CWE id from cppcheck's ``cwe=`` attribute, else None."""
+    if not value:
+        return None
+    try:
+        cwe = int(value.strip())
+    except ValueError:
+        return None
+    return cwe if cwe > 0 else None
+
+
 class CppcheckIngestor(BaseIngestor):
     """Parses cppcheck XML output files."""
 
@@ -64,6 +75,16 @@ class CppcheckIngestor(BaseIngestor):
         if root.tag != "results":
             return False
         return root.find("cppcheck") is not None
+
+    def extract_scanner_version(self, raw: bytes) -> str | None:
+        """Return the version from ``<results><cppcheck version="..."/>``."""
+        try:
+            root = parse_xml_bytes(raw, fmt="cppcheck")
+        except IngestorError:
+            return None
+        el = root.find("cppcheck")
+        v = el.get("version") if el is not None else None
+        return str(v) if v else None
 
     def ingest(self, path: Path) -> list[Finding]:
         """Parse a cppcheck XML file and return a list of Finding objects."""
@@ -94,7 +115,10 @@ class CppcheckIngestor(BaseIngestor):
                     "severity": sev_str,
                     "files": [],
                     "source_code_refs": [],
+                    "tool_cwe": None,
                 }
+            if groups[key]["tool_cwe"] is None:
+                groups[key]["tool_cwe"] = _parse_cwe_attr(error.get("cwe"))
 
             for loc in error.findall("location"):
                 file_path = loc.get("file", "")
@@ -132,6 +156,10 @@ class CppcheckIngestor(BaseIngestor):
                     if mapped is not None:
                         severity = mapped
                         extra_fields["cdata_severity_fallback"] = mapped.value.lower()
+            if cwe_id is None:
+                # Fall back to cppcheck's own cwe= attribute (e.g.
+                # bufferAccessOutOfBounds -> 788) when CData has no mapping.
+                cwe_id = group["tool_cwe"]
 
             findings.append(
                 Finding(

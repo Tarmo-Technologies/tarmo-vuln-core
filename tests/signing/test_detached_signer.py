@@ -8,9 +8,18 @@ import json
 from pathlib import Path
 
 import pytest
+import responses as responses_lib
 
-from tarmo_vuln_core.signing import ReportSigner, SigningConfig, VerificationResult
+from tarmo_vuln_core.signing import (
+    ReportSigner,
+    ReportSigningError,
+    SigningConfig,
+    SigningPolicy,
+    VerificationResult,
+)
 from tarmo_vuln_core.signing.keygen import ensure_keys_exist
+
+TSA_URL = "http://tsa.test.invalid/tsr"
 
 
 @pytest.fixture()
@@ -150,3 +159,89 @@ class TestDetachedSigVerification:
         result = signer.verify(report)
         assert result.cert_fingerprint is not None
         assert result.cert_fingerprint.startswith("sha256:")
+
+
+class TestDetachedTsaPolicy:
+    def _cfg(self, signing_dir: Path, **overrides: object) -> SigningConfig:
+        values: dict[str, object] = {
+            "key_path": signing_dir / "signing.key.pem",
+            "cert_path": signing_dir / "signing.cert.pem",
+        }
+        values.update(overrides)
+        return SigningConfig.model_validate(values)
+
+    def test_no_tsa_call_when_unset(self, signing_dir: Path, tmp_path: Path) -> None:
+        report = tmp_path / "report.md"
+        report.write_text("# Report")
+        with responses_lib.RequestsMock(assert_all_requests_are_fired=False) as rsps:
+            result = ReportSigner.from_config(self._cfg(signing_dir)).sign(report)
+            assert len(rsps.calls) == 0
+        assert result.signed is True
+        envelope = json.loads((tmp_path / "report.md.sig").read_text())
+        assert envelope["tsa"] is None
+        assert "tsa_token" not in envelope
+
+    def test_required_tsa_failure_raises(self, signing_dir: Path, tmp_path: Path) -> None:
+        report = tmp_path / "report.md"
+        report.write_text("# Report")
+        cfg = self._cfg(signing_dir, policy=SigningPolicy.REQUIRED, tsa_url=TSA_URL)
+        with responses_lib.RequestsMock() as rsps:
+            rsps.add(responses_lib.POST, TSA_URL, status=500, body=b"")
+            with pytest.raises(ReportSigningError, match="tsa.test.invalid"):
+                ReportSigner.from_config(cfg).sign(report)
+            assert len(rsps.calls) == 1
+        assert not (tmp_path / "report.md.sig").exists()
+
+    def test_best_effort_tsa_failure_records_null(
+        self, signing_dir: Path, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        report = tmp_path / "report.md"
+        report.write_text("# Report")
+        cfg = self._cfg(signing_dir, tsa_url=TSA_URL)
+        with responses_lib.RequestsMock() as rsps:
+            rsps.add(responses_lib.POST, TSA_URL, status=500, body=b"")
+            result = ReportSigner.from_config(cfg).sign(report)
+            assert len(rsps.calls) == 1
+        assert result.signed is True
+        assert result.tsa is False
+        envelope = json.loads((tmp_path / "report.md.sig").read_text())
+        assert envelope["tsa"] is None
+        assert "tsa_token" not in envelope
+        warnings = [rec for rec in caplog.records if rec.levelname == "WARNING"]
+        assert any(rec.exc_info is not None for rec in warnings)
+
+    def test_rsa_key_refused_for_sig_json(self, tmp_path: Path) -> None:
+        import datetime
+
+        from cryptography import x509
+        from cryptography.hazmat.primitives import hashes, serialization
+        from cryptography.hazmat.primitives.asymmetric import rsa
+
+        key = rsa.generate_private_key(public_exponent=65537, key_size=3072)
+        name = x509.Name([x509.NameAttribute(x509.oid.NameOID.COMMON_NAME, "rsa")])
+        now = datetime.datetime.now(datetime.timezone.utc)  # noqa: UP017
+        cert = (
+            x509.CertificateBuilder()
+            .subject_name(name)
+            .issuer_name(name)
+            .public_key(key.public_key())
+            .serial_number(1)
+            .not_valid_before(now)
+            .not_valid_after(now + datetime.timedelta(days=1))
+            .sign(key, hashes.SHA256())
+        )
+        (tmp_path / "k.pem").write_bytes(
+            key.private_bytes(
+                serialization.Encoding.PEM,
+                serialization.PrivateFormat.PKCS8,
+                serialization.NoEncryption(),
+            )
+        )
+        (tmp_path / "c.pem").write_bytes(cert.public_bytes(serialization.Encoding.PEM))
+        report = tmp_path / "report.md"
+        report.write_text("# r")
+        cfg = SigningConfig(
+            policy=SigningPolicy.REQUIRED, key_path=tmp_path / "k.pem", cert_path=tmp_path / "c.pem"
+        )
+        with pytest.raises(ReportSigningError, match="ECDSA"):
+            ReportSigner.from_config(cfg).sign(report)

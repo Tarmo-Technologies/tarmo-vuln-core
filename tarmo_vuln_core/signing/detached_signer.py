@@ -1,4 +1,9 @@
-"""ECDSA P-256 detached .sig signing and verification for non-PDF formats."""
+"""ECDSA P-256 detached ``.sig`` JSON signing and verification for non-PDF formats.
+
+The ``sig-json`` envelope is kept for pentest-scribe and for verifying existing
+``.sig`` files. New consumers that need recipients to verify with standard tools
+use the CMS ``.p7s`` sidecar (:mod:`tarmo_vuln_core.signing.cms_signer`).
+"""
 
 from __future__ import annotations
 
@@ -7,6 +12,8 @@ import datetime
 import hashlib
 import json
 import logging
+import os
+from dataclasses import dataclass
 from pathlib import Path
 
 from cryptography import x509
@@ -17,84 +24,115 @@ from cryptography.hazmat.primitives.asymmetric.ec import (
     EllipticCurvePrivateKey,
     EllipticCurvePublicKey,
 )
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
 
 from tarmo_vuln_core._compat import UTC
-from tarmo_vuln_core.signing.config import SigningConfig
+from tarmo_vuln_core.signing.config import (
+    ReportSigningError,
+    SigningConfig,
+    SigningPolicy,
+)
 
 logger = logging.getLogger(__name__)
 
-_SIGNABLE_EXTENSIONS = {".html", ".md", ".docx", ".pptx"}
+SIGNABLE_EXTENSIONS = frozenset({".html", ".md", ".docx", ".pptx"})
+_SIGNABLE_EXTENSIONS = SIGNABLE_EXTENSIONS  # backward-compatible alias
 
-# Formats explicitly excluded from signing
+# Formats explicitly excluded from sig-json signing
 _EXCLUDED_EXTENSIONS = {".csv", ".json", ".sarif", ".xml"}
 
 
-def sign_file(path: Path, config: SigningConfig) -> None:
-    """Sign a non-PDF file by writing a JSON .sig sidecar.
+@dataclass(frozen=True)
+class DetachedSignOutcome:
+    sig_path: Path
+    signer_fp: str
+    tsa: bool
 
-    Skips silently for non-signable extensions. Never raises.
+
+def sign_file(
+    path: Path, config: SigningConfig, *, policy: SigningPolicy | None = None
+) -> DetachedSignOutcome:
+    """Sign a non-PDF file by writing a JSON ``<path>.sig`` sidecar.
+
+    Raises:
+        ReportSigningError: the extension is not signable in sig-json, the key is not
+            ECDSA, or (under ``REQUIRED``) the configured TSA fails.
+        SigningConfigError: the key material cannot be loaded.
     """
-    if path.suffix not in _SIGNABLE_EXTENSIONS:
-        return
+    effective = policy or config.policy
+    if path.suffix not in SIGNABLE_EXTENSIONS:
+        raise ReportSigningError(
+            f"{path.name}: extension {path.suffix!r} is not signable with the sig-json "
+            "envelope; use detached_format='cms'"
+        )
 
-    try:
-        _do_sign(path, config)
-    except Exception:
-        logger.warning("Failed to sign %s", path, exc_info=True)
+    material = config.load_material()
+    if not isinstance(material.key, EllipticCurvePrivateKey):
+        raise ReportSigningError(
+            f"{path.name}: the sig-json envelope supports only ECDSA P-256 keys; "
+            "use detached_format='cms' for RSA keys"
+        )
 
-
-def _do_sign(path: Path, config: SigningConfig) -> None:
     file_bytes = path.read_bytes()
     sha256_hex = hashlib.sha256(file_bytes).hexdigest()
-
-    key_path = config.resolved_key_path()
-    cert_path = config.resolved_cert_path()
-
-    private_key = load_pem_private_key(key_path.read_bytes(), password=None)
-    assert isinstance(private_key, EllipticCurvePrivateKey)
-
-    cert = x509.load_pem_x509_certificate(cert_path.read_bytes())
-    fingerprint = cert.fingerprint(hashes.SHA256()).hex()
-
-    sig_bytes = private_key.sign(file_bytes, ECDSA(hashes.SHA256()))
-    sig_b64 = base64.b64encode(sig_bytes).decode()
-
-    now = datetime.datetime.now(UTC)
+    sig_bytes = material.key.sign(file_bytes, ECDSA(hashes.SHA256()))
 
     envelope: dict[str, object] = {
         "version": 1,
         "algorithm": "ECDSA-P256-SHA256",
-        "signed_at": now.isoformat().replace("+00:00", "Z"),
+        "signed_at": datetime.datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "sha256": sha256_hex,
-        "signature": sig_b64,
-        "cert_fingerprint": f"sha256:{fingerprint}",
+        "signature": base64.b64encode(sig_bytes).decode(),
+        "cert_fingerprint": material.fingerprint,
+        "tsa": None,
     }
 
-    # Attempt RFC 3161 timestamp
-    tsa_token = _get_tsa_token(sha256_hex, config.tsa_url)
+    tsa_token = _get_tsa_token(sha256_hex, config.tsa_url, effective)
     if tsa_token is not None:
+        envelope["tsa"] = config.tsa_url
         envelope["tsa_token"] = tsa_token
 
     sig_path = path.parent / (path.name + ".sig")
-    sig_path.write_text(json.dumps(envelope, indent=2))
+    tmp_path = sig_path.with_name(f".{sig_path.name}.{os.getpid()}.tmp")
+    tmp_path.write_text(json.dumps(envelope, indent=2))
+    os.replace(tmp_path, sig_path)
+    return DetachedSignOutcome(
+        sig_path=sig_path, signer_fp=material.fingerprint, tsa=tsa_token is not None
+    )
 
 
-def _get_tsa_token(sha256_hex: str, tsa_url: str) -> str | None:
-    """Request RFC 3161 timestamp. Returns base64-encoded token or None on failure."""
-    try:
-        import rfc3161ng
+def _get_tsa_token(sha256_hex: str, tsa_url: str | None, policy: SigningPolicy) -> str | None:
+    """Request an RFC 3161 timestamp token for ``sha256_hex``.
 
-        digest = bytes.fromhex(sha256_hex)
-        response = rfc3161ng.get_timestamp(digest, tsa_url, hash_algorithm="sha256")
-        return base64.b64encode(response).decode()
-    except Exception:
-        logger.warning("TSA request failed for %s — signing without timestamp", tsa_url)
+    No request is made when ``tsa_url`` is ``None``. On a TSA failure,
+    ``REQUIRED`` raises :class:`ReportSigningError`; ``BEST_EFFORT`` logs a warning
+    and returns ``None``.
+    """
+    if tsa_url is None:
         return None
+
+    import rfc3161ng
+    from pyasn1.error import PyAsn1Error  # type: ignore[import-untyped]
+
+    try:
+        stamper = rfc3161ng.RemoteTimestamper(tsa_url, hashname="sha256")
+        token: bytes = stamper.timestamp(digest=bytes.fromhex(sha256_hex))
+    except (
+        rfc3161ng.TimestampingError,
+        OSError,  # includes requests.RequestException
+        ValueError,
+        PyAsn1Error,
+    ) as exc:
+        if policy is SigningPolicy.REQUIRED:
+            raise ReportSigningError(f"TSA request to {tsa_url} failed: {exc}") from exc
+        logger.warning(
+            "TSA request to %s failed; recording tsa=null in the envelope", tsa_url, exc_info=True
+        )
+        return None
+    return base64.b64encode(token).decode()
 
 
 def verify_file(path: Path, config: SigningConfig) -> tuple[bool, str | None, dict[str, object]]:
-    """Verify a detached .sig for a non-PDF file.
+    """Verify a detached ``.sig`` for a non-PDF file.
 
     Returns (valid, error_message, metadata_dict).
     """
@@ -124,7 +162,6 @@ def verify_file(path: Path, config: SigningConfig) -> tuple[bool, str | None, di
         sig_bytes = base64.b64decode(envelope["signature"])
         public_key.verify(sig_bytes, file_bytes, ECDSA(hashes.SHA256()))
 
-        # Enrich envelope with cert metadata for callers
         cn_attrs = cert.subject.get_attributes_for_oid(x509.oid.NameOID.COMMON_NAME)
         cert_subject = cn_attrs[0].value if cn_attrs else cert.subject.rfc4514_string()
         meta = dict(envelope)
@@ -133,5 +170,5 @@ def verify_file(path: Path, config: SigningConfig) -> tuple[bool, str | None, di
 
     except InvalidSignature:
         return False, "Signature verification failed — file may have been tampered with", envelope
-    except Exception as exc:
+    except (OSError, ValueError, KeyError, TypeError) as exc:
         return False, f"Verification error: {exc}", envelope

@@ -17,6 +17,8 @@ dependencies = [
     "pyhanko-certvalidator>=0.26",
     "rfc3161ng>=2.1",
     "cryptography>=42",
+    "asn1crypto>=1.5",
+    "pyasn1>=0.4",
 ]
 
 [project.optional-dependencies]
@@ -60,7 +62,12 @@ warn_return_any = true
 warn_unused_configs = true
 
 [[tool.mypy.overrides]]
-module = ["pyhanko.*", "pyhanko_certvalidator.*", "rfc3161ng.*", "asn1crypto.*"]
+module = [
+    "pyhanko.*",
+    "pyhanko_certvalidator.*",
+    "rfc3161ng.*",
+    "asn1crypto.*",
+]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
