@@ -4,10 +4,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import defusedxml.ElementTree as ET
-
+from tarmo_vuln_core.ingestors._xml import parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 from tarmo_vuln_core.utils import get_xml_text as _get_text
 from tarmo_vuln_core.utils import slugify as _slugify
 
@@ -57,6 +56,8 @@ def _clean_cve(cve_str: str) -> str | None:
 class OpenvasIngestor(BaseIngestor):
     """Parses OpenVAS/Greenbone Vulnerability Manager XML report files."""
 
+    category = FindingCategory.INFRASTRUCTURE
+
     @property
     def supported_extensions(self) -> list[str]:
         """File extensions this ingestor handles."""
@@ -72,13 +73,12 @@ class OpenvasIngestor(BaseIngestor):
         if not path.exists():
             return False
         try:
-            tree = ET.parse(path)
-            root = tree.getroot()
-            if root.tag != "report":
-                return False
-            return root.find(".//result/nvt") is not None
-        except ET.ParseError:
+            root = parse_xml_file(path, fmt="OpenVAS")
+        except IngestorError:
             return False
+        if root.tag != "report":
+            return False
+        return root.find(".//result/nvt") is not None
 
     def ingest(self, path: Path) -> list[Finding]:
         """Parse an OpenVAS XML report and return findings grouped by NVT OID.
@@ -97,12 +97,7 @@ class OpenvasIngestor(BaseIngestor):
         """
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
-        try:
-            tree = ET.parse(path)
-        except ET.ParseError as e:
-            raise IngestorError(f"Failed to parse OpenVAS XML: {e}") from e
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt="OpenVAS")
 
         # group_key → accumulated metadata dict
         group_data: dict[str, dict[str, object]] = {}

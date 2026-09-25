@@ -8,7 +8,7 @@ from pathlib import Path
 
 from tarmo_vuln_core.cdata import default_registry
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 _SEVERITY_MAP: dict[str, Severity] = {
@@ -23,6 +23,8 @@ _DEFAULT_REMEDIATION = "Review and remediate the identified issue."
 
 class SigasiIngestor(BaseIngestor):
     """Parses Sigasi JSON diagnostic output files."""
+
+    category = FindingCategory.SAST
 
     @property
     def supported_extensions(self) -> list[str]:

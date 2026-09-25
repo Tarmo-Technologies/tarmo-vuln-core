@@ -7,10 +7,9 @@ from pathlib import Path
 from typing import cast
 from xml.etree.ElementTree import Element
 
-import defusedxml.ElementTree as ET
-
+from tarmo_vuln_core.ingestors._xml import parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 from tarmo_vuln_core.utils import get_xml_text as _get_text
 from tarmo_vuln_core.utils import slugify as _slugify
 
@@ -29,6 +28,8 @@ _MSF_DEFAULT_REMEDIATION = (
 
 class MetasploitIngestor(BaseIngestor):
     """Parses Metasploit Framework CSV or XML export files."""
+
+    category = FindingCategory.INFRASTRUCTURE
 
     @property
     def supported_extensions(self) -> list[str]:
@@ -50,10 +51,8 @@ class MetasploitIngestor(BaseIngestor):
 
         if suffix == ".xml":
             try:
-                tree = ET.parse(path)
-                root = tree.getroot()
-                return root.tag in _MSF_XML_ROOTS
-            except ET.ParseError:
+                return parse_xml_file(path, fmt="Metasploit").tag in _MSF_XML_ROOTS
+            except IngestorError:
                 return False
 
         return False
@@ -85,12 +84,7 @@ class MetasploitIngestor(BaseIngestor):
         Supports both flat top-level schema (vulns/vuln, services/service) and the
         host-nested schema (hosts/host/vulns/vuln, hosts/host/services/service).
         """
-        try:
-            tree = ET.parse(path)
-        except ET.ParseError as e:
-            raise IngestorError(f"Failed to parse Metasploit XML: {e}") from e
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt="Metasploit")
 
         # --- Collect vuln elements with their associated host address ---
         # key: vuln name → metadata + accumulated hosts

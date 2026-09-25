@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 from tarmo_vuln_core.utils import slugify as _slugify
 
 _TRIVY_SEVERITY_MAP: dict[str, Severity] = {
@@ -52,6 +52,8 @@ def _extract_cwe(vuln: dict) -> int | None:
 
 class TrivyIngestor(BaseIngestor):
     """Parses Trivy JSON output files (trivy image/fs/repo --format json)."""
+
+    category = FindingCategory.SCA
 
     @property
     def supported_extensions(self) -> list[str]:

@@ -1,0 +1,41 @@
+{
+  "actionability": {
+    "confidence": "medium",
+    "cwe": [
+      "CWE-120"
+    ],
+    "verdict": "static_only"
+  },
+  "classification": "static_scan",
+  "confirmation": "static",
+  "data_flow": "",
+  "dialect": null,
+  "entity": "",
+  "exception": {
+    "message": "Unbounded string copy (strcpy/strcat/gets) with no length limit",
+    "source_file": "",
+    "source_line": ""
+  },
+  "harness_id": "static-scan",
+  "id": "F-STATIC-0000",
+  "oracle": {
+    "evidence": [
+      {
+        "key": "source",
+        "value": "/work/proj/lib/parse.c:6:copy_name"
+      }
+    ]
+  },
+  "report_only": true,
+  "rule_id": "BHF-401",
+  "severity": "high",
+  "target": {
+    "line": 6,
+    "location": {
+      "line": 6,
+      "path": "/work/proj/lib/parse.c"
+    },
+    "name": "parse.c",
+    "source_path": "/work/proj/lib/parse.c"
+  }
+}

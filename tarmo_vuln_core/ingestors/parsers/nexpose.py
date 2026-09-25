@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import contextlib
 import re
-import xml.etree.ElementTree as ET
 from pathlib import Path
+from xml.etree.ElementTree import Element
 
+from tarmo_vuln_core.ingestors._xml import parse_xml_file, xml_first_tag
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 
 #: Nexpose severity is an integer 1–10.
 _SEVERITY_MAP: list[tuple[int, Severity]] = [
@@ -30,7 +31,7 @@ def _severity(score: int) -> Severity:
     return Severity.INFO
 
 
-def _element_text(elem: ET.Element | None) -> str:
+def _element_text(elem: Element | None) -> str:
     """Return all text content from an element's subtree, collapsed."""
     if elem is None:
         return ""
@@ -40,6 +41,8 @@ def _element_text(elem: ET.Element | None) -> str:
 
 class NexposeIngestor(BaseIngestor):
     """Parses Rapid7 Nexpose / InsightVM XML export files (``NexposeReport`` format)."""
+
+    category = FindingCategory.INFRASTRUCTURE
 
     @property
     def supported_extensions(self) -> list[str]:
@@ -57,11 +60,9 @@ class NexposeIngestor(BaseIngestor):
         if path.suffix.lower() != ".xml":
             return False
         try:
-            for _event, elem in ET.iterparse(str(path), events=("start",)):  # nosec B314
-                return elem.tag in ("NexposeReport", "NexposeSimpleXML")
-        except ET.ParseError:
+            return xml_first_tag(path, fmt="Nexpose") in ("NexposeReport", "NexposeSimpleXML")
+        except IngestorError:
             return False
-        return False
 
     def ingest(self, path: Path) -> list[Finding]:
         """Parse a Nexpose XML export and return normalised findings.
@@ -82,17 +83,12 @@ class NexposeIngestor(BaseIngestor):
         """
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
-        try:
-            tree = ET.parse(str(path))  # nosec B314
-        except ET.ParseError as exc:
-            raise IngestorError(f"Failed to parse Nexpose XML: {exc}") from exc
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt="Nexpose")
         if root.tag not in ("NexposeReport", "NexposeSimpleXML"):
             raise IngestorError(f"Expected NexposeReport root element, got {root.tag!r}")
 
         # ── Step 1: Build vulnerability definitions map ──────────────────────
-        vuln_defs: dict[str, ET.Element] = {
+        vuln_defs: dict[str, Element] = {
             v.get("id", ""): v
             for v in root.findall("VulnerabilityDefinitions/vulnerability")
             if v.get("id")

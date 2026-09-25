@@ -32,3 +32,10 @@ Additional realistic SAST parser fixtures used for schema hardening:
 |---------|--------|
 | `coverity_cli_sample.json` | Adapted from [DefectDojo/django-DefectDojo `unittests/scans/coverity_scan/one_vuln.json`](https://raw.githubusercontent.com/DefectDojo/django-DefectDojo/2f25c4510361e2f27f63fbbcff3901cbd2ef4a07/unittests/scans/coverity_scan/one_vuln.json) |
 | `fortify_realistic_sample.fvdl` | Trimmed from [DefectDojo/django-DefectDojo `unittests/scans/fortify/audit.fvdl`](https://raw.githubusercontent.com/DefectDojo/django-DefectDojo/2f25c4510361e2f27f63fbbcff3901cbd2ef4a07/unittests/scans/fortify/audit.fvdl) |
+
+BHF (Build Harness Fuzz) output:
+
+| Fixture | Source |
+|---------|--------|
+| `bhf/auto-run/` | Real `bhf auto` work directory (BHF 0.2.32) from a small C target, with paths sanitized: scanned source root `/work/src`, BHF work dir `/work/bhf`, BHF runtime `/opt/bhf`. `decoded.json` files were dropped (unused). |
+| `bhf/static/` | Real `bhf static` output (SARIF and native `bhf.static.v1` JSON) for the same target. |

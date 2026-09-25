@@ -7,7 +7,7 @@ from os.path import basename
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 _DEFAULT_IMPACT = "The vulnerability may allow an attacker to compromise the affected system."
@@ -16,6 +16,8 @@ _DEFAULT_REMEDIATION = "Review and remediate the identified issue."
 
 class PragmaticIngestor(BaseIngestor):
     """Parses Pragmatic CSV output files."""
+
+    category = FindingCategory.SAST
 
     @property
     def supported_extensions(self) -> list[str]:

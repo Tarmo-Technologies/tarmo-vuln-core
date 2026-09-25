@@ -4,7 +4,7 @@ Shared vulnerability processing library used by [pentest-scribe](https://github.
 
 ## Features
 
-- **37 built-in parsers** — Nmap, Nessus, Nexpose, Burp Suite, Acunetix, Nikto, OWASP ZAP, OpenVAS, Qualys, Metasploit, Trivy, WPScan, SSLyze, Tenable.io, Semgrep, BloodHound, HackerOne, Bandit, Cppcheck, SARIF 2.1.0, Gitleaks, TruffleHog, config file analyzer, `strings` output, `binwalk` output, CSV, manual YAML, ESLint, Pylint, GNAT SAS, Sigasi, SRM/CodeDx, OWASP Dependency Check, SARP, Checkmarx, Coverity, Fortify, and Binary Analyzer; auto-detection and custom plugin support
+- **40 built-in parsers** — Nmap, Nessus, Nexpose, Burp Suite, Acunetix, Nikto, OWASP ZAP, OpenVAS, Qualys, Metasploit, Trivy, WPScan, SSLyze, Tenable.io, Semgrep, BloodHound, HackerOne, Bandit, Cppcheck, SARIF 2.1.0, Gitleaks, TruffleHog, config file analyzer, `strings` output, `binwalk` output, CSV, manual YAML, ESLint, Pylint, GNAT SAS, Sigasi, SRM/CodeDx, OWASP Dependency Check, SARP, Checkmarx, Coverity, Fortify, Binary Analyzer, and BHF (fuzz + static); auto-detection and custom plugin support. XML parsing goes through `defusedxml` (entity declarations and external references are refused), and Fortify `.fpr` archives have a decompressed-size cap
 - **Deduplication engine** — content-hash dedup (Rust xxHash64 with Python fallback); preserves first-seen order
 - **Correlation engine** — cross-tool similarity scoring with 3-tier Rust pipeline (deterministic blocking → MinHash/LSH → weighted scoring); per-severity threshold overrides; Python fallback for portability
 - **Finding merge** — same-id re-ingest (new content wins, assessor fields preserved) and cross-tool merge (hosts/instances/tools accumulated, higher CVSS kept)
@@ -67,6 +67,8 @@ The two are independently importable. The Python package loads without the Rust 
 | Coverity | JSON | C/C++ SAST findings; groups by checker name |
 | Fortify | FPR (ZIP/FVDL XML) | SAST findings; severity from DefaultSeverity float |
 | Binary Analyzer | `.strings`/`.binwalk`/`.txt` | Hardcoded secrets, URLs, API keys, and embedded artifacts in binaries |
+| BHF (fuzz) | Work dir, `findings.csv`, or `finding.json` | One finding per root-cause row; `Finding.fuzz` carries sanitizer, verdict, project-only stack, and reproducer; paths relative to the scanned source root |
+| BHF (static) | `static-report.sarif` / `static-report.json` | SAST findings; enclosing function as `symbol`; verdict/baseline/triage tags |
 
 ## Public API
 
@@ -74,7 +76,8 @@ Key exports from `tarmo_vuln_core`:
 
 ```python
 # Models (top-level re-exports)
-Finding, FindingStatus, Severity, Instance, Evidence, EvidenceType
+Finding, FindingStatus, FindingCategory, Severity, Instance, Evidence, EvidenceType
+FuzzEvidence, StackFrame
 Host, HostProperty, DreadScore
 Protocol, PortState, ServiceName
 # Additional models available via tarmo_vuln_core.models:

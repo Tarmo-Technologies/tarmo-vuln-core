@@ -7,11 +7,13 @@ from pathlib import Path
 import yaml
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding
+from tarmo_vuln_core.models import Finding, FindingCategory
 
 
 class ManualIngestor(BaseIngestor):
     """Parses manually authored YAML or JSON finding files."""
+
+    category = FindingCategory.MANUAL
 
     @property
     def supported_extensions(self) -> list[str]:

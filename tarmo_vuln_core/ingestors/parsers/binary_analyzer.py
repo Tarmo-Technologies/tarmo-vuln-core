@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 # Pattern categories for strings analysis
@@ -115,6 +115,8 @@ def _redact_secret(value: str, keep: int = 4) -> str:
 class StringsIngestor(BaseIngestor):
     """Parses `strings` command output for security-relevant patterns."""
 
+    category = FindingCategory.BINARY
+
     @property
     def supported_extensions(self) -> list[str]:
         return [".txt", ".strings"]
@@ -197,6 +199,8 @@ class StringsIngestor(BaseIngestor):
 
 class BinwalkIngestor(BaseIngestor):
     """Parses binwalk analysis output."""
+
+    category = FindingCategory.BINARY
 
     @property
     def supported_extensions(self) -> list[str]:

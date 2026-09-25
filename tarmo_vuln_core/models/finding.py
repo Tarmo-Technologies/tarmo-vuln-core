@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import uuid
 from datetime import date, datetime
 from pathlib import Path
@@ -78,7 +79,28 @@ class FindingStatus(StrEnum):
     POTENTIAL = "potential"
 
 
+logger = logging.getLogger(__name__)
+
 _EVIDENCE_TYPE_BY_EXT: dict[str, EvidenceType] = {}  # populated after EvidenceType is defined
+
+
+class FindingCategory(StrEnum):
+    """Broad class of tool / technique that produced a finding.
+
+    Set per-ingestor via ``BaseIngestor.category`` and filled onto every
+    finding the ingestor returns unless the ingestor set one explicitly.
+    """
+
+    SAST = "sast"
+    DAST = "dast"
+    SCA = "sca"
+    SECRETS = "secrets"
+    FUZZ = "fuzz"
+    INFRASTRUCTURE = "infrastructure"
+    BINARY = "binary"
+    CONFIG = "config"
+    MANUAL = "manual"
+    OTHER = "other"
 
 
 class EvidenceType(StrEnum):
@@ -155,6 +177,43 @@ class SourceCodeRef(BaseModel):
     repository: str = ""
     branch: str = ""
     commit_sha: str = ""
+
+
+class StackFrame(BaseModel):
+    """One frame of a crash stack. ``file`` is relative to the scanned source root."""
+
+    file: str | None = None
+    function: str | None = None
+    line: int | None = None
+
+
+class FuzzEvidence(BaseModel):
+    """Fuzzer-specific evidence attached to a dynamically confirmed finding.
+
+    ``stack`` holds project frames only (fuzzer runtime, harness, libc and
+    sanitizer frames are dropped by the ingestor). Paths are POSIX-relative to
+    the scanned source root; ``reproducer_path`` is relative to the fuzzer's
+    work directory.
+    """
+
+    engine: str
+    finding_id: str
+    rule_id: str | None = None
+    exception_name: str | None = None
+    sanitizer: str | None = None
+    classification: str | None = None
+    verdict: str | None = None
+    confidence: str | None = None
+    confirmation: str | None = None
+    harness_id: str | None = None
+    cluster_key: str | None = None
+    signature: str | None = None
+    member_ids: list[str] = []
+    stack: list[StackFrame] = []
+    reproducer_path: str | None = None
+    replay_command: str | None = None
+    prosthetics_used: bool | None = None
+    cwe_ids: list[int] = []
 
 
 class RuntimeTarget(BaseModel):
@@ -249,9 +308,11 @@ class Finding(BaseModel):
     cvss_v4_vector: str | None = None
     cwe_id: int | None = None
     owasp_id: str | None = None
+    category: FindingCategory | None = None
     affected_hosts: list[str] = []
     source_code_refs: list[SourceCodeRef] = []
     runtime_targets: list[RuntimeTarget] = []
+    fuzz: FuzzEvidence | None = None
     description: str = ""
     impact: str = ""
     remediation: str = ""
@@ -285,6 +346,43 @@ class Finding(BaseModel):
     remediation_due: date | None = None
     sla_days: int | None = None
     provisional_until: date | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _lenient_category(cls, data: Any) -> Any:
+        """Normalise ``category`` and never let an unrecognised value reject a finding.
+
+        Matching is case- and whitespace-insensitive (``"SAST"`` → ``sast``),
+        like ``severity``. Before :class:`FindingCategory` existed a free-text
+        ``category`` key (e.g. ``"Web Application"`` in a manual YAML finding)
+        was silently ignored, so an unknown value is dropped to ``None`` (the
+        ingestor's default category then applies) and the raw value is kept in
+        ``extra_fields["category"]`` unless that key is already set.
+        """
+        if not isinstance(data, dict) or data.get("category") is None:
+            return data
+        raw = data["category"]
+        if isinstance(raw, FindingCategory):
+            return data
+        if isinstance(raw, str):
+            try:
+                return {**data, "category": FindingCategory(raw.strip().lower())}
+            except ValueError:
+                pass
+        logger.warning(
+            "Unrecognised finding category %r for finding %r; expected one of %s. "
+            "Leaving category unset and keeping the value in extra_fields['category'].",
+            raw,
+            data.get("title"),
+            ", ".join(c.value for c in FindingCategory),
+        )
+        out = {**data, "category": None}
+        extra = data.get("extra_fields")
+        if extra is None:
+            out["extra_fields"] = {"category": raw}
+        elif isinstance(extra, dict) and "category" not in extra:
+            out["extra_fields"] = {**extra, "category": raw}
+        return out
 
     @field_validator("cvss_score", "cvss_v4_score")
     @classmethod

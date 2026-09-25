@@ -7,7 +7,7 @@ from os.path import basename
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 _SEVERITY_MAP: dict[str, Severity] = {
@@ -96,6 +96,8 @@ _BANDIT_CWE_MAP: dict[str, int] = {
 
 class BanditIngestor(BaseIngestor):
     """Parses Bandit JSON output files."""
+
+    category = FindingCategory.SAST
 
     @property
     def supported_extensions(self) -> list[str]:

@@ -14,7 +14,9 @@ from tarmo_vuln_core.models import (
     Evidence,
     EvidenceType,
     Finding,
+    FindingCategory,
     FindingStatus,
+    FuzzEvidence,
     Host,
     HostProperty,
     Instance,
@@ -22,6 +24,7 @@ from tarmo_vuln_core.models import (
     Protocol,
     ServiceName,
     Severity,
+    StackFrame,
 )
 from tarmo_vuln_core.utils import get_xml_text, slugify
 from tarmo_vuln_core.workflow import DEFAULT_TRANSITIONS, StatusWorkflow
@@ -39,7 +42,9 @@ __all__ = [
     "Evidence",
     "EvidenceType",
     "Finding",
+    "FindingCategory",
     "FindingStatus",
+    "FuzzEvidence",
     "Host",
     "HostProperty",
     "IngestorError",
@@ -49,6 +54,7 @@ __all__ = [
     "REGISTRY",
     "Severity",
     "ServiceName",
+    "StackFrame",
     "StatusWorkflow",
     "__version__",
     "auto_detect",

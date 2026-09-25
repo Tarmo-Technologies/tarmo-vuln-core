@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 _DEFAULT_DESCRIPTION = "A secret or credential was detected by TruffleHog."
@@ -48,6 +48,8 @@ def _extract_source_ref(item: dict) -> SourceCodeRef | None:
 
 class TrufflehogIngestor(BaseIngestor):
     """Parses TruffleHog JSON-lines output files."""
+
+    category = FindingCategory.SECRETS
 
     @property
     def supported_extensions(self) -> list[str]:

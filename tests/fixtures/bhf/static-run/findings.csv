@@ -1,0 +1,2 @@
+id,count,harness_id,rule_id,message,exception_name,sanitizer,classification,confirmation,impact,confidence,verdict,cwe,source,data_flow,sink_file,sink_line,sink_function,entity,remediation,signature,member_finding_ids,scan_type,stub_total,stub_blind,stub_declared,linked_real
+F-STATIC-0000,1,,BHF-401,Unbounded string copy (strcpy/strcat/gets) with no length limit,,,static_scan,static,high,medium,likely_reachable,120,,,lib/parse.c,6,copy_name,copy_name,Use a bounded copy (`snprintf`/`strlcpy`/`std::string`) with an explicit destination size.,,,static-dynamic,,,,

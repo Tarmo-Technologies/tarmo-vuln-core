@@ -336,10 +336,10 @@ class TestEveryParserSmoke:
 
 
 class TestIngestorRegistrySmoke:
-    def test_registry_has_38_parsers(self) -> None:
+    def test_registry_has_40_parsers(self) -> None:
         from tarmo_vuln_core.ingestors.parsers import DEFAULT_REGISTRY_ORDER
 
-        assert len(DEFAULT_REGISTRY_ORDER) == 38
+        assert len(DEFAULT_REGISTRY_ORDER) == 40
 
     def test_auto_detect_nmap(self) -> None:
         from tarmo_vuln_core import auto_detect

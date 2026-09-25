@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 
 _WPSCAN_DEFAULT_IMPACT = (
     "Successful exploitation may allow an attacker to compromise the WordPress "
@@ -108,6 +108,8 @@ def _vuln_to_finding(
 
 class WpscanIngestor(BaseIngestor):
     """Parses WPScan JSON output files (``wpscan --format json``)."""
+
+    category = FindingCategory.DAST
 
     @property
     def supported_extensions(self) -> list[str]:

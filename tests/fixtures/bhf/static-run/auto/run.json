@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "partial": false,
+  "mode": "reporting",
+  "source_root": "/work/proj",
+  "summary": {
+    "discovered": 1,
+    "discovered_total": 1,
+    "built": 1,
+    "built_and_fuzzed": 0,
+    "fuzzed_stub_only": 0,
+    "built_not_entered": 1,
+    "failed_build": 0,
+    "unsupported_params": 0,
+    "unrecoverable_link": 0,
+    "unrecoverable_runtime": 0,
+    "findings": 1
+  }
+}

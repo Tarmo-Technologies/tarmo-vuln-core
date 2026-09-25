@@ -1,0 +1,45 @@
+{
+  "actionability": {
+    "confidence": "medium",
+    "cwe": [
+      "CWE-77"
+    ],
+    "verdict": "likely_reachable"
+  },
+  "analysis": {
+    "engine": "bhf.dynamic.capability.diff"
+  },
+  "capability": {
+    "examples": [
+      "ls AAAAAA",
+      "ls ase]\nls__25s_ls__25s = \"printf\"\n[ls__s_]\nread = \"continue\"\n[jobs]\ncontinue = \"ls__s:\"\n"
+    ],
+    "input_controlled": false,
+    "input_triggered": true,
+    "kind": "process-exec",
+    "operand_count": 2
+  },
+  "classification": "capability",
+  "cluster_key_full": "abe8be87705e0caab1fc12beced15e8d40c391a66d88826ee9e07e1a9ad294d0",
+  "exception": {
+    "message": "Attacker input can make run_cmd execute a process — this capability is exercised by the fuzz corpus but by no baseline input, so it is input-triggered attack surface.",
+    "name": "INPUT_TRIGGERED_CAPABILITY"
+  },
+  "harness_id": "H-C0004-8B1AE7C6",
+  "id": "F-CAP-0000",
+  "oracle": {
+    "evidence": [
+      {
+        "key": "source",
+        "value": "/work/src/cmd.c:4"
+      }
+    ]
+  },
+  "rule_id": "BHF-668",
+  "severity": "medium",
+  "target": {
+    "line": 4,
+    "name": "run_cmd",
+    "source_path": "/work/src/cmd.c"
+  }
+}

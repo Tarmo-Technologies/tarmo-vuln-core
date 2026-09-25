@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from tarmo_vuln_core.cdata import default_registry
+from tarmo_vuln_core.ingestors._xml import parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 _SEVERITY_MAP: dict[str, Severity] = {
@@ -25,6 +25,8 @@ _DEFAULT_REMEDIATION = "Review and remediate the identified issue."
 class SrmIngestor(BaseIngestor):
     """Parses SRM XML report files with cross-scanner deduplication."""
 
+    category = FindingCategory.SAST
+
     @property
     def supported_extensions(self) -> list[str]:
         return [".xml"]
@@ -33,24 +35,18 @@ class SrmIngestor(BaseIngestor):
         if not path.exists():
             return False
         try:
-            tree = ET.parse(path)  # noqa: S314
-            root = tree.getroot()
-            if root.tag != "report":
-                return False
-            return root.find("findings") is not None
-        except Exception:
+            root = parse_xml_file(path, fmt="SRM")
+        except IngestorError:
             return False
+        if root.tag != "report":
+            return False
+        return root.find("findings") is not None
 
     def ingest(self, path: Path) -> list[Finding]:
         if not path.exists():
             raise IngestorError(f"File not found: {path}")
 
-        try:
-            tree = ET.parse(path)  # noqa: S314
-        except ET.ParseError as e:
-            raise IngestorError(f"Failed to parse SRM XML: {e}") from e
-
-        root = tree.getroot()
+        root = parse_xml_file(path, fmt="SRM")
         findings_el = root.find("findings")
         if findings_el is None:
             return []

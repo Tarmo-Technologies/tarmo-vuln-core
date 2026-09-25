@@ -11,7 +11,7 @@ import logging
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +45,8 @@ class SslyzeIngestor(BaseIngestor):
     into the ``affected_hosts`` list. The library matcher will enrich description,
     CVSS, CWE, and remediation from the built-in finding library.
     """
+
+    category = FindingCategory.INFRASTRUCTURE
 
     @property
     def supported_extensions(self) -> list[str]:

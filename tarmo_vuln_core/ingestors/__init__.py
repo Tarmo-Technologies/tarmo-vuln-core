@@ -8,6 +8,8 @@ from pathlib import Path
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
 from tarmo_vuln_core.ingestors.parsers import (
     AcunetixIngestor,
+    BhfIngestor,
+    BhfStaticIngestor,
     BloodHoundIngestor,
     BurpIngestor,
     CsvFindingIngestor,
@@ -29,13 +31,15 @@ from tarmo_vuln_core.ingestors.parsers import (
     register_all,
 )
 
-# Registry populated with all 38 built-in parsers at import time.
+# Registry populated with all 40 built-in parsers at import time.
 REGISTRY: list[BaseIngestor] = []
 register_all(REGISTRY)
 
 __all__ = [
     "AcunetixIngestor",
     "BaseIngestor",
+    "BhfIngestor",
+    "BhfStaticIngestor",
     "BloodHoundIngestor",
     "BurpIngestor",
     "CsvFindingIngestor",
@@ -101,8 +105,11 @@ def get_by_format(name: str, extra: list[BaseIngestor] | None = None) -> BaseIng
 def auto_detect(path: Path, extra: list[BaseIngestor] | None = None) -> BaseIngestor:
     """Return the first ingestor that claims it can handle the given file.
 
+    Directories are accepted too: a BHF work directory is claimed by
+    ``BhfIngestor`` (every other built-in ingestor rejects directories).
+
     Args:
-        path: Path to the file to detect.
+        path: Path to the file (or BHF work directory) to detect.
         extra: Optional list of additional ingestor instances to try after
             the built-in registry.
 
@@ -126,5 +133,6 @@ def auto_detect(path: Path, extra: list[BaseIngestor] | None = None) -> BaseInge
         "Nikto XML, ZAP XML, OpenVAS XML, Qualys XML, Metasploit CSV/XML, "
         "Trivy JSON, WPScan JSON, SSLyze JSON, Tenable.io JSON, SARIF 2.1.0 JSON, "
         "BloodHound JSON, HackerOne JSON, Coverity JSON, Fortify .fpr/.fvdl, "
+        "BHF findings.csv/finding.json/work directory, BHF static SARIF/JSON, "
         "CSV findings, YAML/JSON manual."
     )

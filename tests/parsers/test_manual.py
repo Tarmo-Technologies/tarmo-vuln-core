@@ -8,7 +8,7 @@ import pytest
 
 from tarmo_vuln_core.ingestors.base import IngestorError
 from tarmo_vuln_core.ingestors.parsers.manual import ManualIngestor
-from tarmo_vuln_core.models import Severity
+from tarmo_vuln_core.models import FindingCategory, Severity
 
 FIXTURES = Path(__file__).parent.parent / "fixtures"
 
@@ -129,3 +129,41 @@ class TestManualIngestor:
         assert findings[0].cvss_score == 7.4
         assert findings[0].cwe_id == 79
         assert findings[0].owasp_id == "A03:2021"
+
+
+@pytest.mark.unit
+class TestManualFreeTextCategory:
+    """Regression: a free-text ``category:`` key (silently ignored before the
+    FindingCategory enum existed) must not reject the whole file."""
+
+    def test_free_text_category_still_ingests(self, tmp_path: Path) -> None:
+        p = tmp_path / "findings.yaml"
+        p.write_text(
+            "- title: Stored XSS in comments\n"
+            "  severity: HIGH\n"
+            "  category: Web Application\n"
+            "- title: Weak TLS\n"
+            "  severity: LOW\n"
+            "  category: DAST\n"
+        )
+        findings = ManualIngestor().ingest(p)
+        assert [f.title for f in findings] == ["Stored XSS in comments", "Weak TLS"]
+        xss, tls = findings
+        assert xss.severity == Severity.HIGH
+        # Unrecognised value: ingestor default applies, raw text is preserved.
+        assert xss.category == FindingCategory.MANUAL
+        assert xss.extra_fields == {"category": "Web Application"}
+        # Recognised value in any case is honoured.
+        assert tls.category == FindingCategory.DAST
+        assert tls.extra_fields == {}
+
+    def test_free_text_category_via_auto_detect(self, tmp_path: Path) -> None:
+        from tarmo_vuln_core import auto_detect
+
+        p = tmp_path / "manual.json"
+        p.write_text('[{"title": "IDOR on /api/users", "severity": "MEDIUM", "category": "API"}]')
+        ingestor = auto_detect(p)
+        findings = ingestor.ingest(p)
+        assert len(findings) == 1
+        assert findings[0].category == FindingCategory.MANUAL
+        assert findings[0].extra_fields == {"category": "API"}

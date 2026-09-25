@@ -10,7 +10,7 @@ import re
 from pathlib import Path
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 # Extensions that only a config analyzer would handle (no other ingestor claims these)
@@ -175,6 +175,8 @@ _RULES: list[tuple[str, str, Severity, int, re.Pattern[str], str]] = [
 
 class ConfigAnalyzerIngestor(BaseIngestor):
     """Scans configuration files for security issues."""
+
+    category = FindingCategory.CONFIG
 
     @property
     def supported_extensions(self) -> list[str]:
