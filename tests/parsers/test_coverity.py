@@ -165,3 +165,13 @@ class TestCoverityGeneratedCode:
         [old] = self.ingestor.ingest(FIXTURES / "coverity_generated_v7.json")
         assert new.source_code_refs[0].symbol == old.source_code_refs[0].symbol
         assert new.source_code_refs[0].start_line != old.source_code_refs[0].start_line
+
+    def test_merge_key_recorded_for_downstream_identity(self) -> None:
+        """Coverity's mergeKey is stable across builds and line shifts."""
+        new = self._v10("OVERRUN")
+        [old] = self.ingestor.ingest(FIXTURES / "coverity_generated_v7.json")
+        assert new.extra_fields["merge_key"] == "0b8f5c2d9e41a7c3f6d2e8a1b4c7d9e2"
+        assert old.extra_fields["merge_key"] == new.extra_fields["merge_key"]
+        assert self._v10("RESOURCE_LEAK").extra_fields["merge_key"] == (
+            "5e2a9c1f7b3d4e6a8c0f2b4d6e8a1c3f"
+        )

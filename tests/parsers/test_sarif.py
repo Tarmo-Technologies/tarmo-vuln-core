@@ -389,6 +389,40 @@ class TestSarifPathProvenance:
         assert f.source_code_refs[0].file_path.endswith("a/x.c")
         assert f.extra_fields["uri_base_id"] == "A"
 
+    def test_unknown_base_id_keeps_the_repo_relative_uri(self, tmp_path: Path) -> None:
+        """A base that is not a known build root (here ``SRC``) keeps ``src/x.c`` relative."""
+        bases = {"SRC": {"uri": "file:///home/ci/repo/"}}
+        loc = {"uri": "src/x.c", "uriBaseId": "SRC"}
+        p = _write_sarif(tmp_path, {"originalUriBaseIds": bases, "results": [_result_at(loc)]})
+        [f] = SarifIngestor().ingest(p)
+        assert f.source_code_refs[0].file_path == "src/x.c"
+        assert f.extra_fields["uri_base_id"] == "SRC"
+        assert f.extra_fields["resolved_path"] == "/home/ci/repo/src/x.c"
+
+    def test_filesystem_root_base_keeps_the_relative_uri(self, tmp_path: Path) -> None:
+        bases = {"ROOTPATH": {"uri": "file:///"}}
+        loc = {"uri": "library/alpine", "uriBaseId": "ROOTPATH"}
+        p = _write_sarif(tmp_path, {"originalUriBaseIds": bases, "results": [_result_at(loc)]})
+        [f] = SarifIngestor().ingest(p)
+        assert f.source_code_refs[0].file_path == "library/alpine"
+        assert f.extra_fields["resolved_path"] == "/library/alpine"
+
+    @pytest.mark.parametrize("base_id", ["BUILDROOT", "%OUTDIR%", "build_dir", "OBJROOT"])
+    def test_build_root_base_resolves_to_an_absolute_path(
+        self, tmp_path: Path, base_id: str
+    ) -> None:
+        bases = {base_id: {"uri": "file:///tmp/ci-1/out/"}}
+        loc = {"uri": "gen/foo_idl.c", "uriBaseId": base_id}
+        p = _write_sarif(tmp_path, {"originalUriBaseIds": bases, "results": [_result_at(loc)]})
+        [f] = SarifIngestor().ingest(p)
+        assert f.source_code_refs[0].file_path == "/tmp/ci-1/out/gen/foo_idl.c"
+
+    def test_partial_fingerprints_recorded(self) -> None:
+        f = self.findings[0]
+        assert f.extra_fields["partial_fingerprints"] == {
+            "primaryLocationLineHash": "5c0f3a9d1e2b7c44:1"
+        }
+
     def test_plain_relative_uri_adds_no_provenance_fields(self, tmp_path: Path) -> None:
         p = _write_sarif(tmp_path, {"results": [_result_at({"uri": "src/app.py"})]})
         [f] = SarifIngestor().ingest(p)
