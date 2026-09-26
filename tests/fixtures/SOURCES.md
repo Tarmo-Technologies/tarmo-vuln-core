@@ -32,6 +32,9 @@ Additional realistic SAST parser fixtures used for schema hardening:
 |---------|--------|
 | `coverity_cli_sample.json` | Adapted from [DefectDojo/django-DefectDojo `unittests/scans/coverity_scan/one_vuln.json`](https://raw.githubusercontent.com/DefectDojo/django-DefectDojo/2f25c4510361e2f27f63fbbcff3901cbd2ef4a07/unittests/scans/coverity_scan/one_vuln.json) |
 | `fortify_realistic_sample.fvdl` | Trimmed from [DefectDojo/django-DefectDojo `unittests/scans/fortify/audit.fvdl`](https://raw.githubusercontent.com/DefectDojo/django-DefectDojo/2f25c4510361e2f27f63fbbcff3901cbd2ef4a07/unittests/scans/fortify/audit.fvdl) |
+| `coverity_generated_v10.json` | Built on the `coverity_cli_sample.json` (formatVersion 10) issue/event schema: an `OVERRUN` in build-generated `build/gen/foo_idl.c` reported with `cov-format-errors --strip-path /home/ci/work/` (stripped + unstripped paths, `functionDisplayName`, one event without `strippedFilePathname`) plus an in-source `RESOURCE_LEAK`. |
+| `coverity_generated_v7.json` | Same defect in formatVersion 7 layout without `--strip-path`: the stripped fields repeat the volatile absolute build root `/tmp/ci-7f3e2a/`, and regeneration shifted the line. |
+| `sarif_build_roots.sarif` | CodeQL-style SARIF 2.1.0 run exercising `originalUriBaseIds` (`%SRCROOT%` absolute, `BUILDROOT` chained under it, out-of-tree `OBJROOT`, `SYSINCLUDE` with no `uri`), `file:///` URIs (percent-encoded, in and out of the source root), `run.artifacts` roles (`uncontrolled`) and a `generated` tag, and an index-only `artifactLocation`. |
 
 BHF (Build Harness Fuzz) output:
 

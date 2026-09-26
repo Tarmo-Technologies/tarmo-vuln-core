@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -252,3 +253,144 @@ class TestSarifIngestor:
         """SARIF findings are single-location sinks by default."""
         findings = self.ingestor.ingest(FIXTURES / "sarif_real.json")
         assert findings[0].source_code_refs[0].is_sink is True
+
+
+def _write_sarif(tmp_path: Path, run: dict) -> Path:
+    base_run: dict = {"tool": {"driver": {"name": "Example", "rules": [{"id": "R1"}]}}}
+    base_run.update(run)
+    p = tmp_path / "out.sarif"
+    p.write_text(json.dumps({"version": "2.1.0", "runs": [base_run]}))
+    return p
+
+
+def _result_at(artifact_location: dict, line: int = 3) -> dict:
+    return {
+        "ruleId": "R1",
+        "message": {"text": "m"},
+        "locations": [
+            {
+                "physicalLocation": {
+                    "artifactLocation": artifact_location,
+                    "region": {"startLine": line},
+                }
+            }
+        ],
+    }
+
+
+@pytest.mark.unit
+class TestSarifPathProvenance:
+    """uriBaseId / originalUriBaseIds resolution, file:/// URIs and artifact roles."""
+
+    path = FIXTURES / "sarif_build_roots.sarif"
+
+    def setup_method(self) -> None:
+        self.findings = SarifIngestor().ingest(self.path)
+
+    def test_one_finding_per_result(self) -> None:
+        assert len(self.findings) == 7
+
+    def test_chained_build_root_resolves_relative_to_source_root(self) -> None:
+        # BUILDROOT = build/ under %SRCROOT% -> repo-relative build/gen/foo_idl.c
+        f = self.findings[0]
+        ref = f.source_code_refs[0]
+        assert (ref.file_path, ref.start_line, ref.symbol) == (
+            "build/gen/foo_idl.c",
+            212,
+            "foo_idl_unmarshal_request",
+        )
+        assert f.affected_hosts == []
+        assert f.extra_fields["uri_base_id"] == "BUILDROOT"
+        assert f.extra_fields["resolved_path"] == "/home/ci/work/build/gen/foo_idl.c"
+
+    def test_artifact_roles_and_generated_marker_recorded(self) -> None:
+        f = self.findings[0]
+        assert f.extra_fields["artifact_roles"] == ["analysisTarget", "uncontrolled"]
+        assert f.extra_fields["generated_hint"] is True
+
+    def test_in_source_artifact_has_no_generated_hint(self) -> None:
+        f = self.findings[1]
+        assert f.source_code_refs[0].file_path == "src/foo_server.c"
+        assert f.extra_fields["uri_base_id"] == "%SRCROOT%"
+        assert f.extra_fields["resolved_path"] == "/home/ci/work/src/foo_server.c"
+        assert f.extra_fields["artifact_roles"] == ["analysisTarget"]
+        assert "generated_hint" not in f.extra_fields
+
+    def test_absolute_file_uri_under_source_root_is_made_repo_relative(self) -> None:
+        f = self.findings[2]
+        assert f.source_code_refs[0].file_path == "src/util funcs/strbuf.c"
+        assert f.extra_fields["resolved_path"] == "/home/ci/work/src/util funcs/strbuf.c"
+        assert "uri_base_id" not in f.extra_fields
+
+    def test_out_of_tree_base_resolves_to_absolute_path(self) -> None:
+        f = self.findings[3]
+        ref = f.source_code_refs[0]
+        assert ref.file_path == "/tmp/ci-7f3e2a/obj/proto/msg.pb.cc"
+        assert ref.symbol == "acme::proto::Msg::_InternalParse"
+        assert f.extra_fields["uri_base_id"] == "OBJROOT"
+        assert f.extra_fields["resolved_path"] == "/tmp/ci-7f3e2a/obj/proto/msg.pb.cc"
+
+    def test_absolute_file_uri_outside_source_root_keeps_leading_slash(self) -> None:
+        f = self.findings[4]
+        assert f.source_code_refs[0].file_path == "/opt/vendor/include/zlib.h"
+
+    def test_index_only_artifact_location_resolves_through_run_artifacts(self) -> None:
+        f = self.findings[5]
+        ref = f.source_code_refs[0]
+        assert (ref.file_path, ref.start_line) == ("build/gen/foo_idl.c", 260)
+        assert f.extra_fields["uri_base_id"] == "BUILDROOT"
+        assert f.extra_fields["generated_hint"] is True
+
+    def test_base_without_uri_keeps_relative_path_and_records_base(self) -> None:
+        f = self.findings[6]
+        assert f.source_code_refs[0].file_path == "bits/stdio2.h"
+        assert f.extra_fields["uri_base_id"] == "SYSINCLUDE"
+        assert "resolved_path" not in f.extra_fields
+
+    def test_path_provenance_is_aligned_with_source_code_refs(self) -> None:
+        f = self.findings[0]
+        prov = f.extra_fields["path_provenance"]
+        assert prov == [
+            {
+                "file_path": "build/gen/foo_idl.c",
+                "uri": "gen/foo_idl.c",
+                "uri_base_id": "BUILDROOT",
+                "resolved_path": "/home/ci/work/build/gen/foo_idl.c",
+                "artifact_roles": ["analysisTarget", "uncontrolled"],
+                "generated_hint": True,
+            }
+        ]
+
+    def test_file_uri_without_bases_keeps_leading_slash(self, tmp_path: Path) -> None:
+        p = _write_sarif(tmp_path, {"results": [_result_at({"uri": "file:///home/ci/x.c"})]})
+        [f] = SarifIngestor().ingest(p)
+        assert f.source_code_refs[0].file_path == "/home/ci/x.c"
+
+    def test_windows_drive_file_uri_has_no_leading_slash(self) -> None:
+        [f] = SarifIngestor().ingest(FIXTURES / "sarif_real.json")
+        assert (
+            f.source_code_refs[0].file_path
+            == "C:/dev/sarif/sarif-tutorials/samples/Introduction/simple-example.js"
+        )
+
+    def test_srcroot_without_original_bases_stays_relative(self, tmp_path: Path) -> None:
+        loc = {"uri": "app/views.py", "uriBaseId": "%SRCROOT%"}
+        p = _write_sarif(tmp_path, {"results": [_result_at(loc)]})
+        [f] = SarifIngestor().ingest(p)
+        assert f.source_code_refs[0].file_path == "app/views.py"
+        assert f.extra_fields["uri_base_id"] == "%SRCROOT%"
+        assert "resolved_path" not in f.extra_fields
+
+    def test_cyclic_base_ids_do_not_loop(self, tmp_path: Path) -> None:
+        bases = {"A": {"uri": "a/", "uriBaseId": "B"}, "B": {"uri": "b/", "uriBaseId": "A"}}
+        loc = {"uri": "x.c", "uriBaseId": "A"}
+        p = _write_sarif(tmp_path, {"originalUriBaseIds": bases, "results": [_result_at(loc)]})
+        [f] = SarifIngestor().ingest(p)
+        assert f.source_code_refs[0].file_path.endswith("a/x.c")
+        assert f.extra_fields["uri_base_id"] == "A"
+
+    def test_plain_relative_uri_adds_no_provenance_fields(self, tmp_path: Path) -> None:
+        p = _write_sarif(tmp_path, {"results": [_result_at({"uri": "src/app.py"})]})
+        [f] = SarifIngestor().ingest(p)
+        assert f.source_code_refs[0].file_path == "src/app.py"
+        assert f.extra_fields == {}

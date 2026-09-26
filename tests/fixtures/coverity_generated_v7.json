@@ -1,0 +1,59 @@
+{
+  "type": "Coverity issues",
+  "formatVersion": 7,
+  "suppressedIssueCount": 0,
+  "issues": [
+    {
+      "mergeKey": "0b8f5c2d9e41a7c3f6d2e8a1b4c7d9e2",
+      "occurrenceCountForMK": 1,
+      "occurrenceNumberInMK": 1,
+      "checkerName": "OVERRUN",
+      "subcategory": "none",
+      "type": "overrun",
+      "subtype": "none",
+      "extra": "req->name",
+      "domain": "STATIC_C",
+      "language": "C",
+      "mainEventFilePathname": "/tmp/ci-7f3e2a/build/gen/foo_idl.c",
+      "strippedMainEventFilePathname": "/tmp/ci-7f3e2a/build/gen/foo_idl.c",
+      "mainEventLineNumber": 219,
+      "properties": {},
+      "functionDisplayName": "foo_idl_unmarshal_request",
+      "functionMangledName": "foo_idl_unmarshal_request",
+      "localStatus": null,
+      "ordered": true,
+      "events": [
+        {
+          "covLStrEventDescription": "Overrunning array \"req->name\" of 64 bytes by passing it to a function which accesses it at byte offset 65534 using argument \"len\" (which evaluates to 65535).",
+          "eventDescription": "Overrunning array \"req->name\" of 64 bytes by passing it to a function which accesses it at byte offset 65534 using argument \"len\" (which evaluates to 65535).",
+          "eventNumber": 1,
+          "eventTreePosition": "1",
+          "eventSet": 0,
+          "eventTag": "overrun-buffer-arg",
+          "filePathname": "/tmp/ci-7f3e2a/build/gen/foo_idl.c",
+          "strippedFilePathname": "/tmp/ci-7f3e2a/build/gen/foo_idl.c",
+          "lineNumber": 219,
+          "main": true,
+          "moreInformationId": null,
+          "remediation": false,
+          "events": null
+        }
+      ],
+      "checkerProperties": {
+        "category": "Memory - corruptions",
+        "categoryDescription": "Memory - corruptions",
+        "cweCategory": "119",
+        "issueKinds": ["QUALITY", "SECURITY"],
+        "eventSetCaptions": [],
+        "impact": "High",
+        "impactDescription": "High",
+        "subcategoryLocalEffect": "",
+        "subcategoryShortDescription": "Out-of-bounds access",
+        "subcategoryLongDescription": "Out-of-bounds access (ARRAY_VS_SINGLETON)"
+      }
+    }
+  ],
+  "desktopAnalysisSettings": null,
+  "error": null,
+  "warnings": []
+}
