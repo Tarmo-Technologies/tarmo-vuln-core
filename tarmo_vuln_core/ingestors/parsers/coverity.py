@@ -55,6 +55,51 @@ def _primary_event_description(events: object) -> str | None:
     return None
 
 
+def _derive_strip_prefix(unstripped: str, stripped: str) -> str | None:
+    """Recover the ``cov-format-errors --strip-path`` prefix from one path pair.
+
+    ``/home/ci/work/build/gen/foo_idl.c`` + ``build/gen/foo_idl.c`` ->
+    ``/home/ci/work/``. None when nothing was stripped or the pair disagrees.
+    """
+    if not unstripped or not stripped or unstripped == stripped or stripped.startswith("/"):
+        return None
+    if unstripped.endswith("/" + stripped):
+        return unstripped[: -len(stripped)]
+    return None
+
+
+def _event_file_path(event: Mapping[str, object], strip_prefix: str | None) -> str | None:
+    stripped = _as_str(event.get("strippedFilePathname"))
+    if stripped:
+        return stripped
+    raw = _as_str(event.get("filePathname"))
+    if raw and strip_prefix and raw.startswith(strip_prefix):
+        return raw[len(strip_prefix) :]
+    return raw or None
+
+
+def _normalize_events(events: list[object], strip_prefix: str | None) -> list[object]:
+    """Copy *events*, adding a normalized ``file_path`` to each (nested included).
+
+    Uses the event's ``strippedFilePathname`` when present, otherwise applies the
+    issue's derived strip prefix to ``filePathname``. Raw fields are untouched.
+    """
+    out: list[object] = []
+    for event in events:
+        if not isinstance(event, Mapping):
+            out.append(event)
+            continue
+        copy = dict(event)
+        path = _event_file_path(event, strip_prefix)
+        if path:
+            copy["file_path"] = path
+        nested = event.get("events")
+        if isinstance(nested, list):
+            copy["events"] = _normalize_events(nested, strip_prefix)
+        out.append(copy)
+    return out
+
+
 class CoverityIngestor(BaseIngestor):
     """Parses Coverity JSON output files."""
 
@@ -100,9 +145,10 @@ class CoverityIngestor(BaseIngestor):
 
             cwe_id = _as_int(props.get("cweCategory"))
 
-            file_path = _as_str(
-                issue.get("strippedMainEventFilePathname") or issue.get("mainEventFilePathname", "")
-            )
+            main_path = _as_str(issue.get("mainEventFilePathname"))
+            file_path = _as_str(issue.get("strippedMainEventFilePathname")) or main_path
+            strip_prefix = _derive_strip_prefix(main_path, file_path)
+            symbol = _as_str(issue.get("functionDisplayName")) or None
             line = _as_int(issue.get("mainEventLineNumber"))
             events = issue.get("events", [])
             description = (
@@ -115,13 +161,19 @@ class CoverityIngestor(BaseIngestor):
             # Source code ref
             source_refs: list[SourceCodeRef] = []
             if file_path:
-                source_refs.append(SourceCodeRef(file_path=file_path, start_line=line))
+                source_refs.append(
+                    SourceCodeRef(file_path=file_path, start_line=line, symbol=symbol)
+                )
 
             # Event trace — if >10 events, keep first 5 + last 5
             extra_fields: dict[str, object] = {}
-            if events:
+            if isinstance(events, list) and events:
                 event_trace = events[:5] + events[-5:] if len(events) > 10 else events
-                extra_fields["event_trace"] = event_trace
+                extra_fields["event_trace"] = _normalize_events(event_trace, strip_prefix)
+            if main_path and main_path != file_path:
+                extra_fields["resolved_path"] = main_path
+            if strip_prefix:
+                extra_fields["strip_prefix"] = strip_prefix
 
             file_base = basename(file_path) if file_path else "unknown"
             finding_id = f"coverity-{slugify(checker_name)}-{slugify(file_base)}-l{line}"
