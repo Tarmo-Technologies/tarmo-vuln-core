@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "CodeQL",
+          "organization": "GitHub",
+          "semanticVersion": "2.17.6",
+          "rules": [
+            {
+              "id": "cpp/overflow-buffer",
+              "name": "cpp/overflow-buffer",
+              "shortDescription": {"text": "Call to memory access function may overflow buffer"},
+              "fullDescription": {"text": "Incorrect use of a function that accesses a memory buffer may read or write data past the end of that buffer."},
+              "defaultConfiguration": {"enabled": true, "level": "error"},
+              "properties": {
+                "tags": ["reliability", "security", "external/cwe/cwe-119", "external/cwe/cwe-121"],
+                "precision": "medium",
+                "security-severity": "9.3"
+              }
+            },
+            {
+              "id": "cpp/uncontrolled-allocation-size",
+              "name": "cpp/uncontrolled-allocation-size",
+              "shortDescription": {"text": "Uncontrolled allocation size"},
+              "defaultConfiguration": {"enabled": true, "level": "error"},
+              "properties": {"tags": ["reliability", "security", "external/cwe/cwe-190", "external/cwe/cwe-789"], "security-severity": "8.1"}
+            }
+          ]
+        }
+      },
+      "originalUriBaseIds": {
+        "%SRCROOT%": {"uri": "file:///home/ci/work/"},
+        "BUILDROOT": {"uri": "build/", "uriBaseId": "%SRCROOT%"},
+        "OBJROOT": {"uri": "file:///tmp/ci-7f3e2a/obj/"},
+        "SYSINCLUDE": {"description": {"text": "System include directory of the build host."}}
+      },
+      "artifacts": [
+        {
+          "location": {"uri": "gen/foo_idl.c", "uriBaseId": "BUILDROOT", "index": 0},
+          "roles": ["analysisTarget", "uncontrolled"],
+          "sourceLanguage": "c",
+          "properties": {"tags": ["generated"]}
+        },
+        {
+          "location": {"uri": "src/foo_server.c", "uriBaseId": "%SRCROOT%", "index": 1},
+          "roles": ["analysisTarget"],
+          "sourceLanguage": "c"
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "cpp/overflow-buffer",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {"text": "This 'memcpy' operation accesses 65535 bytes but the destination buffer only has 64 bytes."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "gen/foo_idl.c", "uriBaseId": "BUILDROOT", "index": 0},
+                "region": {"startLine": 212, "startColumn": 9, "endColumn": 44}
+              },
+              "logicalLocations": [{"name": "foo_idl_unmarshal_request", "kind": "function"}]
+            }
+          ],
+          "partialFingerprints": {"primaryLocationLineHash": "5c0f3a9d1e2b7c44:1"}
+        },
+        {
+          "ruleId": "cpp/uncontrolled-allocation-size",
+          "ruleIndex": 1,
+          "level": "error",
+          "message": {"text": "This allocation size is derived from user input and might overflow."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "src/foo_server.c", "uriBaseId": "%SRCROOT%", "index": 1},
+                "region": {"startLine": 88, "startColumn": 18, "endColumn": 42}
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/overflow-buffer",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {"text": "This 'strcpy' operation may overflow the destination buffer."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "file:///home/ci/work/src/util%20funcs/strbuf.c"},
+                "region": {"startLine": 31, "startColumn": 5}
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/overflow-buffer",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {"text": "This 'memcpy' operation may overflow the destination buffer."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "proto/msg.pb.cc", "uriBaseId": "OBJROOT"},
+                "region": {"startLine": 402, "startColumn": 7}
+              },
+              "logicalLocations": [{"fullyQualifiedName": "acme::proto::Msg::_InternalParse", "name": "_InternalParse", "kind": "function"}]
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/overflow-buffer",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {"text": "This 'memcpy' operation may overflow the destination buffer."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "file:///opt/vendor/include/zlib.h"},
+                "region": {"startLine": 1210}
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/overflow-buffer",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {"text": "This 'memcpy' operation accesses 128 bytes but the destination buffer only has 32 bytes."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"index": 0},
+                "region": {"startLine": 260, "startColumn": 9}
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/overflow-buffer",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {"text": "This 'sprintf' operation may overflow the destination buffer."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "bits/stdio2.h", "uriBaseId": "SYSINCLUDE"},
+                "region": {"startLine": 30}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

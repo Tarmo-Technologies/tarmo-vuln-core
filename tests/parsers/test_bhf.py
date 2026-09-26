@@ -487,6 +487,36 @@ class TestBhfStaticIngestor:
     def test_scanner_version_from_sarif_driver(self) -> None:
         assert BhfStaticIngestor().extract_scanner_version(STATIC_SARIF.read_bytes()) == "0.2.32"
 
+    def test_sarif_path_provenance_survives_customization(self, tmp_path: Path) -> None:
+        """uriBaseId/originalUriBaseIds/artifact roles from the SARIF layer reach extra_fields."""
+        doc = json.loads(STATIC_SARIF.read_text())
+        run = doc["runs"][0]
+        run["originalUriBaseIds"] = {
+            "%SRCROOT%": {"uri": "file:///home/ci/work/"},
+            "BUILDROOT": {"uri": "build/", "uriBaseId": "%SRCROOT%"},
+        }
+        run["artifacts"] = [
+            {
+                "location": {"uri": "gen/cmd_idl.c", "uriBaseId": "BUILDROOT"},
+                "roles": ["uncontrolled"],
+            }
+        ]
+        loc = run["results"][0]["locations"][0]["physicalLocation"]["artifactLocation"]
+        loc.clear()
+        loc.update({"uri": "gen/cmd_idl.c", "uriBaseId": "BUILDROOT", "index": 0})
+        path = tmp_path / "static-report.sarif"
+        path.write_text(json.dumps(doc))
+
+        (f,) = BhfStaticIngestor().ingest(path)
+
+        assert f.source_code_refs[0].file_path == "build/gen/cmd_idl.c"
+        assert f.extra_fields["uri_base_id"] == "BUILDROOT"
+        assert f.extra_fields["resolved_path"] == "/home/ci/work/build/gen/cmd_idl.c"
+        assert f.extra_fields["generated_hint"] is True
+        assert f.extra_fields["path_provenance"][0]["file_path"] == "build/gen/cmd_idl.c"
+        # the BHF static keys are still there
+        assert f.extra_fields["bhf_rule_id"] == "BHF-401"
+
     def test_generic_sarif_unaffected(self) -> None:
         findings = SarifIngestor().ingest(STATIC_SARIF)
         assert len(findings) == 1

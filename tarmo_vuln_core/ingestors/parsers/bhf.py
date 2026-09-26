@@ -609,6 +609,24 @@ def _merge_same_id(findings: list[Finding]) -> list[Finding]:
     return list(merged.values())
 
 
+#: Path keys the generic SARIF layer adds (see ``sarif._PROVENANCE_KEYS``).
+_SARIF_PATH_KEYS = ("uri_base_id", "resolved_path", "artifact_roles", "generated_hint")
+
+
+def _sarif_path_provenance(extra: dict[str, Any], refs: list[SourceCodeRef]) -> dict[str, Any]:
+    """The SARIF path-provenance keys of *extra*, re-aligned to the display-mapped *refs*."""
+    kept: dict[str, Any] = {k: extra[k] for k in _SARIF_PATH_KEYS if k in extra}
+    entries = extra.get("path_provenance")
+    if isinstance(entries, list):
+        kept["path_provenance"] = [
+            {**entry, "file_path": refs[i].file_path}
+            if isinstance(entry, dict) and i < len(refs)
+            else entry
+            for i, entry in enumerate(entries)
+        ]
+    return kept
+
+
 class BhfIngestor(BaseIngestor):
     """Parses BHF (Build Harness Fuzz) ``bhf auto`` findings.
 
@@ -1266,6 +1284,10 @@ class BhfStaticIngestor(SarifIngestor):
         )
         updates["source_code_refs"] = refs
         updates["affected_hosts"] = list(dict.fromkeys(r.file_path for r in refs))
+        updates["extra_fields"] = {
+            **_sarif_path_provenance(finding.extra_fields, refs),
+            **updates["extra_fields"],
+        }
         return finding.model_copy(update=updates)
 
     def _ingest_native(self, doc: dict[str, Any]) -> list[Finding]:

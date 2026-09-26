@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 import json
+import posixpath
 import re
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
+from urllib.parse import unquote, urlsplit
 
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
 from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
@@ -113,32 +117,313 @@ def _extract_symbol(loc: dict) -> str | None:
     return None
 
 
-def _extract_source_code_refs(result: dict) -> list[SourceCodeRef]:
-    """Extract source code references from result.locations physicalLocation."""
-    refs: list[SourceCodeRef] = []
+# uriBaseId names that denote the analysed source tree (compared after dropping
+# ``%`` delimiters, ``_``/``-`` and case): ``%SRCROOT%``, ``SRC_ROOT``, ``REPO_ROOT`` ...
+_SOURCE_ROOT_BASE_IDS = frozenset(
+    {"SRCROOT", "SOURCEROOT", "PROJECTROOT", "REPOROOT", "WORKSPACE", "WORKSPACEROOT"}
+)
+# uriBaseId names that denote a build output or host root outside the source
+# tree (same normalisation). Only these keep their absolute expansion; a
+# relative uri under any other base (``SRC``, ``ROOT``, ``ROOTPATH``, ...) stays
+# the repo-relative path the tool wrote, with the expansion in ``resolved_path``.
+_BUILD_ROOT_BASE_IDS = frozenset(
+    {
+        "BUILDROOT",
+        "BUILDDIR",
+        "BUILD",
+        "BUILDPATH",
+        "BUILDOUTPUT",
+        "OBJROOT",
+        "OBJDIR",
+        "OBJ",
+        "OUTROOT",
+        "OUTDIR",
+        "OUT",
+        "OUTPUTDIR",
+        "OUTPUTROOT",
+        "BINROOT",
+        "BINDIR",
+        "BINARYDIR",
+        "CMAKEBINARYDIR",
+        "GENROOT",
+        "GENDIR",
+        "GENERATED",
+        "INTDIR",
+        "INTERMEDIATEDIR",
+        "TARGETDIR",
+        "TMPDIR",
+        "TEMPDIR",
+        "SYSROOT",
+        "SYSINCLUDE",
+    }
+)
+# Artifact roles that mark a file as not under version control (build output).
+_GENERATED_ROLES = frozenset({"uncontrolled"})
+_MAX_BASE_CHAIN = 32
+_WINDOWS_DRIVE_RE = re.compile(r"^[A-Za-z]:[/\\]")
+
+
+def _base_key(base_id: str) -> str:
+    return base_id.strip("%").replace("_", "").replace("-", "").upper()
+
+
+def _is_source_root_id(base_id: str) -> bool:
+    return _base_key(base_id) in _SOURCE_ROOT_BASE_IDS
+
+
+def _is_build_root_id(base_id: str) -> bool:
+    return _base_key(base_id) in _BUILD_ROOT_BASE_IDS
+
+
+def _uri_to_path(uri: str) -> tuple[str, bool]:
+    """Decode a SARIF URI reference into ``(path, is_absolute)``.
+
+    ``file:///home/ci/x.c`` keeps its leading ``/``; ``file:///C:/x.c`` becomes
+    ``C:/x.c``; ``file://host/share/x.c`` becomes ``//host/share/x.c``.
+    Percent-encoding is decoded. Non-file schemes are returned unchanged.
+    """
+    if uri[:5].lower() == "file:":
+        parts = urlsplit(uri)
+        path = unquote(parts.path)
+        if parts.netloc and parts.netloc.lower() != "localhost":
+            return f"//{parts.netloc}{path}", True
+        if _WINDOWS_DRIVE_RE.match(path[1:]):
+            path = path[1:]
+        return path, True
+    if "://" in uri:
+        return uri, False
+    path = unquote(uri)
+    return path, path.startswith("/") or bool(_WINDOWS_DRIVE_RE.match(path))
+
+
+def _join(base: str, rel: str) -> str:
+    if not base:
+        return rel
+    joined = base.rstrip("/") + "/" + rel if rel else base
+    if "./" in joined:
+        trailing = joined.endswith("/")
+        joined = posixpath.normpath(joined) + ("/" if trailing else "")
+    return joined
+
+
+def _expand_base(path: str, base_id: str, bases: dict[str, Any]) -> tuple[str, bool]:
+    """Prefix *path* with the chain of ``originalUriBaseIds`` rooted at *base_id*.
+
+    Returns ``(path, is_absolute)``. Expansion stops at a base with no ``uri``
+    (an undefined root such as ``%SRCROOT%`` without a value), a missing base or
+    a cycle; the path is then still relative to that base.
+    """
+    current: str | None = base_id
+    seen: set[str] = set()
+    while current is not None and current not in seen and len(seen) < _MAX_BASE_CHAIN:
+        seen.add(current)
+        entry = bases.get(current)
+        if not isinstance(entry, dict):
+            break
+        base_uri = entry.get("uri")
+        if not isinstance(base_uri, str) or not base_uri:
+            break
+        base_path, absolute = _uri_to_path(base_uri)
+        path = _join(base_path, path)
+        if absolute:
+            return path, True
+        parent = entry.get("uriBaseId")
+        current = parent if isinstance(parent, str) and parent else None
+    return path, False
+
+
+@dataclass
+class _RunContext:
+    """Per-run lookup state for resolving artifact locations."""
+
+    bases: dict[str, Any] = field(default_factory=dict)
+    artifacts: list[Any] = field(default_factory=list)
+    artifact_by_location: dict[tuple[str, str | None], dict[str, Any]] = field(default_factory=dict)
+    source_root: str | None = None
+
+    @classmethod
+    def from_run(cls, run: dict[str, Any]) -> _RunContext:
+        bases = run.get("originalUriBaseIds")
+        bases = bases if isinstance(bases, dict) else {}
+        artifacts = run.get("artifacts")
+        artifacts = artifacts if isinstance(artifacts, list) else []
+        by_location: dict[tuple[str, str | None], dict[str, Any]] = {}
+        for artifact in artifacts:
+            loc = artifact.get("location") if isinstance(artifact, dict) else None
+            if isinstance(loc, dict) and isinstance(loc.get("uri"), str):
+                by_location.setdefault((loc["uri"], loc.get("uriBaseId")), artifact)
+        source_root = None
+        for base_id in bases:
+            if isinstance(base_id, str) and _is_source_root_id(base_id):
+                root, absolute = _expand_base("", base_id, bases)
+                if absolute and root:
+                    source_root = root.rstrip("/") + "/"
+                break
+        return cls(bases, artifacts, by_location, source_root)
+
+    def artifact_at(self, index: object) -> dict[str, Any] | None:
+        if (
+            isinstance(index, int)
+            and not isinstance(index, bool)
+            and 0 <= index < len(self.artifacts)
+        ):
+            artifact = self.artifacts[index]
+            if isinstance(artifact, dict):
+                return artifact
+        return None
+
+
+def _generated_hint(artifact: dict[str, Any], roles: list[str]) -> bool:
+    if _GENERATED_ROLES.intersection(roles):
+        return True
+    props = artifact.get("properties")
+    if not isinstance(props, dict):
+        return False
+    if props.get("generated") is True:
+        return True
+    tags = props.get("tags")
+    return isinstance(tags, list) and any(str(t).lower() == "generated" for t in tags)
+
+
+def _resolve_artifact_location(
+    artifact_location: dict[str, Any], ctx: _RunContext
+) -> tuple[str, dict[str, Any]] | None:
+    """Resolve a SARIF ``artifactLocation`` to ``(file_path, provenance)``.
+
+    Rules:
+
+    * ``uriBaseId`` is expanded through ``run.originalUriBaseIds`` (chains allowed).
+    * An absolute result that falls under the run's source root (``%SRCROOT%``
+      and friends) is re-expressed relative to it, so in-tree files stay
+      repo-relative whichever base the tool used.
+    * A relative uri expanded through a known build-root base (``BUILDROOT``,
+      ``OBJROOT``, ``OUTDIR``, ...) and any absolute ``file:`` uri outside the
+      source root are kept absolute with their leading ``/``; downstream strip
+      rules decide what they are.
+    * A relative uri under any other base (``SRC``, ``ROOTPATH``, ...) keeps
+      the relative uri as the path (the expansion goes to ``resolved_path``).
+    * A base that cannot be expanded (no ``uri``) leaves the path relative.
+
+    ``provenance`` always carries ``file_path`` and the raw ``uri``; it adds
+    ``uri_base_id``, ``resolved_path`` (absolute path, when a base was expanded
+    or it differs from ``file_path``), ``artifact_roles`` and ``generated_hint``
+    (``True`` for an ``uncontrolled`` role or a ``generated`` artifact property/tag)
+    only when present.
+    """
+    uri = artifact_location.get("uri")
+    base_id = artifact_location.get("uriBaseId")
+    artifact = ctx.artifact_at(artifact_location.get("index"))
+    if not uri and artifact is not None:
+        art_loc = artifact.get("location")
+        if isinstance(art_loc, dict):
+            uri = art_loc.get("uri")
+            base_id = base_id or art_loc.get("uriBaseId")
+    if not isinstance(uri, str) or not uri:
+        return None
+    if not isinstance(base_id, str) or not base_id:
+        base_id = None
+    if artifact is None:
+        artifact = ctx.artifact_by_location.get((uri, base_id))
+
+    path, absolute = _uri_to_path(uri)
+    relative_uri = None if absolute else path
+    expanded = False
+    if not absolute and base_id is not None:
+        path, absolute = _expand_base(path, base_id, ctx.bases)
+        expanded = absolute
+    file_path = path
+    if absolute and ctx.source_root and path.startswith(ctx.source_root):
+        file_path = path[len(ctx.source_root) :]
+    elif expanded and relative_uri is not None and not _is_build_root_id(base_id or ""):
+        # Not under the source root and not a known build root: the tool wrote
+        # a repo-relative uri against some checkout root; keep it relative.
+        file_path = relative_uri
+
+    provenance: dict[str, Any] = {"file_path": file_path, "uri": uri}
+    if base_id is not None:
+        provenance["uri_base_id"] = base_id
+    if absolute and (expanded or path != file_path):
+        provenance["resolved_path"] = path
+    if artifact is not None:
+        raw_roles = artifact.get("roles")
+        roles = [r for r in raw_roles if isinstance(r, str)] if isinstance(raw_roles, list) else []
+        if roles:
+            provenance["artifact_roles"] = roles
+        if _generated_hint(artifact, roles):
+            provenance["generated_hint"] = True
+    return file_path, provenance
+
+
+def _extract_locations(
+    result: dict, ctx: _RunContext | None = None
+) -> list[tuple[SourceCodeRef, dict[str, Any]]]:
+    """Extract ``(SourceCodeRef, provenance)`` pairs from result.locations."""
+    ctx = ctx or _RunContext()
+    out: list[tuple[SourceCodeRef, dict[str, Any]]] = []
     for loc in result.get("locations", []):
         phys = loc.get("physicalLocation")
         if not phys:
             continue
         artifact = phys.get("artifactLocation", {})
-        uri = artifact.get("uri", "")
-        if not uri:
+        if not isinstance(artifact, dict):
             continue
-        # Strip file:// prefix for local paths
-        if uri.startswith("file:///"):
-            uri = uri[len("file:///") :]
+        resolved = _resolve_artifact_location(artifact, ctx)
+        if resolved is None:
+            continue
+        file_path, provenance = resolved
         region = phys.get("region", {})
-        refs.append(
-            SourceCodeRef(
-                file_path=uri,
-                start_line=region.get("startLine"),
-                end_line=region.get("endLine"),
-                column=region.get("startColumn"),
-                symbol=_extract_symbol(loc),
-                snippet=region.get("snippet", {}).get("text", ""),
-            )
+        ref = SourceCodeRef(
+            file_path=file_path,
+            start_line=region.get("startLine"),
+            end_line=region.get("endLine"),
+            column=region.get("startColumn"),
+            symbol=_extract_symbol(loc),
+            snippet=region.get("snippet", {}).get("text", ""),
         )
-    return refs
+        provenance["file_path"] = ref.file_path
+        out.append((ref, provenance))
+    return out
+
+
+def _extract_source_code_refs(result: dict, ctx: _RunContext | None = None) -> list[SourceCodeRef]:
+    """Extract source code references from result.locations physicalLocation."""
+    return [ref for ref, _ in _extract_locations(result, ctx)]
+
+
+_PROVENANCE_KEYS = ("uri_base_id", "resolved_path", "artifact_roles", "generated_hint")
+
+
+def _provenance_extra_fields(provenance: list[dict[str, Any]]) -> dict[str, Any]:
+    """Finding-level extra_fields for path provenance.
+
+    ``path_provenance`` is aligned index-for-index with ``source_code_refs``;
+    the flat keys mirror the primary (first) location for simple consumers.
+    Empty when no location carries a base id, resolved path or artifact marker.
+    """
+    if not any(key in entry for entry in provenance for key in _PROVENANCE_KEYS):
+        return {}
+    extra: dict[str, Any] = {"path_provenance": provenance}
+    for key in _PROVENANCE_KEYS:
+        if key in provenance[0]:
+            extra[key] = provenance[0][key]
+    return extra
+
+
+def _fingerprint_extra_fields(result: dict[str, Any]) -> dict[str, Any]:
+    """``partial_fingerprints`` / ``fingerprints`` of a result, when the tool emits them.
+
+    Tools compute these to be stable across line shifts, so consumers can tell
+    apart two hits of one rule in one function without using line numbers.
+    """
+    extra: dict[str, Any] = {}
+    for source, key in (
+        ("partialFingerprints", "partial_fingerprints"),
+        ("fingerprints", "fingerprints"),
+    ):
+        value = result.get(source)
+        if isinstance(value, dict) and value:
+            extra[key] = {str(k): str(v) for k, v in value.items()}
+    return extra
 
 
 class SarifIngestor(BaseIngestor):
@@ -196,6 +481,7 @@ class SarifIngestor(BaseIngestor):
         findings: list[Finding] = []
 
         for run in data.get("runs", []):
+            ctx = _RunContext.from_run(run)
             driver = run.get("tool", {}).get("driver", {})
             rules_list: list[dict] = driver.get("rules", [])
 
@@ -240,7 +526,8 @@ class SarifIngestor(BaseIngestor):
 
                 cwe_id = _parse_cwe(rule)
                 hosts = _extract_hosts(result)
-                source_refs = _extract_source_code_refs(result)
+                locations = _extract_locations(result, ctx)
+                source_refs = [ref for ref, _ in locations]
 
                 finding = Finding(
                     id=f"sarif-{_slugify(rule_id or title)}",
@@ -254,6 +541,10 @@ class SarifIngestor(BaseIngestor):
                     source_code_refs=source_refs,
                     source_tool="sarif",
                     raw_ref=rule_id or None,
+                    extra_fields={
+                        **_provenance_extra_fields([prov for _, prov in locations]),
+                        **_fingerprint_extra_fields(result),
+                    },
                 )
                 findings.append(self._customize_finding(finding, result=result, rule=rule))
 
