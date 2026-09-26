@@ -174,6 +174,10 @@ class CoverityIngestor(BaseIngestor):
                 extra_fields["resolved_path"] = main_path
             if strip_prefix:
                 extra_fields["strip_prefix"] = strip_prefix
+            merge_key = _as_str(issue.get("mergeKey"))
+            if merge_key:
+                # Stable across builds and line shifts (Coverity's own defect identity).
+                extra_fields["merge_key"] = merge_key
 
             file_base = basename(file_path) if file_path else "unknown"
             finding_id = f"coverity-{slugify(checker_name)}-{slugify(file_base)}-l{line}"

@@ -122,14 +122,57 @@ def _extract_symbol(loc: dict) -> str | None:
 _SOURCE_ROOT_BASE_IDS = frozenset(
     {"SRCROOT", "SOURCEROOT", "PROJECTROOT", "REPOROOT", "WORKSPACE", "WORKSPACEROOT"}
 )
+# uriBaseId names that denote a build output or host root outside the source
+# tree (same normalisation). Only these keep their absolute expansion; a
+# relative uri under any other base (``SRC``, ``ROOT``, ``ROOTPATH``, ...) stays
+# the repo-relative path the tool wrote, with the expansion in ``resolved_path``.
+_BUILD_ROOT_BASE_IDS = frozenset(
+    {
+        "BUILDROOT",
+        "BUILDDIR",
+        "BUILD",
+        "BUILDPATH",
+        "BUILDOUTPUT",
+        "OBJROOT",
+        "OBJDIR",
+        "OBJ",
+        "OUTROOT",
+        "OUTDIR",
+        "OUT",
+        "OUTPUTDIR",
+        "OUTPUTROOT",
+        "BINROOT",
+        "BINDIR",
+        "BINARYDIR",
+        "CMAKEBINARYDIR",
+        "GENROOT",
+        "GENDIR",
+        "GENERATED",
+        "INTDIR",
+        "INTERMEDIATEDIR",
+        "TARGETDIR",
+        "TMPDIR",
+        "TEMPDIR",
+        "SYSROOT",
+        "SYSINCLUDE",
+    }
+)
 # Artifact roles that mark a file as not under version control (build output).
 _GENERATED_ROLES = frozenset({"uncontrolled"})
 _MAX_BASE_CHAIN = 32
 _WINDOWS_DRIVE_RE = re.compile(r"^[A-Za-z]:[/\\]")
 
 
+def _base_key(base_id: str) -> str:
+    return base_id.strip("%").replace("_", "").replace("-", "").upper()
+
+
 def _is_source_root_id(base_id: str) -> bool:
-    return base_id.strip("%").replace("_", "").replace("-", "").upper() in _SOURCE_ROOT_BASE_IDS
+    return _base_key(base_id) in _SOURCE_ROOT_BASE_IDS
+
+
+def _is_build_root_id(base_id: str) -> bool:
+    return _base_key(base_id) in _BUILD_ROOT_BASE_IDS
 
 
 def _uri_to_path(uri: str) -> tuple[str, bool]:
@@ -253,8 +296,12 @@ def _resolve_artifact_location(
     * An absolute result that falls under the run's source root (``%SRCROOT%``
       and friends) is re-expressed relative to it, so in-tree files stay
       repo-relative whichever base the tool used.
-    * Any other absolute result (out-of-tree build dir, system header) is kept
-      absolute with its leading ``/``; downstream strip rules decide what it is.
+    * A relative uri expanded through a known build-root base (``BUILDROOT``,
+      ``OBJROOT``, ``OUTDIR``, ...) and any absolute ``file:`` uri outside the
+      source root are kept absolute with their leading ``/``; downstream strip
+      rules decide what they are.
+    * A relative uri under any other base (``SRC``, ``ROOTPATH``, ...) keeps
+      the relative uri as the path (the expansion goes to ``resolved_path``).
     * A base that cannot be expanded (no ``uri``) leaves the path relative.
 
     ``provenance`` always carries ``file_path`` and the raw ``uri``; it adds
@@ -279,6 +326,7 @@ def _resolve_artifact_location(
         artifact = ctx.artifact_by_location.get((uri, base_id))
 
     path, absolute = _uri_to_path(uri)
+    relative_uri = None if absolute else path
     expanded = False
     if not absolute and base_id is not None:
         path, absolute = _expand_base(path, base_id, ctx.bases)
@@ -286,6 +334,10 @@ def _resolve_artifact_location(
     file_path = path
     if absolute and ctx.source_root and path.startswith(ctx.source_root):
         file_path = path[len(ctx.source_root) :]
+    elif expanded and relative_uri is not None and not _is_build_root_id(base_id or ""):
+        # Not under the source root and not a known build root: the tool wrote
+        # a repo-relative uri against some checkout root; keep it relative.
+        file_path = relative_uri
 
     provenance: dict[str, Any] = {"file_path": file_path, "uri": uri}
     if base_id is not None:
@@ -354,6 +406,23 @@ def _provenance_extra_fields(provenance: list[dict[str, Any]]) -> dict[str, Any]
     for key in _PROVENANCE_KEYS:
         if key in provenance[0]:
             extra[key] = provenance[0][key]
+    return extra
+
+
+def _fingerprint_extra_fields(result: dict[str, Any]) -> dict[str, Any]:
+    """``partial_fingerprints`` / ``fingerprints`` of a result, when the tool emits them.
+
+    Tools compute these to be stable across line shifts, so consumers can tell
+    apart two hits of one rule in one function without using line numbers.
+    """
+    extra: dict[str, Any] = {}
+    for source, key in (
+        ("partialFingerprints", "partial_fingerprints"),
+        ("fingerprints", "fingerprints"),
+    ):
+        value = result.get(source)
+        if isinstance(value, dict) and value:
+            extra[key] = {str(k): str(v) for k, v in value.items()}
     return extra
 
 
@@ -472,7 +541,10 @@ class SarifIngestor(BaseIngestor):
                     source_code_refs=source_refs,
                     source_tool="sarif",
                     raw_ref=rule_id or None,
-                    extra_fields=_provenance_extra_fields([prov for _, prov in locations]),
+                    extra_fields={
+                        **_provenance_extra_fields([prov for _, prov in locations]),
+                        **_fingerprint_extra_fields(result),
+                    },
                 )
                 findings.append(self._customize_finding(finding, result=result, rule=rule))
 
