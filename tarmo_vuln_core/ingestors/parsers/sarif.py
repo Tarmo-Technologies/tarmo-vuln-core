@@ -65,6 +65,8 @@ def _parse_cwe(rule: dict) -> int | None:
     1. rule.relationships where toolComponent.name == "CWE"
     2. rule.properties.tags matching "cwe:CWE-<id>"
     3. rule.properties.tags matching "CWE-<id>: <description>" (Semgrep format)
+    4. rule.properties.tags matching "external/cwe/cwe-<id>" (CodeQL format,
+       zero-padded, e.g. "external/cwe/cwe-089")
     """
     for rel in rule.get("relationships", []):
         target = rel.get("target", {})
@@ -83,6 +85,10 @@ def _parse_cwe(rule: dict) -> int | None:
             return int(m.group(1))
         # Format: "CWE-89: Improper Neutralization..." (Semgrep style)
         m = re.match(r"CWE-(\d+)\b", tag_str, re.IGNORECASE)
+        if m:
+            return int(m.group(1))
+        # Format: "external/cwe/cwe-089" (CodeQL style)
+        m = re.fullmatch(r"external/cwe/cwe-(\d+)", tag_str, re.IGNORECASE)
         if m:
             return int(m.group(1))
     return None

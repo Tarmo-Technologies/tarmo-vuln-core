@@ -75,7 +75,7 @@ _BANDIT_CWE_MAP: dict[str, int] = {
     "B503": 295,  # ssl_with_bad_defaults → CWE-295
     "B504": 295,  # ssl_with_no_version → CWE-295
     "B505": 327,  # weak_cryptographic_key → CWE-327
-    "B506": 295,  # yaml_load → CWE-295
+    "B506": 502,  # yaml_load → CWE-502 (arbitrary object construction)
     "B507": 295,  # ssh_no_host_key_verification → CWE-295
     "B601": 78,  # paramiko_calls → CWE-78
     "B602": 78,  # subprocess_popen_with_shell_equals_true → CWE-78
