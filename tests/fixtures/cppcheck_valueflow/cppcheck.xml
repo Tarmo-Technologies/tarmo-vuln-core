@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+    <cppcheck version="2.13.0"/>
+    <errors>
+        <error id="nullPointer" severity="warning" msg="Possible null pointer dereference: p" verbose="Possible null pointer dereference: p" cwe="476" file0="src/nullarg.c">
+            <location file="src/nullarg.c" line="3" column="6" info="Null pointer dereference"/>
+            <location file="src/nullarg.c" line="8" column="17" info="Calling function &apos;write_value&apos;, 1st argument &apos;0&apos; value is 0"/>
+            <symbol>p</symbol>
+        </error>
+        <error id="arrayIndexOutOfBoundsCond" severity="warning" msg="Either the condition &apos;idx&lt;20&apos; is redundant or the array &apos;buf[10]&apos; is accessed at index 19, which is out of bounds." verbose="Either the condition &apos;idx&lt;20&apos; is redundant or the array &apos;buf[10]&apos; is accessed at index 19, which is out of bounds." cwe="788" file0="src/redundant.c">
+            <location file="src/redundant.c" line="17" column="19" info="Array index out of bounds"/>
+            <location file="src/redundant.c" line="16" column="13" info="Assuming that condition &apos;idx&lt;20&apos; is not redundant"/>
+        </error>
+        <error id="nullPointerRedundantCheck" severity="warning" msg="Either the condition &apos;p==NULL&apos; is redundant or there is possible null pointer dereference: p." verbose="Either the condition &apos;p==NULL&apos; is redundant or there is possible null pointer dereference: p." cwe="476" file0="src/redundant.c">
+            <location file="src/redundant.c" line="5" column="14" info="Null pointer dereference"/>
+            <location file="src/redundant.c" line="6" column="11" info="Assuming that condition &apos;p==NULL&apos; is not redundant"/>
+            <symbol>p</symbol>
+        </error>
+        <error id="uninitvar" severity="error" msg="Uninitialized variable: x" verbose="Uninitialized variable: x" cwe="457" file0="src/redundant.c">
+            <location file="src/redundant.c" line="25" column="12"/>
+            <symbol>x</symbol>
+        </error>
+        <error id="ctunullpointer" severity="error" msg="Null pointer dereference: p" verbose="Null pointer dereference: p" cwe="476">
+            <location file="src/nullarg.c" line="3" column="6" info="Dereferencing argument p that is null"/>
+            <location file="src/nullarg.c" line="8" column="16" info="Calling function write_value, 1st argument is null"/>
+        </error>
+    </errors>
+</results>

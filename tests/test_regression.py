@@ -81,12 +81,12 @@ class TestParserStability:
         findings = SarifIngestor().ingest(FIXTURES / "sarif_sample.json")
         assert len(findings) == 3
 
-    def test_cppcheck_real_produces_6_findings(self) -> None:
+    def test_cppcheck_real_produces_12_findings(self) -> None:
         from tarmo_vuln_core.ingestors.parsers.cppcheck import CppcheckIngestor
 
-        # 7 original groups minus 1 filtered noise (missingInclude) = 6
+        # One finding per <error>: 13 errors minus 1 filtered noise (missingInclude) = 12
         findings = CppcheckIngestor().ingest(FIXTURES / "cppcheck_real.xml")
-        assert len(findings) == 6
+        assert len(findings) == 12
 
     def test_gitleaks_sample_produces_3_findings(self) -> None:
         from tarmo_vuln_core.ingestors.parsers.gitleaks import GitleaksIngestor

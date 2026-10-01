@@ -317,7 +317,7 @@ class TestEveryParserSmoke:
         from tarmo_vuln_core.ingestors.parsers.cppcheck import CppcheckIngestor
 
         findings = CppcheckIngestor().ingest(FIXTURES / "cppcheck_real.xml")
-        assert len(findings) == 6
+        assert len(findings) == 12
 
     def test_gitleaks_sample(self) -> None:
         from tarmo_vuln_core.ingestors.parsers.gitleaks import GitleaksIngestor
