@@ -1,0 +1,1940 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "CodeQL",
+          "organization": "GitHub",
+          "semanticVersion": "2.5.4",
+          "rules": [
+            {
+              "id": "py/empty-except",
+              "name": "py/empty-except",
+              "shortDescription": {
+                "text": "Empty except"
+              },
+              "fullDescription": {
+                "text": "Except doesn't do anything and has no comment"
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "note"
+              },
+              "properties": {
+                "tags": [
+                  "reliability",
+                  "maintainability",
+                  "external/cwe/cwe-390"
+                ],
+                "description": "Except doesn't do anything and has no comment",
+                "id": "py/empty-except",
+                "kind": "problem",
+                "name": "Empty except",
+                "precision": "high",
+                "problem.severity": "recommendation",
+                "sub-severity": "high"
+              }
+            },
+            {
+              "id": "py/path-injection",
+              "name": "py/path-injection",
+              "shortDescription": {
+                "text": "Uncontrolled data used in path expression"
+              },
+              "fullDescription": {
+                "text": "Accessing paths influenced by users can allow an attacker to access unexpected resources."
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "error"
+              },
+              "properties": {
+                "tags": [
+                  "correctness",
+                  "security",
+                  "external/owasp/owasp-a1",
+                  "external/cwe/cwe-022",
+                  "external/cwe/cwe-023",
+                  "external/cwe/cwe-036",
+                  "external/cwe/cwe-073",
+                  "external/cwe/cwe-099"
+                ],
+                "description": "Accessing paths influenced by users can allow an attacker to access unexpected resources.",
+                "id": "py/path-injection",
+                "kind": "path-problem",
+                "name": "Uncontrolled data used in path expression",
+                "precision": "high",
+                "problem.severity": "error",
+                "sub-severity": "high"
+              }
+            },
+            {
+              "id": "py/reflective-xss",
+              "name": "py/reflective-xss",
+              "shortDescription": {
+                "text": "Reflected server-side cross-site scripting"
+              },
+              "fullDescription": {
+                "text": "Writing user input directly to a web page allows for a cross-site scripting vulnerability."
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "external/cwe/cwe-079",
+                  "external/cwe/cwe-116"
+                ],
+                "description": "Writing user input directly to a web page\n              allows for a cross-site scripting vulnerability.",
+                "id": "py/reflective-xss",
+                "kind": "path-problem",
+                "name": "Reflected server-side cross-site scripting",
+                "precision": "high",
+                "problem.severity": "error",
+                "sub-severity": "high"
+              }
+            }
+          ]
+        }
+      },
+      "artifacts": [
+        {
+          "location": {
+            "uri": "good/db_init.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 0
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/db_init.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 1
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/libsession.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 2
+          }
+        },
+        {
+          "location": {
+            "uri": "good/libsession.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 3
+          }
+        },
+        {
+          "location": {
+            "uri": "utils/scrypt-crack.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 4
+          }
+        },
+        {
+          "location": {
+            "uri": "good/mod_user.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 5
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/mod_user.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 6
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/api_list.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 7
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/api_post.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 8
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/libuser.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 9
+          }
+        },
+        {
+          "location": {
+            "uri": "utils/aes-decrypt.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 10
+          }
+        },
+        {
+          "location": {
+            "uri": "utils/aes-encrypt.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 11
+          }
+        },
+        {
+          "location": {
+            "uri": "utils/ca-csr-create.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 12
+          }
+        },
+        {
+          "location": {
+            "uri": "utils/ca-csr-load.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 13
+          }
+        },
+        {
+          "location": {
+            "uri": "utils/crack-cvv.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 14
+          }
+        },
+        {
+          "location": {
+            "uri": "good/libapi.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 15
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/libmfa.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 16
+          }
+        },
+        {
+          "location": {
+            "uri": "good/libmfa.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 17
+          }
+        },
+        {
+          "location": {
+            "uri": "good/libposts.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 18
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/libposts.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 19
+          }
+        },
+        {
+          "location": {
+            "uri": "good/libuser.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 20
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/mod_api.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 21
+          }
+        },
+        {
+          "location": {
+            "uri": "good/mod_api.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 22
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/mod_hello.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 23
+          }
+        },
+        {
+          "location": {
+            "uri": "good/mod_hello.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 24
+          }
+        },
+        {
+          "location": {
+            "uri": "good/mod_mfa.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 25
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/mod_posts.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 26
+          }
+        },
+        {
+          "location": {
+            "uri": "good/mod_posts.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 27
+          }
+        },
+        {
+          "location": {
+            "uri": "good/mod_welcome1.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 28
+          }
+        },
+        {
+          "location": {
+            "uri": "utils/scrypt-generate.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 29
+          }
+        },
+        {
+          "location": {
+            "uri": "utils/scrypt-verify.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 30
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/libapi.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 31
+          }
+        },
+        {
+          "location": {
+            "uri": "good/vulpy-ssl.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 32
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/vulpy-ssl.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 33
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/vulpy.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 34
+          }
+        },
+        {
+          "location": {
+            "uri": "good/vulpy.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 35
+          }
+        },
+        {
+          "location": {
+            "uri": "bad/mod_mfa.py",
+            "uriBaseId": "%SRCROOT%",
+            "index": 36
+          }
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "py/empty-except",
+          "ruleIndex": 0,
+          "message": {
+            "text": "'except' clause does nothing but pass and there is no explanatory comment."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bad/db_init.py",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 1
+                },
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 5,
+                  "endColumn": 30
+                },
+                "contextRegion": {
+                  "startLine": 38,
+                  "endLine": 42,
+                  "snippet": {
+                    "text": "    try:\n        os.remove('db_users.sqlite')\n    except FileNotFoundError:\n        pass\n\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "9cbc869fbfffeb60:1",
+            "primaryLocationStartColumnFingerprint": "0"
+          }
+        },
+        {
+          "ruleId": "py/path-injection",
+          "ruleIndex": 1,
+          "message": {
+            "text": "This path depends on [a user-provided value](1).\nThis path depends on [a user-provided value](2)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bad/libapi.py",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 31
+                },
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 5,
+                  "endColumn": 18
+                },
+                "contextRegion": {
+                  "startLine": 20,
+                  "endLine": 24,
+                  "snippet": {
+                    "text": "    keyfile = '/tmp/vulpy.apikey.{}.{}'.format(username, key)\n\n    Path(keyfile).touch()\n\n    return key\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "6e479c79e8d1316:1",
+            "primaryLocationStartColumnFingerprint": "0"
+          },
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_api.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 21
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 12,
+                            "endColumn": 19
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "@mod_api.route('/key', methods=['POST'])\ndef do_key_create():\n    data = request.get_json()\n\n    try:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for request"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_api.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 21
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 12,
+                            "endColumn": 28
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "@mod_api.route('/key', methods=['POST'])\ndef do_key_create():\n    data = request.get_json()\n\n    try:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_api.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 21
+                          },
+                          "region": {
+                            "startLine": 39,
+                            "startColumn": 25,
+                            "endColumn": 41
+                          },
+                          "contextRegion": {
+                            "startLine": 37,
+                            "endLine": 41,
+                            "snippet": {
+                              "text": "        return jsonify({'error': 'invalid schema', 'schema': key_schema}), 400\n\n    key = libapi.keygen(data['username'], data['password'])\n\n    if key:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Subscript"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/libapi.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 31
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for username"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/libapi.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 31
+                          },
+                          "region": {
+                            "startLine": 22,
+                            "startColumn": 5,
+                            "endColumn": 18
+                          },
+                          "contextRegion": {
+                            "startLine": 20,
+                            "endLine": 24,
+                            "snippet": {
+                              "text": "    keyfile = '/tmp/vulpy.apikey.{}.{}'.format(username, key)\n\n    Path(keyfile).touch()\n\n    return key\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Path()"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "good/mod_api.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 22
+                          },
+                          "region": {
+                            "startLine": 34,
+                            "startColumn": 12,
+                            "endColumn": 19
+                          },
+                          "contextRegion": {
+                            "startLine": 32,
+                            "endLine": 36,
+                            "snippet": {
+                              "text": "@mod_api.route('/key', methods=['POST'])\ndef do_key_create():\n    data = request.get_json()\n\n    try:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for request"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "good/mod_api.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 22
+                          },
+                          "region": {
+                            "startLine": 34,
+                            "startColumn": 12,
+                            "endColumn": 28
+                          },
+                          "contextRegion": {
+                            "startLine": 32,
+                            "endLine": 36,
+                            "snippet": {
+                              "text": "@mod_api.route('/key', methods=['POST'])\ndef do_key_create():\n    data = request.get_json()\n\n    try:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "good/mod_api.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 22
+                          },
+                          "region": {
+                            "startLine": 41,
+                            "startColumn": 25,
+                            "endColumn": 41
+                          },
+                          "contextRegion": {
+                            "startLine": 39,
+                            "endLine": 43,
+                            "snippet": {
+                              "text": "        return jsonify({'error': 'invalid schema', 'schema': key_schema}, 400)\n\n    key = libapi.keygen(data['username'], data['password'])\n\n    if key:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Subscript"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/libapi.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 31
+                          },
+                          "region": {
+                            "startLine": 8,
+                            "startColumn": 12,
+                            "endColumn": 20
+                          },
+                          "contextRegion": {
+                            "startLine": 6,
+                            "endLine": 10,
+                            "snippet": {
+                              "text": "\n\ndef keygen(username, password=None):\n\n    if password:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for username"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/libapi.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 31
+                          },
+                          "region": {
+                            "startLine": 22,
+                            "startColumn": 5,
+                            "endColumn": 18
+                          },
+                          "contextRegion": {
+                            "startLine": 20,
+                            "endLine": 24,
+                            "snippet": {
+                              "text": "    keyfile = '/tmp/vulpy.apikey.{}.{}'.format(username, key)\n\n    Path(keyfile).touch()\n\n    return key\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Path()"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "relatedLocations": [
+            {
+              "id": 1,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bad/mod_api.py",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 21
+                },
+                "region": {
+                  "startLine": 32,
+                  "startColumn": 12,
+                  "endColumn": 19
+                },
+                "contextRegion": {
+                  "startLine": 30,
+                  "endLine": 34,
+                  "snippet": {
+                    "text": "@mod_api.route('/key', methods=['POST'])\ndef do_key_create():\n    data = request.get_json()\n\n    try:\n"
+                  }
+                }
+              },
+              "message": {
+                "text": "a user-provided value"
+              }
+            },
+            {
+              "id": 2,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "good/mod_api.py",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 22
+                },
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 12,
+                  "endColumn": 19
+                },
+                "contextRegion": {
+                  "startLine": 32,
+                  "endLine": 36,
+                  "snippet": {
+                    "text": "@mod_api.route('/key', methods=['POST'])\ndef do_key_create():\n    data = request.get_json()\n\n    try:\n"
+                  }
+                }
+              },
+              "message": {
+                "text": "a user-provided value"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "py/reflective-xss",
+          "ruleIndex": 2,
+          "message": {
+            "text": "Cross-site scripting vulnerability due to [a user-provided value](1).\nCross-site scripting vulnerability due to [a user-provided value](2).\nCross-site scripting vulnerability due to [a user-provided value](3).\nCross-site scripting vulnerability due to [a user-provided value](4).\nCross-site scripting vulnerability due to [a user-provided value](5).\nCross-site scripting vulnerability due to [a user-provided value](1)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bad/mod_user.py",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 6
+                },
+                "region": {
+                  "startLine": 33,
+                  "startColumn": 16,
+                  "endColumn": 24
+                },
+                "contextRegion": {
+                  "startLine": 31,
+                  "endLine": 35,
+                  "snippet": {
+                    "text": "        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n    return render_template('user.login.mfa.html')\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "68a9962897fd336c:1",
+            "primaryLocationStartColumnFingerprint": "7"
+          },
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/libsession.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 2
+                          },
+                          "region": {
+                            "startLine": 5,
+                            "startColumn": 12,
+                            "endColumn": 20
+                          },
+                          "contextRegion": {
+                            "startLine": 3,
+                            "endLine": 7,
+                            "snippet": {
+                              "text": "\n\ndef create(response, username):\n    session = base64.b64encode(json.dumps({'username': username}).encode())\n    response.set_cookie('vulpy_session', session)\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/libsession.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 2
+                          },
+                          "region": {
+                            "startLine": 8,
+                            "startColumn": 12,
+                            "endColumn": 20
+                          },
+                          "contextRegion": {
+                            "startLine": 6,
+                            "endLine": 10,
+                            "snippet": {
+                              "text": "    session = base64.b64encode(json.dumps({'username': username}).encode())\n    response.set_cookie('vulpy_session', session)\n    return response\n\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 20,
+                            "endColumn": 75
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "\n        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute()"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 33,
+                            "startColumn": 16,
+                            "endColumn": 24
+                          },
+                          "contextRegion": {
+                            "startLine": 31,
+                            "endLine": 35,
+                            "snippet": {
+                              "text": "        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n    return render_template('user.login.mfa.html')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/libsession.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 2
+                          },
+                          "region": {
+                            "startLine": 7,
+                            "startColumn": 5,
+                            "endColumn": 13
+                          },
+                          "contextRegion": {
+                            "startLine": 5,
+                            "endLine": 9,
+                            "snippet": {
+                              "text": "def create(response, username):\n    session = base64.b64encode(json.dumps({'username': username}).encode())\n    response.set_cookie('vulpy_session', session)\n    return response\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/libsession.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 2
+                          },
+                          "region": {
+                            "startLine": 8,
+                            "startColumn": 12,
+                            "endColumn": 20
+                          },
+                          "contextRegion": {
+                            "startLine": 6,
+                            "endLine": 10,
+                            "snippet": {
+                              "text": "    session = base64.b64encode(json.dumps({'username': username}).encode())\n    response.set_cookie('vulpy_session', session)\n    return response\n\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 20,
+                            "endColumn": 75
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "\n        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute()"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 33,
+                            "startColumn": 16,
+                            "endColumn": 24
+                          },
+                          "contextRegion": {
+                            "startLine": 31,
+                            "endLine": 35,
+                            "snippet": {
+                              "text": "        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n    return render_template('user.login.mfa.html')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/libsession.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 2
+                          },
+                          "region": {
+                            "startLine": 8,
+                            "startColumn": 12,
+                            "endColumn": 20
+                          },
+                          "contextRegion": {
+                            "startLine": 6,
+                            "endLine": 10,
+                            "snippet": {
+                              "text": "    session = base64.b64encode(json.dumps({'username': username}).encode())\n    response.set_cookie('vulpy_session', session)\n    return response\n\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 20,
+                            "endColumn": 75
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "\n        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute()"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 33,
+                            "startColumn": 16,
+                            "endColumn": 24
+                          },
+                          "contextRegion": {
+                            "startLine": 31,
+                            "endLine": 35,
+                            "snippet": {
+                              "text": "        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n    return render_template('user.login.mfa.html')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 14,
+                            "startColumn": 8,
+                            "endColumn": 15
+                          },
+                          "contextRegion": {
+                            "startLine": 12,
+                            "endLine": 16,
+                            "snippet": {
+                              "text": "    session.pop('username', None)\n\n    if request.method == 'POST':\n\n        username = request.form.get('username')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for request"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 16,
+                            "startColumn": 20,
+                            "endColumn": 32
+                          },
+                          "contextRegion": {
+                            "startLine": 14,
+                            "endLine": 18,
+                            "snippet": {
+                              "text": "    if request.method == 'POST':\n\n        username = request.form.get('username')\n        password = request.form.get('password')\n        otp = request.form.get('otp')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 20,
+                            "startColumn": 34,
+                            "endColumn": 42
+                          },
+                          "contextRegion": {
+                            "startLine": 18,
+                            "endLine": 22,
+                            "snippet": {
+                              "text": "        otp = request.form.get('otp')\n\n        username = libuser.login(username, password)\n\n        if not username:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for username"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 20,
+                            "startColumn": 20,
+                            "endColumn": 53
+                          },
+                          "contextRegion": {
+                            "startLine": 18,
+                            "endLine": 22,
+                            "snippet": {
+                              "text": "        otp = request.form.get('otp')\n\n        username = libuser.login(username, password)\n\n        if not username:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute()"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 66,
+                            "endColumn": 74
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "\n        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for username"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 20,
+                            "endColumn": 75
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "\n        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute()"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 33,
+                            "startColumn": 16,
+                            "endColumn": 24
+                          },
+                          "contextRegion": {
+                            "startLine": 31,
+                            "endLine": 35,
+                            "snippet": {
+                              "text": "        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n    return render_template('user.login.mfa.html')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 14,
+                            "startColumn": 8,
+                            "endColumn": 15
+                          },
+                          "contextRegion": {
+                            "startLine": 12,
+                            "endLine": 16,
+                            "snippet": {
+                              "text": "    session.pop('username', None)\n\n    if request.method == 'POST':\n\n        username = request.form.get('username')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for request"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 16,
+                            "startColumn": 20,
+                            "endColumn": 27
+                          },
+                          "contextRegion": {
+                            "startLine": 14,
+                            "endLine": 18,
+                            "snippet": {
+                              "text": "    if request.method == 'POST':\n\n        username = request.form.get('username')\n        password = request.form.get('password')\n        otp = request.form.get('otp')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for request"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 16,
+                            "startColumn": 20,
+                            "endColumn": 32
+                          },
+                          "contextRegion": {
+                            "startLine": 14,
+                            "endLine": 18,
+                            "snippet": {
+                              "text": "    if request.method == 'POST':\n\n        username = request.form.get('username')\n        password = request.form.get('password')\n        otp = request.form.get('otp')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 20,
+                            "startColumn": 34,
+                            "endColumn": 42
+                          },
+                          "contextRegion": {
+                            "startLine": 18,
+                            "endLine": 22,
+                            "snippet": {
+                              "text": "        otp = request.form.get('otp')\n\n        username = libuser.login(username, password)\n\n        if not username:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for username"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 20,
+                            "startColumn": 20,
+                            "endColumn": 53
+                          },
+                          "contextRegion": {
+                            "startLine": 18,
+                            "endLine": 22,
+                            "snippet": {
+                              "text": "        otp = request.form.get('otp')\n\n        username = libuser.login(username, password)\n\n        if not username:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute()"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 66,
+                            "endColumn": 74
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "\n        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for username"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 20,
+                            "endColumn": 75
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "\n        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute()"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 33,
+                            "startColumn": 16,
+                            "endColumn": 24
+                          },
+                          "contextRegion": {
+                            "startLine": 31,
+                            "endLine": 35,
+                            "snippet": {
+                              "text": "        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n    return render_template('user.login.mfa.html')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 16,
+                            "startColumn": 20,
+                            "endColumn": 27
+                          },
+                          "contextRegion": {
+                            "startLine": 14,
+                            "endLine": 18,
+                            "snippet": {
+                              "text": "    if request.method == 'POST':\n\n        username = request.form.get('username')\n        password = request.form.get('password')\n        otp = request.form.get('otp')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for request"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 16,
+                            "startColumn": 20,
+                            "endColumn": 32
+                          },
+                          "contextRegion": {
+                            "startLine": 14,
+                            "endLine": 18,
+                            "snippet": {
+                              "text": "    if request.method == 'POST':\n\n        username = request.form.get('username')\n        password = request.form.get('password')\n        otp = request.form.get('otp')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 20,
+                            "startColumn": 34,
+                            "endColumn": 42
+                          },
+                          "contextRegion": {
+                            "startLine": 18,
+                            "endLine": 22,
+                            "snippet": {
+                              "text": "        otp = request.form.get('otp')\n\n        username = libuser.login(username, password)\n\n        if not username:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for username"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 20,
+                            "startColumn": 20,
+                            "endColumn": 53
+                          },
+                          "contextRegion": {
+                            "startLine": 18,
+                            "endLine": 22,
+                            "snippet": {
+                              "text": "        otp = request.form.get('otp')\n\n        username = libuser.login(username, password)\n\n        if not username:\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute()"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 66,
+                            "endColumn": 74
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "\n        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for username"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 20,
+                            "endColumn": 75
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "\n        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute()"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 33,
+                            "startColumn": 16,
+                            "endColumn": 24
+                          },
+                          "contextRegion": {
+                            "startLine": 31,
+                            "endLine": 35,
+                            "snippet": {
+                              "text": "        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n    return render_template('user.login.mfa.html')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/libsession.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 2
+                          },
+                          "region": {
+                            "startLine": 5,
+                            "startColumn": 12,
+                            "endColumn": 20
+                          },
+                          "contextRegion": {
+                            "startLine": 3,
+                            "endLine": 7,
+                            "snippet": {
+                              "text": "\n\ndef create(response, username):\n    session = base64.b64encode(json.dumps({'username': username}).encode())\n    response.set_cookie('vulpy_session', session)\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "SSA variable response"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/libsession.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 2
+                          },
+                          "region": {
+                            "startLine": 8,
+                            "startColumn": 12,
+                            "endColumn": 20
+                          },
+                          "contextRegion": {
+                            "startLine": 6,
+                            "endLine": 10,
+                            "snippet": {
+                              "text": "    session = base64.b64encode(json.dumps({'username': username}).encode())\n    response.set_cookie('vulpy_session', session)\n    return response\n\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 32,
+                            "startColumn": 20,
+                            "endColumn": 75
+                          },
+                          "contextRegion": {
+                            "startLine": 30,
+                            "endLine": 34,
+                            "snippet": {
+                              "text": "\n        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for Attribute()"
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "bad/mod_user.py",
+                            "uriBaseId": "%SRCROOT%",
+                            "index": 6
+                          },
+                          "region": {
+                            "startLine": 33,
+                            "startColumn": 16,
+                            "endColumn": 24
+                          },
+                          "contextRegion": {
+                            "startLine": 31,
+                            "endLine": 35,
+                            "snippet": {
+                              "text": "        response = make_response(redirect('/'))\n        response = libsession.create(response=response, username=username)\n        return response\n\n    return render_template('user.login.mfa.html')\n"
+                            }
+                          }
+                        },
+                        "message": {
+                          "text": "ControlFlowNode for response"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "relatedLocations": [
+            {
+              "id": 1,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bad/libsession.py",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 2
+                },
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 12,
+                  "endColumn": 20
+                },
+                "contextRegion": {
+                  "startLine": 3,
+                  "endLine": 7,
+                  "snippet": {
+                    "text": "\n\ndef create(response, username):\n    session = base64.b64encode(json.dumps({'username': username}).encode())\n    response.set_cookie('vulpy_session', session)\n"
+                  }
+                }
+              },
+              "message": {
+                "text": "a user-provided value"
+              }
+            },
+            {
+              "id": 2,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bad/libsession.py",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 2
+                },
+                "region": {
+                  "startLine": 7,
+                  "startColumn": 5,
+                  "endColumn": 13
+                },
+                "contextRegion": {
+                  "startLine": 5,
+                  "endLine": 9,
+                  "snippet": {
+                    "text": "def create(response, username):\n    session = base64.b64encode(json.dumps({'username': username}).encode())\n    response.set_cookie('vulpy_session', session)\n    return response\n\n"
+                  }
+                }
+              },
+              "message": {
+                "text": "a user-provided value"
+              }
+            },
+            {
+              "id": 3,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bad/libsession.py",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 2
+                },
+                "region": {
+                  "startLine": 8,
+                  "startColumn": 12,
+                  "endColumn": 20
+                },
+                "contextRegion": {
+                  "startLine": 6,
+                  "endLine": 10,
+                  "snippet": {
+                    "text": "    session = base64.b64encode(json.dumps({'username': username}).encode())\n    response.set_cookie('vulpy_session', session)\n    return response\n\n\n"
+                  }
+                }
+              },
+              "message": {
+                "text": "a user-provided value"
+              }
+            },
+            {
+              "id": 4,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bad/mod_user.py",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 6
+                },
+                "region": {
+                  "startLine": 14,
+                  "startColumn": 8,
+                  "endColumn": 15
+                },
+                "contextRegion": {
+                  "startLine": 12,
+                  "endLine": 16,
+                  "snippet": {
+                    "text": "    session.pop('username', None)\n\n    if request.method == 'POST':\n\n        username = request.form.get('username')\n"
+                  }
+                }
+              },
+              "message": {
+                "text": "a user-provided value"
+              }
+            },
+            {
+              "id": 5,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bad/mod_user.py",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 6
+                },
+                "region": {
+                  "startLine": 16,
+                  "startColumn": 20,
+                  "endColumn": 27
+                },
+                "contextRegion": {
+                  "startLine": 14,
+                  "endLine": 18,
+                  "snippet": {
+                    "text": "    if request.method == 'POST':\n\n        username = request.form.get('username')\n        password = request.form.get('password')\n        otp = request.form.get('otp')\n"
+                  }
+                }
+              },
+              "message": {
+                "text": "a user-provided value"
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "unicodeCodePoints",
+      "properties": {
+        "semmle.formatSpecifier": "sarif-latest"
+      }
+    }
+  ]
+}

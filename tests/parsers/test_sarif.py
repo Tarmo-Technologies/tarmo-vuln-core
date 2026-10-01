@@ -9,7 +9,7 @@ import pytest
 
 from tarmo_vuln_core.ingestors.base import IngestorError
 from tarmo_vuln_core.ingestors.parsers.sarif import SarifIngestor
-from tarmo_vuln_core.models import Severity
+from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
 
 FIXTURES = Path(__file__).parent.parent / "fixtures"
 
@@ -436,3 +436,276 @@ class TestSarifPathProvenance:
         [f] = SarifIngestor().ingest(p)
         assert f.source_code_refs[0].file_path == "src/app.py"
         assert f.extra_fields == {}
+
+
+CODEQL = FIXTURES / "codeql_path_problem.sarif"
+
+
+def _thread_flow_location(
+    artifact_location: dict, line: int, message: str = "m", kinds: list[str] | None = None
+) -> dict:
+    tfl: dict = {
+        "location": {
+            "physicalLocation": {
+                "artifactLocation": artifact_location,
+                "region": {"startLine": line, "startColumn": 2},
+            },
+            "message": {"text": message},
+        }
+    }
+    if kinds is not None:
+        tfl["kinds"] = kinds
+    return tfl
+
+
+def _code_flow(*locations: dict) -> dict:
+    return {"threadFlows": [{"locations": list(locations)}]}
+
+
+def _flow_shape(finding: Finding) -> list[list[tuple[str, int | None, int | None, str]]]:
+    return [
+        [(s.file_path, s.start_line, s.column, s.role) for s in flow.steps]
+        for flow in finding.data_flows
+    ]
+
+
+@pytest.mark.unit
+class TestSarifCodeFlows:
+    """``result.codeFlows`` -> ``Finding.data_flows`` (#8), on real CodeQL path-problem output."""
+
+    def setup_method(self) -> None:
+        self.findings = SarifIngestor().ingest(CODEQL)
+        self.by_rule = {f.raw_ref: f for f in self.findings}
+
+    def test_result_without_code_flows_has_no_data_flows(self) -> None:
+        assert [f.raw_ref for f in self.findings] == [
+            "py/empty-except",
+            "py/path-injection",
+            "py/reflective-xss",
+        ]
+        assert self.by_rule["py/empty-except"].data_flows == []
+
+    def test_each_code_flow_becomes_a_data_flow(self) -> None:
+        f = self.by_rule["py/path-injection"]
+        assert _flow_shape(f) == [
+            [
+                ("bad/mod_api.py", 32, 12, "source"),
+                ("bad/mod_api.py", 32, 12, "step"),
+                ("bad/mod_api.py", 39, 25, "step"),
+                # CodeQL 2.5.4 wrote this step without a region.
+                ("bad/libapi.py", None, None, "step"),
+                ("bad/libapi.py", 22, 5, "sink"),
+            ],
+            [
+                ("good/mod_api.py", 34, 12, "source"),
+                ("good/mod_api.py", 34, 12, "step"),
+                ("good/mod_api.py", 41, 25, "step"),
+                ("bad/libapi.py", 8, 12, "step"),
+                ("bad/libapi.py", 22, 5, "sink"),
+            ],
+        ]
+        assert [flow.truncated for flow in f.data_flows] == [False, False]
+
+    def test_message_kept_and_free_text_never_becomes_a_symbol(self) -> None:
+        flow = self.by_rule["py/path-injection"].data_flows[0]
+        assert [s.message for s in flow.steps] == [
+            "ControlFlowNode for request",
+            "ControlFlowNode for Attribute",
+            "ControlFlowNode for Subscript",
+            "ControlFlowNode for username",
+            "ControlFlowNode for Path()",
+        ]
+        assert [s.symbol for s in flow.steps] == [None] * 5
+        assert [s.tool_kind for s in flow.steps] == [None] * 5
+        assert {s.origin for s in flow.steps} == {"sarif_code_flow"}
+
+    def test_at_most_three_code_flows(self) -> None:
+        # The result has 7 codeFlows; the first 3 are kept.
+        f = self.by_rule["py/reflective-xss"]
+        assert [len(flow.steps) for flow in f.data_flows] == [4, 4, 3]
+        assert _flow_shape(f)[2] == [
+            ("bad/libsession.py", 8, 12, "source"),
+            ("bad/mod_user.py", 32, 20, "step"),
+            ("bad/mod_user.py", 33, 16, "sink"),
+        ]
+
+    def test_sink_of_each_flow_is_the_result_location(self) -> None:
+        for raw_ref in ("py/path-injection", "py/reflective-xss"):
+            f = self.by_rule[raw_ref]
+            [ref] = f.source_code_refs
+            assert {
+                (flow.steps[-1].file_path, flow.steps[-1].start_line, flow.steps[-1].column)
+                for flow in f.data_flows
+            } == {(ref.file_path, ref.start_line, ref.column)}
+
+    def test_code_flows_leave_existing_fields_unchanged(self, tmp_path: Path) -> None:
+        """codeFlows add data_flows only: refs, hosts and extra_fields are as without them."""
+        doc = json.loads(CODEQL.read_text())
+        for result in doc["runs"][0]["results"]:
+            result.pop("codeFlows", None)
+        stripped = tmp_path / "no-flows.sarif"
+        stripped.write_text(json.dumps(doc))
+
+        def fields(findings: list[Finding]) -> list[tuple]:
+            return [
+                (
+                    f.id,
+                    f.title,
+                    f.severity,
+                    f.description,
+                    f.cwe_id,
+                    f.affected_hosts,
+                    f.source_code_refs,
+                    f.extra_fields,
+                )
+                for f in findings
+            ]
+
+        without = SarifIngestor().ingest(stripped)
+        assert [f.data_flows for f in without] == [[], [], []]
+        assert fields(self.findings) == fields(without)
+        assert [r.is_sink for f in self.findings for r in f.source_code_refs] == [True] * 3
+        f = self.by_rule["py/path-injection"]
+        assert f.source_code_refs == [
+            SourceCodeRef(file_path="bad/libapi.py", start_line=22, column=5)
+        ]
+        assert f.affected_hosts == []
+        assert f.extra_fields == {
+            "path_provenance": [
+                {"file_path": "bad/libapi.py", "uri": "bad/libapi.py", "uri_base_id": "%SRCROOT%"}
+            ],
+            "uri_base_id": "%SRCROOT%",
+            "partial_fingerprints": {
+                "primaryLocationLineHash": "6e479c79e8d1316:1",
+                "primaryLocationStartColumnFingerprint": "0",
+            },
+        }
+
+    def test_step_paths_resolve_like_result_locations(self, tmp_path: Path) -> None:
+        bases = {
+            "%SRCROOT%": {"uri": "file:///home/ci/work/"},
+            "BUILDROOT": {"uri": "build/", "uriBaseId": "%SRCROOT%"},
+            "OBJROOT": {"uri": "file:///tmp/ci-7f3e2a/obj/"},
+        }
+        artifacts = [{"location": {"uri": "gen/foo_idl.c", "uriBaseId": "BUILDROOT"}}]
+        result = _result_at({"uri": "gen/foo_idl.c", "uriBaseId": "BUILDROOT"}, line=212)
+        result["codeFlows"] = [
+            _code_flow(
+                _thread_flow_location({"uri": "src/foo_server.c", "uriBaseId": "%SRCROOT%"}, 88),
+                _thread_flow_location({"uri": "file:///home/ci/work/src/util%20funcs/s.c"}, 9),
+                _thread_flow_location({"uri": "proto/msg.pb.cc", "uriBaseId": "OBJROOT"}, 40),
+                _thread_flow_location({"uri": "file:///opt/vendor/include/zlib.h"}, 5),
+                _thread_flow_location({"index": 0}, 212),
+            )
+        ]
+        p = _write_sarif(
+            tmp_path,
+            {"originalUriBaseIds": bases, "artifacts": artifacts, "results": [result]},
+        )
+
+        [f] = SarifIngestor().ingest(p)
+
+        assert [s.file_path for s in f.data_flows[0].steps] == [
+            "src/foo_server.c",
+            "src/util funcs/s.c",
+            "/tmp/ci-7f3e2a/obj/proto/msg.pb.cc",
+            "/opt/vendor/include/zlib.h",
+            "build/gen/foo_idl.c",
+        ]
+        assert f.data_flows[0].steps[-1].file_path == f.source_code_refs[0].file_path
+
+    def test_kinds_and_identifier_messages(self, tmp_path: Path) -> None:
+        loc = {"uri": "app/views.py"}
+        result = _result_at(loc, line=30)
+        result["codeFlows"] = [
+            _code_flow(
+                _thread_flow_location(loc, 10, "request.args", kinds=["source"]),
+                _thread_flow_location(loc, 20, "call to getenv", kinds=["call", "taint"]),
+                _thread_flow_location(loc, 25, "self->buf", kinds=[]),
+                _thread_flow_location(loc, 30, "  query  "),
+            )
+        ]
+        p = _write_sarif(tmp_path, {"results": [result]})
+
+        [f] = SarifIngestor().ingest(p)
+
+        steps = f.data_flows[0].steps
+        assert [(s.symbol, s.message, s.tool_kind) for s in steps] == [
+            ("request.args", "request.args", "source"),
+            (None, "call to getenv", "call,taint"),
+            ("self->buf", "self->buf", None),
+            ("query", "query", None),
+        ]
+        assert [s.role for s in steps] == ["source", "step", "step", "sink"]
+
+    def test_long_thread_flow_keeps_first_16_and_last_16(self, tmp_path: Path) -> None:
+        loc = {"uri": "app/views.py"}
+        result = _result_at(loc, line=40)
+        result["codeFlows"] = [_code_flow(*[_thread_flow_location(loc, n) for n in range(1, 41)])]
+        p = _write_sarif(tmp_path, {"results": [result]})
+
+        [f] = SarifIngestor().ingest(p)
+
+        [flow] = f.data_flows
+        assert [s.start_line for s in flow.steps] == list(range(1, 17)) + list(range(25, 41))
+        assert flow.truncated is True
+        assert (flow.steps[0].role, flow.steps[-1].role) == ("source", "sink")
+
+    def test_unresolvable_steps_skipped_and_one_step_flows_dropped(self, tmp_path: Path) -> None:
+        loc = {"uri": "app/views.py"}
+        result = _result_at(loc, line=9)
+        result["codeFlows"] = [
+            # Only one step has a file: no path beyond the sink, so no flow.
+            _code_flow(
+                {"location": {"message": {"text": "no physical location"}}},
+                _thread_flow_location(loc, 9),
+            ),
+            _code_flow(
+                _thread_flow_location(loc, 3),
+                {"location": {"physicalLocation": {"artifactLocation": {}}}},
+                {"kinds": ["call"]},
+                _thread_flow_location(loc, 9),
+            ),
+        ]
+        p = _write_sarif(tmp_path, {"results": [result]})
+
+        [f] = SarifIngestor().ingest(p)
+
+        assert _flow_shape(f) == [
+            [("app/views.py", 3, 2, "source"), ("app/views.py", 9, 2, "sink")]
+        ]
+
+    def test_only_the_first_thread_flow_is_read(self, tmp_path: Path) -> None:
+        loc = {"uri": "app/views.py"}
+        result = _result_at(loc, line=9)
+        result["codeFlows"] = [
+            {
+                "threadFlows": [
+                    {"locations": [_thread_flow_location(loc, 1), _thread_flow_location(loc, 9)]},
+                    {"locations": [_thread_flow_location(loc, 5), _thread_flow_location(loc, 6)]},
+                ]
+            }
+        ]
+        p = _write_sarif(tmp_path, {"results": [result]})
+
+        [f] = SarifIngestor().ingest(p)
+
+        assert [[s.start_line for s in flow.steps] for flow in f.data_flows] == [[1, 9]]
+
+    def test_thread_flow_location_index_uses_the_run_cache(self, tmp_path: Path) -> None:
+        """SARIF 2.1.0 §3.38.2: ``index`` points into ``run.threadFlowLocations``."""
+        loc = {"uri": "app/views.py"}
+        cached = _thread_flow_location(loc, 4, "user_id", kinds=["source"])
+        result = _result_at(loc, line=9)
+        result["codeFlows"] = [_code_flow({"index": 0}, _thread_flow_location(loc, 9))]
+        p = _write_sarif(tmp_path, {"threadFlowLocations": [cached], "results": [result]})
+
+        [f] = SarifIngestor().ingest(p)
+
+        first = f.data_flows[0].steps[0]
+        assert (first.start_line, first.symbol, first.tool_kind, first.role) == (
+            4,
+            "user_id",
+            "source",
+            "source",
+        )

@@ -8,7 +8,7 @@ import pytest
 
 from tarmo_vuln_core.ingestors.base import IngestorError
 from tarmo_vuln_core.ingestors.parsers.cppcheck import CppcheckIngestor
-from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
+from tarmo_vuln_core.models import DataFlow, Finding, FlowStep, Severity, SourceCodeRef
 
 FIXTURES = Path(__file__).parent.parent / "fixtures"
 
@@ -383,4 +383,106 @@ class TestCppcheckMultiLocation:
         assert f.extra_fields["cppcheck_locations"] == [
             {"file": "src/caller.c", "line": 8, "column": None, "info": None},
             {"file": "src/main.c", "line": 2, "column": 5, "info": "Calling function f"},
+        ]
+
+
+@pytest.mark.unit
+class TestCppcheckDataFlows:
+    """``cppcheck_locations`` -> ``Finding.data_flows`` (#8).
+
+    The primary location is the sink. The other locations are steps in
+    cppcheck's call-stack order: the reverse of the XML, which lists the
+    primary first. The text run of the fixture's sources prints the same
+    order with ``--template-location`` (condition or call site, then primary).
+    """
+
+    def setup_method(self) -> None:
+        self.findings = CppcheckIngestor().ingest(VALUEFLOW)
+
+    def test_primary_location_is_the_sink_and_the_others_are_steps(self) -> None:
+        [f] = [f for f in self.findings if f.raw_ref == "ctunullpointer"]
+        assert f.data_flows == [
+            DataFlow(
+                steps=[
+                    FlowStep(
+                        file_path="src/nullarg.c",
+                        start_line=8,
+                        column=16,
+                        message="Calling function write_value, 1st argument is null",
+                        role="step",
+                        origin="cppcheck_location",
+                    ),
+                    FlowStep(
+                        file_path="src/nullarg.c",
+                        start_line=3,
+                        column=6,
+                        message="Dereferencing argument p that is null",
+                        role="sink",
+                        origin="cppcheck_location",
+                    ),
+                ]
+            )
+        ]
+
+    def test_one_flow_per_multi_location_error(self) -> None:
+        assert [(f.raw_ref, len(f.data_flows)) for f in self.findings] == [
+            ("nullPointer", 1),
+            ("arrayIndexOutOfBoundsCond", 1),
+            ("nullPointerRedundantCheck", 1),
+            ("uninitvar", 0),
+            ("ctunullpointer", 1),
+        ]
+        [f] = [f for f in self.findings if f.raw_ref == "arrayIndexOutOfBoundsCond"]
+        assert [(s.start_line, s.role, s.message) for s in f.data_flows[0].steps] == [
+            (16, "step", "Assuming that condition 'idx<20' is not redundant"),
+            (17, "sink", "Array index out of bounds"),
+        ]
+
+    def test_steps_follow_the_call_stack_order(self, tmp_path: Path) -> None:
+        report = """<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+  <cppcheck version="2.13.0"/>
+  <errors>
+    <error id="ctunullpointer" severity="error" msg="Null pointer dereference: p">
+      <location file="src/c.c" line="30" column="3" info="Dereferencing argument p"/>
+      <location file="src/b.c" line="20" column="5" info="Calling function c, 1st argument"/>
+      <location file="src/a.c" line="10" column="7"/>
+    </error>
+  </errors>
+</results>
+"""
+        path = tmp_path / "ctu.xml"
+        path.write_text(report, encoding="utf-8")
+
+        [f] = CppcheckIngestor().ingest(path)
+
+        [flow] = f.data_flows
+        assert [(s.file_path, s.start_line, s.role, s.message) for s in flow.steps] == [
+            ("src/a.c", 10, "step", ""),
+            ("src/b.c", 20, "step", "Calling function c, 1st argument"),
+            ("src/c.c", 30, "sink", "Dereferencing argument p"),
+        ]
+        assert f.source_code_refs == [SourceCodeRef(file_path="src/c.c", start_line=30, column=3)]
+
+    def test_no_flow_without_a_primary_file(self, tmp_path: Path) -> None:
+        report = """<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+  <cppcheck version="2.13.0"/>
+  <errors>
+    <error id="someCheck" severity="warning" msg="m">
+      <location file="*" line="0" column="0"/>
+      <location file="src/a.c" line="10" column="7" info="here"/>
+    </error>
+  </errors>
+</results>
+"""
+        path = tmp_path / "star.xml"
+        path.write_text(report, encoding="utf-8")
+
+        [f] = CppcheckIngestor().ingest(path)
+
+        assert f.source_code_refs == []
+        assert f.data_flows == []
+        assert f.extra_fields["cppcheck_locations"] == [
+            {"file": "src/a.c", "line": 10, "column": 7, "info": "here"}
         ]

@@ -9,7 +9,7 @@ import pytest
 
 from tarmo_vuln_core.ingestors.base import IngestorError
 from tarmo_vuln_core.ingestors.parsers.coverity import CoverityIngestor
-from tarmo_vuln_core.models import Finding, Severity
+from tarmo_vuln_core.models import Finding, Severity, SourceCodeRef
 
 FIXTURES = Path(__file__).parent.parent / "fixtures"
 
@@ -175,3 +175,130 @@ class TestCoverityGeneratedCode:
         assert self._v10("RESOURCE_LEAK").extra_fields["merge_key"] == (
             "5e2a9c1f7b3d4e6a8c0f2b4d6e8a1c3f"
         )
+
+
+def _event(line: int, tag: str, *, main: bool = False, remediation: bool = False) -> dict:
+    return {
+        "eventDescription": f"{tag} at {line}",
+        "eventNumber": line,
+        "eventTag": tag,
+        "filePathname": "/home/ci/work/src/big.c",
+        "strippedFilePathname": "src/big.c",
+        "lineNumber": line,
+        "main": main,
+        "remediation": remediation,
+        "events": None,
+    }
+
+
+def _write_issue(tmp_path: Path, events: list[dict]) -> Path:
+    issue = {
+        "mergeKey": "k1",
+        "checkerName": "TAINTED_SCALAR",
+        "mainEventFilePathname": "/home/ci/work/src/big.c",
+        "strippedMainEventFilePathname": "src/big.c",
+        "mainEventLineNumber": 31,
+        "checkerProperties": {"impact": "High", "cweCategory": "20"},
+        "events": events,
+    }
+    path = tmp_path / "cov.json"
+    path.write_text(json.dumps({"formatVersion": 10, "issues": [issue]}))
+    return path
+
+
+@pytest.mark.unit
+class TestCoverityDataFlows:
+    """Coverity ``events`` -> ``Finding.data_flows`` (#8); ``event_trace`` is unchanged."""
+
+    def setup_method(self) -> None:
+        self.ingestor = CoverityIngestor()
+
+    def _v10(self, title: str) -> Finding:
+        findings = self.ingestor.ingest(FIXTURES / "coverity_generated_v10.json")
+        return next(f for f in findings if f.title == title)
+
+    def test_main_event_is_the_sink_and_the_others_are_steps(self) -> None:
+        [flow] = self._v10("OVERRUN").data_flows
+        assert [(s.file_path, s.start_line, s.role, s.tool_kind) for s in flow.steps] == [
+            ("build/gen/foo_idl.c", 205, "step", "assignment"),
+            # Paths are normalized like event_trace's file_path.
+            ("src/foo_server.c", 88, "step", "caller"),
+            ("build/gen/foo_idl.c", 212, "sink", "overrun-buffer-arg"),
+        ]
+        assert flow.steps[0].message == (
+            'Assigning: "len" = "hdr->name_len". '
+            'The value of "len" is now between 0 and 65535 (inclusive).'
+        )
+        assert {s.origin for s in flow.steps} == {"coverity_event"}
+        assert [s.symbol for s in flow.steps] == [None, None, None]
+        assert flow.truncated is False
+
+    def test_event_trace_and_refs_unchanged(self) -> None:
+        f = self._v10("OVERRUN")
+        assert set(f.extra_fields) == {"event_trace", "resolved_path", "strip_prefix", "merge_key"}
+        assert [
+            (e["eventNumber"], e["eventTag"], e["main"], e["file_path"])
+            for e in f.extra_fields["event_trace"]
+        ] == [
+            (1, "assignment", False, "build/gen/foo_idl.c"),
+            (2, "overrun-buffer-arg", True, "build/gen/foo_idl.c"),
+            (3, "caller", False, "src/foo_server.c"),
+        ]
+        assert f.source_code_refs == [
+            SourceCodeRef(
+                file_path="build/gen/foo_idl.c", start_line=212, symbol="foo_idl_unmarshal_request"
+            )
+        ]
+
+    def test_single_event_issue_has_no_flow(self) -> None:
+        assert self._v10("RESOURCE_LEAK").data_flows == []
+
+    def test_remediation_event_is_not_a_step(self) -> None:
+        # Main event plus a remediation event: no path beyond the sink.
+        [f] = self.ingestor.ingest(FIXTURES / "coverity_cli_sample.json")
+        assert f.data_flows == []
+        assert len(f.extra_fields["event_trace"]) == 2
+
+    def test_events_without_a_main_flag_give_no_flow(self) -> None:
+        findings = self.ingestor.ingest(FIXTURES / "coverity_sample.json")
+        assert [f.data_flows for f in findings] == [[], []]
+
+    def test_long_event_list_keeps_the_main_event(self, tmp_path: Path) -> None:
+        events = [_event(n, "taint", main=(n == 31)) for n in range(1, 51)]
+        events.append(_event(51, "remediation", remediation=True))
+
+        [f] = self.ingestor.ingest(_write_issue(tmp_path, events))
+
+        [flow] = f.data_flows
+        assert flow.truncated is True
+        # 49 steps + the main event = 50: the first 16 and the last 16, main last.
+        assert [s.start_line for s in flow.steps] == (
+            list(range(1, 17)) + list(range(36, 51)) + [31]
+        )
+        assert flow.steps[-1].role == "sink"
+        assert {s.role for s in flow.steps[:-1]} == {"step"}
+        # event_trace keeps today's first-5-plus-last-5 trim.
+        assert [e["lineNumber"] for e in f.extra_fields["event_trace"]] == [
+            1,
+            2,
+            3,
+            4,
+            5,
+            47,
+            48,
+            49,
+            50,
+            51,
+        ]
+
+    def test_nested_events_are_steps_in_tree_order(self, tmp_path: Path) -> None:
+        outer = _event(10, "call")
+        outer["events"] = [_event(20, "assignment"), _event(21, "alias")]
+        [f] = self.ingestor.ingest(_write_issue(tmp_path, [outer, _event(31, "sink", main=True)]))
+
+        assert [(s.start_line, s.tool_kind, s.role) for s in f.data_flows[0].steps] == [
+            (10, "call", "step"),
+            (20, "assignment", "step"),
+            (21, "alias", "step"),
+            (31, "sink", "sink"),
+        ]
