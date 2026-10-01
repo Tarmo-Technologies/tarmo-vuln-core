@@ -5,9 +5,11 @@ from __future__ import annotations
 from pathlib import Path
 
 from tarmo_vuln_core.cdata import default_registry
+from tarmo_vuln_core.ingestors._flows import FlowPoint, build_data_flow
 from tarmo_vuln_core.ingestors._xml import parse_xml_bytes, parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
+from tarmo_vuln_core.models import DataFlow, Finding, FindingCategory, Severity, SourceCodeRef
+from tarmo_vuln_core.models.finding import MAX_DATA_FLOWS
 from tarmo_vuln_core.utils import slugify
 
 _DEFAULT_IMPACT = "The vulnerability may allow an attacker to compromise the affected system."
@@ -73,11 +75,14 @@ class CheckmarxIngestor(BaseIngestor):
                 line_num = int(line_str) if line_str.isdigit() else None
                 result_id = result.get("NodeId", "")
 
-                # Build data flow trace + source/sink refs from PathNodes.
+                # Build data flow trace + source/sink refs from PathNodes, and one
+                # DataFlow per <Path> (first node source, last node sink).
                 data_flow: list[dict[str, object]] = []
                 path_node_refs: list[SourceCodeRef] = []
+                data_flows: list[DataFlow] = []
 
                 for path_el in result.findall(".//Path"):
+                    path_points: list[FlowPoint] = []
                     for node in path_el.findall("PathNode"):
                         pn_file = ""
                         pn_line: int | None = None
@@ -96,6 +101,12 @@ class CheckmarxIngestor(BaseIngestor):
                         name_el = node.find("Name")
                         if name_el is not None and name_el.text:
                             pn_name = name_el.text
+                        type_el = node.find("Type")
+                        pn_type = (
+                            type_el.text.strip()
+                            if type_el is not None and type_el.text and type_el.text.strip()
+                            else None
+                        )
 
                         data_flow.append(
                             {"file": pn_file, "line": pn_line, "snippet": pn_name or ""}
@@ -112,6 +123,21 @@ class CheckmarxIngestor(BaseIngestor):
                                     is_sink=False,
                                 )
                             )
+                            path_points.append(
+                                FlowPoint(
+                                    file_path=pn_file,
+                                    start_line=pn_line,
+                                    column=pn_col,
+                                    message=pn_name or "",
+                                    tool_kind=pn_type,
+                                )
+                            )
+                    if len(data_flows) < MAX_DATA_FLOWS:
+                        flow = build_data_flow(
+                            path_points, origin="checkmarx_path", has_source=True
+                        )
+                        if flow is not None:
+                            data_flows.append(flow)
 
                 # Promote the final PathNode to sink. Sink-only tools correlate
                 # against this location; earlier nodes are taint sources.
@@ -145,6 +171,7 @@ class CheckmarxIngestor(BaseIngestor):
                         raw_ref=result_id,
                         cwe_id=cwe_id,
                         source_code_refs=source_refs,
+                        data_flows=data_flows,
                         affected_hosts=[file_name] if file_name else [],
                         extra_fields=extra_fields,
                     )

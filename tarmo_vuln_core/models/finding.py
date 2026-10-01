@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import re
 import uuid
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
 
@@ -179,6 +180,87 @@ class SourceCodeRef(BaseModel):
     commit_sha: str = ""
 
 
+MAX_DATA_FLOWS = 3
+MAX_FLOW_STEPS = 32
+_FLOW_HEAD = 16
+_FLOW_TAIL = MAX_FLOW_STEPS - _FLOW_HEAD
+MAX_FLOW_SYMBOL_LENGTH = 64
+_PLAIN_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:(?:\.|->|::)[A-Za-z_][A-Za-z0-9_]*)*")
+
+
+def plain_identifier(text: str | None) -> str | None:
+    """Return *text* (stripped) when it is a plain identifier, else None.
+
+    A plain identifier is a name or a member access (``req.args``,
+    ``self->buf``, ``std::string``) of at most 64 characters. Scanner free
+    text (``ControlFlowNode for request``, ``call to getenv``) is never one,
+    so it can never reach a :class:`FlowStep` ``symbol``.
+    """
+    if text is None:
+        return None
+    candidate = text.strip()
+    if len(candidate) > MAX_FLOW_SYMBOL_LENGTH or not _PLAIN_IDENTIFIER.fullmatch(candidate):
+        return None
+    return candidate
+
+
+class FlowStep(BaseModel):
+    """One location on a scanner-reported data flow (see :class:`DataFlow`)."""
+
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    file_path: str
+    start_line: int | None = None
+    column: int | None = None
+    # Set only when the tool's text is a plain identifier (see plain_identifier).
+    symbol: str | None = None
+    # The tool's text for this step, kept for display; never a statement of fact.
+    message: str = ""
+    role: Literal["source", "step", "sink"]
+    # SARIF threadFlowLocation kinds (comma-joined), Coverity eventTag or Checkmarx Type.
+    tool_kind: str | None = None
+    # sarif_code_flow, checkmarx_path, coverity_event or cppcheck_location.
+    origin: str
+
+    @field_validator("symbol")
+    @classmethod
+    def _symbol_is_plain_identifier(cls, v: str | None) -> str | None:
+        if v is not None and plain_identifier(v) != v:
+            raise ValueError(
+                f"FlowStep.symbol must be a plain identifier of at most "
+                f"{MAX_FLOW_SYMBOL_LENGTH} characters, got {v!r}"
+            )
+        return v
+
+
+class DataFlow(BaseModel):
+    """A source-to-sink path reported by a scanner.
+
+    ``steps`` run in flow order: the source first (when the tool names one),
+    the sink last. A flow longer than 32 steps keeps its first 16 and last 16
+    steps and sets ``truncated``. Parsers add these alongside the finding's
+    ``source_code_refs``; the steps never become refs.
+    """
+
+    steps: list[FlowStep]
+    truncated: bool = False
+
+    @model_validator(mode="after")
+    def _check_roles_and_trim(self) -> DataFlow:
+        if not self.steps:
+            raise ValueError("A DataFlow needs at least one step")
+        if self.steps[-1].role != "sink":
+            raise ValueError(f"The last step must be the sink, got role {self.steps[-1].role!r}")
+        if any(step.role == "sink" for step in self.steps[:-1]):
+            raise ValueError("In a DataFlow only the last step may be the sink")
+        if any(step.role == "source" for step in self.steps[1:]):
+            raise ValueError("In a DataFlow only the first step may be the source")
+        if len(self.steps) > MAX_FLOW_STEPS:
+            self.steps = self.steps[:_FLOW_HEAD] + self.steps[-_FLOW_TAIL:]
+            self.truncated = True
+        return self
+
+
 class StackFrame(BaseModel):
     """One frame of a crash stack. ``file`` is relative to the scanned source root."""
 
@@ -311,6 +393,8 @@ class Finding(BaseModel):
     category: FindingCategory | None = None
     affected_hosts: list[str] = []
     source_code_refs: list[SourceCodeRef] = []
+    # Scanner source-to-sink paths, at most 3 (see DataFlow). Never refs.
+    data_flows: list[DataFlow] = []
     runtime_targets: list[RuntimeTarget] = []
     fuzz: FuzzEvidence | None = None
     description: str = ""
@@ -390,6 +474,12 @@ class Finding(BaseModel):
         if v is not None and not (0.0 <= v <= 10.0):
             raise ValueError(f"CVSS score must be between 0.0 and 10.0, got {v}")
         return v
+
+    @field_validator("data_flows")
+    @classmethod
+    def _at_most_three_data_flows(cls, v: list[DataFlow]) -> list[DataFlow]:
+        """Keep the first ``MAX_DATA_FLOWS`` flows, in the tool's order."""
+        return v[:MAX_DATA_FLOWS]
 
     @field_validator("owasp_likelihood", "owasp_impact")
     @classmethod

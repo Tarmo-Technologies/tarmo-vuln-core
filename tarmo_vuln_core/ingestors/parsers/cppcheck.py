@@ -6,9 +6,10 @@ from pathlib import Path
 from xml.etree.ElementTree import Element
 
 from tarmo_vuln_core.cdata import default_registry
+from tarmo_vuln_core.ingestors._flows import FlowPoint, build_data_flow
 from tarmo_vuln_core.ingestors._xml import parse_xml_bytes, parse_xml_file
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
+from tarmo_vuln_core.models import DataFlow, Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 _SEVERITY_MAP: dict[str, Severity] = {
@@ -139,34 +140,57 @@ class CppcheckIngestor(BaseIngestor):
             locations = error.findall("location")
             source_refs: list[SourceCodeRef] = []
             hosts: list[str] = []
+            sink_point: FlowPoint | None = None
             if locations:
                 primary = locations[0]
                 primary_file = _location_file(primary)
                 if primary_file:
                     hosts.append(primary_file)
-                    source_refs.append(
-                        SourceCodeRef(
-                            file_path=primary_file,
-                            start_line=_int_attr(primary.get("line")),
-                            column=_location_column(primary),
-                        )
+                    ref = SourceCodeRef(
+                        file_path=primary_file,
+                        start_line=_int_attr(primary.get("line")),
+                        column=_location_column(primary),
+                    )
+                    source_refs.append(ref)
+                    sink_point = FlowPoint(
+                        file_path=ref.file_path,
+                        start_line=ref.start_line,
+                        column=ref.column,
+                        message=primary.get("info") or "",
                     )
 
             # The other locations (value-flow conditions, call sites) keep their
             # info text here; they are never is_sink=False refs.
             other_locations: list[dict[str, object]] = []
+            other_points: list[FlowPoint] = []
             for loc in locations[1:]:
                 loc_file = _location_file(loc)
                 if not loc_file:
                     continue
+                line = _int_attr(loc.get("line"))
+                column = _location_column(loc)
+                info = loc.get("info")
                 other_locations.append(
-                    {
-                        "file": loc_file,
-                        "line": _int_attr(loc.get("line")),
-                        "column": _location_column(loc),
-                        "info": loc.get("info"),
-                    }
+                    {"file": loc_file, "line": line, "column": column, "info": info}
                 )
+                other_points.append(
+                    FlowPoint(
+                        file_path=loc_file, start_line=line, column=column, message=info or ""
+                    )
+                )
+
+            # Data flow: the other locations in cppcheck's call-stack order (the
+            # reverse of the XML, which lists the primary first), then the
+            # primary location as the sink.
+            data_flows: list[DataFlow] = []
+            if sink_point is not None:
+                flow = build_data_flow(
+                    [*reversed(other_points), sink_point],
+                    origin="cppcheck_location",
+                    has_source=False,
+                )
+                if flow is not None:
+                    data_flows.append(flow)
 
             # CData enrichment
             cwe_id: int | None = None
@@ -200,6 +224,7 @@ class CppcheckIngestor(BaseIngestor):
                     remediation=_DEFAULT_REMEDIATION,
                     affected_hosts=hosts,
                     source_code_refs=source_refs,
+                    data_flows=data_flows,
                     source_tool="cppcheck",
                     raw_ref=error_id,
                     cwe_id=cwe_id,

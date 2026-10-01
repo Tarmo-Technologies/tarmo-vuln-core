@@ -7,8 +7,9 @@ from collections.abc import Mapping
 from os.path import basename
 from pathlib import Path
 
+from tarmo_vuln_core.ingestors._flows import FlowPoint, build_data_flow
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
+from tarmo_vuln_core.models import DataFlow, Finding, FindingCategory, Severity, SourceCodeRef
 from tarmo_vuln_core.utils import slugify
 
 _SEVERITY_MAP: dict[str, Severity] = {
@@ -100,6 +101,58 @@ def _normalize_events(events: list[object], strip_prefix: str | None) -> list[ob
     return out
 
 
+def _flatten_events(events: object) -> list[Mapping[str, object]]:
+    """Events and their nested ``events``, depth first (the event tree order)."""
+    out: list[Mapping[str, object]] = []
+    if not isinstance(events, list):
+        return out
+    for event in events:
+        if isinstance(event, Mapping):
+            out.append(event)
+            out.extend(_flatten_events(event.get("events")))
+    return out
+
+
+def _event_point(event: Mapping[str, object], strip_prefix: str | None) -> FlowPoint | None:
+    path = _event_file_path(event, strip_prefix)
+    if not path:
+        return None
+    description = event.get("eventDescription") or event.get("covLStrEventDescription")
+    return FlowPoint(
+        file_path=path,
+        start_line=_as_int(event.get("lineNumber")),
+        message=description.strip() if isinstance(description, str) else "",
+        tool_kind=_as_str(event.get("eventTag")) or None,
+    )
+
+
+def _events_data_flow(events: object, strip_prefix: str | None) -> DataFlow | None:
+    """The issue's events as one flow: the ``main`` event is the sink, the others steps.
+
+    Remediation events are advice, not path locations, and are left out. The
+    main event is placed last, so trimming a long flow (first 16 + last 16
+    steps) always keeps it. No event is a source: Coverity marks none here.
+    Without a ``main`` event there is no sink to anchor the flow.
+    """
+    flat = _flatten_events(events)
+    main = next((event for event in flat if event.get("main") is True), None)
+    if main is None:
+        return None
+    sink = _event_point(main, strip_prefix)
+    if sink is None:
+        return None
+    points = [
+        point
+        for point in (
+            _event_point(event, strip_prefix)
+            for event in flat
+            if event is not main and event.get("remediation") is not True
+        )
+        if point is not None
+    ]
+    return build_data_flow([*points, sink], origin="coverity_event", has_source=False)
+
+
 class CoverityIngestor(BaseIngestor):
     """Parses Coverity JSON output files."""
 
@@ -179,6 +232,10 @@ class CoverityIngestor(BaseIngestor):
                 # Stable across builds and line shifts (Coverity's own defect identity).
                 extra_fields["merge_key"] = merge_key
 
+            # event_trace above stays as it was (VAMS reads it); data_flows is
+            # built from the full event list.
+            flow = _events_data_flow(events, strip_prefix)
+
             file_base = basename(file_path) if file_path else "unknown"
             finding_id = f"coverity-{slugify(checker_name)}-{slugify(file_base)}-l{line}"
 
@@ -194,6 +251,7 @@ class CoverityIngestor(BaseIngestor):
                     raw_ref=checker_name,
                     cwe_id=cwe_id,
                     source_code_refs=source_refs,
+                    data_flows=[flow] if flow is not None else [],
                     affected_hosts=[file_path] if file_path else [],
                     extra_fields=extra_fields,
                 )

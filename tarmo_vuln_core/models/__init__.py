@@ -10,12 +10,14 @@ from tarmo_vuln_core.models.attack_path import (
 )
 from tarmo_vuln_core.models.enums import PortState, Protocol, ServiceName
 from tarmo_vuln_core.models.finding import (
+    DataFlow,
     DreadScore,
     Evidence,
     EvidenceType,
     Finding,
     FindingCategory,
     FindingStatus,
+    FlowStep,
     FuzzEvidence,
     Instance,
     RuntimeTarget,
@@ -28,12 +30,14 @@ from tarmo_vuln_core.models.host import Host, HostProperty
 __all__ = [
     "AttackPath",
     "AttackStep",
+    "DataFlow",
     "DreadScore",
     "Evidence",
     "EvidenceType",
     "Finding",
     "FindingCategory",
     "FindingStatus",
+    "FlowStep",
     "FuzzEvidence",
     "Host",
     "HostProperty",

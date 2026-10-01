@@ -10,8 +10,10 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote, urlsplit
 
+from tarmo_vuln_core.ingestors._flows import FlowPoint, build_data_flow
 from tarmo_vuln_core.ingestors.base import BaseIngestor, IngestorError
-from tarmo_vuln_core.models import Finding, FindingCategory, Severity, SourceCodeRef
+from tarmo_vuln_core.models import DataFlow, Finding, FindingCategory, Severity, SourceCodeRef
+from tarmo_vuln_core.models.finding import MAX_DATA_FLOWS
 from tarmo_vuln_core.utils import slugify as _slugify
 
 _LEVEL_SEVERITY: dict[str, Severity] = {
@@ -246,6 +248,7 @@ class _RunContext:
     artifacts: list[Any] = field(default_factory=list)
     artifact_by_location: dict[tuple[str, str | None], dict[str, Any]] = field(default_factory=dict)
     source_root: str | None = None
+    thread_flow_locations: list[Any] = field(default_factory=list)
 
     @classmethod
     def from_run(cls, run: dict[str, Any]) -> _RunContext:
@@ -265,7 +268,10 @@ class _RunContext:
                 if absolute and root:
                     source_root = root.rstrip("/") + "/"
                 break
-        return cls(bases, artifacts, by_location, source_root)
+        thread_flow_locations = run.get("threadFlowLocations")
+        if not isinstance(thread_flow_locations, list):
+            thread_flow_locations = []
+        return cls(bases, artifacts, by_location, source_root, thread_flow_locations)
 
     def artifact_at(self, index: object) -> dict[str, Any] | None:
         if (
@@ -389,6 +395,83 @@ def _extract_locations(
         provenance["file_path"] = ref.file_path
         out.append((ref, provenance))
     return out
+
+
+def _int_or_none(value: object) -> int | None:
+    return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+
+def _flow_point(thread_flow_location: object, ctx: _RunContext) -> FlowPoint | None:
+    """Resolve one ``threadFlowLocation`` to a :class:`FlowPoint`, or None without a file.
+
+    ``index`` refers to ``run.threadFlowLocations`` (SARIF 2.1.0 §3.38.2); the
+    local properties win over the cached ones. The path is resolved with
+    :func:`_resolve_artifact_location`, as for the result's own locations.
+    """
+    if not isinstance(thread_flow_location, dict):
+        return None
+    tfl: dict[str, Any] = thread_flow_location
+    index = tfl.get("index")
+    if (
+        isinstance(index, int)
+        and not isinstance(index, bool)
+        and 0 <= index < len(ctx.thread_flow_locations)
+        and isinstance(ctx.thread_flow_locations[index], dict)
+    ):
+        tfl = {**ctx.thread_flow_locations[index], **tfl}
+    location = tfl.get("location")
+    if not isinstance(location, dict):
+        return None
+    phys = location.get("physicalLocation")
+    if not isinstance(phys, dict):
+        return None
+    artifact = phys.get("artifactLocation")
+    if not isinstance(artifact, dict):
+        return None
+    resolved = _resolve_artifact_location(artifact, ctx)
+    if resolved is None:
+        return None
+    file_path, _provenance = resolved
+    region = phys.get("region")
+    region = region if isinstance(region, dict) else {}
+    message = location.get("message")
+    text = message.get("text") if isinstance(message, dict) else None
+    kinds = tfl.get("kinds")
+    kind_names = [k for k in kinds if isinstance(k, str) and k] if isinstance(kinds, list) else []
+    return FlowPoint(
+        file_path=file_path,
+        start_line=_int_or_none(region.get("startLine")),
+        column=_int_or_none(region.get("startColumn")),
+        message=text if isinstance(text, str) else "",
+        tool_kind=",".join(kind_names) or None,
+    )
+
+
+def _extract_data_flows(result: dict, ctx: _RunContext) -> list[DataFlow]:
+    """``result.codeFlows[i].threadFlows[0]`` as data flows: first step source, last sink.
+
+    Steps without a resolvable file are skipped; a flow left with fewer than
+    two steps is dropped. At most ``MAX_DATA_FLOWS`` flows, in the tool's order.
+    """
+    code_flows = result.get("codeFlows")
+    if not isinstance(code_flows, list):
+        return []
+    flows: list[DataFlow] = []
+    for code_flow in code_flows:
+        if len(flows) == MAX_DATA_FLOWS:
+            break
+        thread_flows = code_flow.get("threadFlows") if isinstance(code_flow, dict) else None
+        if not isinstance(thread_flows, list) or not thread_flows:
+            continue
+        thread_flow = thread_flows[0]
+        locations = thread_flow.get("locations") if isinstance(thread_flow, dict) else None
+        if not isinstance(locations, list):
+            continue
+        points = [p for p in (_flow_point(loc, ctx) for loc in locations) if p is not None]
+        flow = build_data_flow(points, origin="sarif_code_flow", has_source=True)
+        if flow is not None:
+            flows.append(flow)
+    return flows
 
 
 def _extract_source_code_refs(result: dict, ctx: _RunContext | None = None) -> list[SourceCodeRef]:
@@ -545,6 +628,7 @@ class SarifIngestor(BaseIngestor):
                     cwe_id=cwe_id,
                     affected_hosts=hosts,
                     source_code_refs=source_refs,
+                    data_flows=_extract_data_flows(result, ctx),
                     source_tool="sarif",
                     raw_ref=rule_id or None,
                     extra_fields={

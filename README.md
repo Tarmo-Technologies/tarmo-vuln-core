@@ -47,8 +47,8 @@ The two are independently importable. The Python package loads without the Rust 
 | BloodHound CE | JSON | AD attack-path findings; domain-aware impact |
 | HackerOne | JSON | Bug bounty reports; CVSS from relationships |
 | Bandit | JSON | Python SAST; one finding per result with file/line |
-| Cppcheck | XML | C/C++ static analysis; one finding per `<error>`, primary location as the sink ref, other locations in `extra_fields["cppcheck_locations"]` |
-| SARIF 2.1.0 | JSON/SARIF | Generic SARIF import; CWE from relationships |
+| Cppcheck | XML | C/C++ static analysis; one finding per `<error>`, primary location as the sink ref, other locations in `extra_fields["cppcheck_locations"]` and as `data_flows` steps |
+| SARIF 2.1.0 | JSON/SARIF | Generic SARIF import; CWE from relationships; `codeFlows` as `data_flows` |
 | Gitleaks | JSON | Secret scanning; groups by RuleID; populates `source_code_refs` |
 | TruffleHog | JSON-lines | Secret scanning; verified=CRITICAL; uses only redacted values |
 | Config Analyzer | `.env`/`.ini`/`.yaml`/etc. | Direct analyzer; detects debug flags, weak passwords, cleartext creds, insecure TLS |
@@ -63,8 +63,8 @@ The two are independently importable. The Python package loads without the Rust 
 | SRM / CodeDx | XML | Cross-scanner deduplication; groups by vuln ID across tools |
 | OWASP Dependency Check | JSON | CVE-based dependency vulnerability findings; dedup by CVE |
 | SARP | CSV (17-column) | Spreadsheet-based finding import with CData CWE mapping |
-| Checkmarx | XML (`CxXMLResults`) | SAST findings; CWE extraction; CData enrichment |
-| Coverity | JSON | C/C++ SAST findings; groups by checker name |
+| Checkmarx | XML (`CxXMLResults`) | SAST findings; CWE extraction; CData enrichment; each `Path` as a `data_flows` entry |
+| Coverity | JSON | C/C++ SAST findings; groups by checker name; `events` as a `data_flows` entry (main event as the sink) |
 | Fortify | FPR (ZIP/FVDL XML) | SAST findings; severity from DefaultSeverity float |
 | Binary Analyzer | `.strings`/`.binwalk`/`.txt` | Hardcoded secrets, URLs, API keys, and embedded artifacts in binaries |
 | BHF (fuzz) | Work dir, `findings.csv`, or `finding.json` | One finding per root-cause row; `Finding.fuzz` carries sanitizer, verdict, project-only stack, and reproducer; paths relative to the scanned source root |
@@ -82,6 +82,8 @@ Host, HostProperty, DreadScore
 Protocol, PortState, ServiceName
 # Additional models available via tarmo_vuln_core.models:
 #   SourceCodeRef, RuntimeTarget
+#   FlowStep, DataFlow (Finding.data_flows: scanner source-to-sink paths,
+#   at most 3 flows of at most 32 steps; never source_code_refs)
 
 # Ingestors
 BaseIngestor, IngestorError, REGISTRY
