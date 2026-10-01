@@ -311,7 +311,8 @@ class TestCppcheckMultiLocation:
         ]
         assert f.source_code_refs[0].is_sink is True
         assert f.affected_hosts == ["src/redundant.c"]
-        assert f.cwe_id == 788
+        # CData (126) wins over the error's own cwe="788" attribute.
+        assert f.cwe_id == 126
 
     def test_other_locations_kept_with_info_in_document_order(self) -> None:
         f = self._one("arrayIndexOutOfBoundsCond")

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from xml.etree.ElementTree import Element
 
 from tarmo_vuln_core.cdata import default_registry
 from tarmo_vuln_core.ingestors._xml import parse_xml_bytes, parse_xml_file
@@ -55,6 +56,32 @@ def _parse_cwe_attr(value: str | None) -> int | None:
     return cwe if cwe > 0 else None
 
 
+def _int_attr(value: str | None) -> int | None:
+    """Return an integer XML attribute value, or None when absent or not a number."""
+    if not value:
+        return None
+    try:
+        return int(value.strip())
+    except ValueError:
+        return None
+
+
+def _location_file(loc: Element) -> str:
+    """The location's file with ``./`` stripped; ``""`` for none or the ``*`` wildcard."""
+    file_path = loc.get("file", "")
+    if file_path == "*":
+        return ""
+    if file_path.startswith("./"):
+        file_path = file_path[2:]
+    return file_path
+
+
+def _location_column(loc: Element) -> int | None:
+    """cppcheck columns are 1-based; ``column="0"`` means the column is unknown."""
+    column = _int_attr(loc.get("column"))
+    return column if column is not None and column > 0 else None
+
+
 class CppcheckIngestor(BaseIngestor):
     """Parses cppcheck XML output files."""
 
@@ -93,60 +120,58 @@ class CppcheckIngestor(BaseIngestor):
 
         root = parse_xml_file(path, fmt="cppcheck")
 
-        # Group by (error_id, msg) to deduplicate
-        groups: dict[tuple[str, str], dict] = {}
-
         errors_el = root.find("errors")
         if errors_el is None:
             return []
 
+        findings: list[Finding] = []
+        registry = default_registry()
+
+        # One finding per <error>. cppcheck lists the primary location first
+        # ("The primary location is listed first", cppcheck manual; toXML
+        # writes the call stack in reverse). Only that location is a ref.
         for error in errors_el.findall("error"):
             error_id = error.get("id", "")
             if error_id in _NOISE_IDS:
                 continue
-            msg = error.get("msg", "")
-            sev_str = error.get("severity", "style")
-            key = (error_id, msg)
+            severity = _SEVERITY_MAP.get(error.get("severity", "style"), Severity.LOW)
 
-            if key not in groups:
-                groups[key] = {
-                    "id": error_id,
-                    "msg": msg,
-                    "severity": sev_str,
-                    "files": [],
-                    "source_code_refs": [],
-                    "tool_cwe": None,
-                }
-            if groups[key]["tool_cwe"] is None:
-                groups[key]["tool_cwe"] = _parse_cwe_attr(error.get("cwe"))
-
-            for loc in error.findall("location"):
-                file_path = loc.get("file", "")
-                # Skip star wildcard locations
-                if file_path == "*":
-                    continue
-                # Strip leading ./
-                if file_path.startswith("./"):
-                    file_path = file_path[2:]
-                if file_path and file_path not in groups[key]["files"]:
-                    groups[key]["files"].append(file_path)
-                if file_path:
-                    line_str = loc.get("line")
-                    line_num = int(line_str) if line_str else None
-                    groups[key]["source_code_refs"].append(
-                        SourceCodeRef(file_path=file_path, start_line=line_num)
+            locations = error.findall("location")
+            source_refs: list[SourceCodeRef] = []
+            hosts: list[str] = []
+            if locations:
+                primary = locations[0]
+                primary_file = _location_file(primary)
+                if primary_file:
+                    hosts.append(primary_file)
+                    source_refs.append(
+                        SourceCodeRef(
+                            file_path=primary_file,
+                            start_line=_int_attr(primary.get("line")),
+                            column=_location_column(primary),
+                        )
                     )
 
-        findings: list[Finding] = []
-        registry = default_registry()
-
-        for (_error_id, _msg), group in groups.items():
-            severity = _SEVERITY_MAP.get(group["severity"], Severity.LOW)
+            # The other locations (value-flow conditions, call sites) keep their
+            # info text here; they are never is_sink=False refs.
+            other_locations: list[dict[str, object]] = []
+            for loc in locations[1:]:
+                loc_file = _location_file(loc)
+                if not loc_file:
+                    continue
+                other_locations.append(
+                    {
+                        "file": loc_file,
+                        "line": _int_attr(loc.get("line")),
+                        "column": _location_column(loc),
+                        "info": loc.get("info"),
+                    }
+                )
 
             # CData enrichment
             cwe_id: int | None = None
             extra_fields: dict[str, object] = {}
-            cdata_match = registry.lookup("cppcheck", group["id"])
+            cdata_match = registry.lookup("cppcheck", error_id)
             if cdata_match is not None:
                 cwe_id = cdata_match.cwe
                 if cdata_match.confidence:
@@ -159,20 +184,24 @@ class CppcheckIngestor(BaseIngestor):
             if cwe_id is None:
                 # Fall back to cppcheck's own cwe= attribute (e.g.
                 # bufferAccessOutOfBounds -> 788) when CData has no mapping.
-                cwe_id = group["tool_cwe"]
+                cwe_id = _parse_cwe_attr(error.get("cwe"))
+            if other_locations:
+                extra_fields["cppcheck_locations"] = other_locations
 
             findings.append(
                 Finding(
-                    id=f"cppcheck-{slugify(group['id'])}",
-                    title=group["id"],
+                    # One id per rule, as for SARIF: the location must not be in
+                    # it, or every line shift would create a new rule key downstream.
+                    id=f"cppcheck-{slugify(error_id)}",
+                    title=error_id,
                     severity=severity,
-                    description=group["msg"],
+                    description=error.get("msg", ""),
                     impact=_DEFAULT_IMPACT,
                     remediation=_DEFAULT_REMEDIATION,
-                    affected_hosts=group["files"],
-                    source_code_refs=group["source_code_refs"],
+                    affected_hosts=hosts,
+                    source_code_refs=source_refs,
                     source_tool="cppcheck",
-                    raw_ref=group["id"],
+                    raw_ref=error_id,
                     cwe_id=cwe_id,
                     extra_fields=extra_fields,
                 )
