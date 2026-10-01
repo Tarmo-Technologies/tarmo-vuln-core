@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -114,3 +115,32 @@ class TestBanditIngestor:
     def test_column_stays_none_when_bandit_omits_it(self) -> None:
         findings = self.ingestor.ingest(FIXTURES / "bandit_real.json")
         assert all(f.source_code_refs[0].column is None for f in findings)
+
+
+@pytest.mark.unit
+def test_yaml_load_maps_to_unsafe_deserialization(tmp_path: Path) -> None:
+    # B506 yaml_load builds arbitrary objects from untrusted YAML: CWE-502,
+    # the CWE the R9 training cells use for it (it was mapped to CWE-295).
+    report = {
+        "errors": [],
+        "results": [
+            {
+                "code": "4 def load(text):\n5     return yaml.load(text)\n",
+                "filename": "app/config.py",
+                "issue_confidence": "HIGH",
+                "issue_cwe": {"id": 20, "link": "https://cwe.mitre.org/data/definitions/20.html"},
+                "issue_severity": "MEDIUM",
+                "issue_text": "Use of unsafe yaml load. Allows instantiation of arbitrary objects. "
+                "Consider yaml.safe_load().",
+                "line_number": 5,
+                "line_range": [5],
+                "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b506_yaml_load.html",
+                "test_id": "B506",
+                "test_name": "yaml_load",
+            }
+        ],
+    }
+    path = tmp_path / "bandit.json"
+    path.write_text(json.dumps(report), encoding="utf-8")
+    [finding] = BanditIngestor().ingest(path)
+    assert (finding.raw_ref, finding.cwe_id) == ("B506", 502)

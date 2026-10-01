@@ -290,6 +290,14 @@ class TestSarifPathProvenance:
     def test_one_finding_per_result(self) -> None:
         assert len(self.findings) == 7
 
+    def test_codeql_external_cwe_tags_give_the_first_cwe(self) -> None:
+        # CodeQL tags CWEs as external/cwe/cwe-NNN (zero-padded); the first tag wins.
+        assert [(f.raw_ref, f.cwe_id) for f in self.findings[:2]] == [
+            ("cpp/overflow-buffer", 119),
+            ("cpp/uncontrolled-allocation-size", 190),
+        ]
+        assert {f.cwe_id for f in self.findings} == {119, 190}
+
     def test_chained_build_root_resolves_relative_to_source_root(self) -> None:
         # BUILDROOT = build/ under %SRCROOT% -> repo-relative build/gen/foo_idl.c
         f = self.findings[0]
