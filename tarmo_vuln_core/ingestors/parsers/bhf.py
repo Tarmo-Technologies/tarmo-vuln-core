@@ -1283,6 +1283,23 @@ class BhfStaticIngestor(SarifIngestor):
             reachability=_str(analysis.get("reachability")),
         )
         updates["source_code_refs"] = refs
+        # BHF writes its taint trace as codeFlows with the same URIs as the
+        # result location, so the steps are remapped the same way.
+        updates["data_flows"] = [
+            flow.model_copy(
+                update={
+                    "steps": [
+                        step.model_copy(
+                            update={
+                                "file_path": mapper.display_path(step.file_path) or step.file_path
+                            }
+                        )
+                        for step in flow.steps
+                    ]
+                }
+            )
+            for flow in finding.data_flows
+        ]
         updates["affected_hosts"] = list(dict.fromkeys(r.file_path for r in refs))
         updates["extra_fields"] = {
             **_sarif_path_provenance(finding.extra_fields, refs),

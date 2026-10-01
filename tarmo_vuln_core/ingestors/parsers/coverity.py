@@ -129,10 +129,12 @@ def _event_point(event: Mapping[str, object], strip_prefix: str | None) -> FlowP
 def _events_data_flow(events: object, strip_prefix: str | None) -> DataFlow | None:
     """The issue's events as one flow: the ``main`` event is the sink, the others steps.
 
-    Remediation events are advice, not path locations, and are left out. The
-    main event is placed last, so trimming a long flow (first 16 + last 16
-    steps) always keeps it. No event is a source: Coverity marks none here.
-    Without a ``main`` event there is no sink to anchor the flow.
+    Remediation events are advice, not path locations, and are left out, as
+    are events of another ``eventSet`` than the main event's (a second set is
+    an original or an example, e.g. for COPY_PASTE_ERROR, not the defect's
+    path). The main event is placed last, so trimming a long flow (first 16 +
+    last 16 steps) always keeps it. No event is a source: Coverity marks none
+    here. Without a ``main`` event there is no sink to anchor the flow.
     """
     flat = _flatten_events(events)
     main = next((event for event in flat if event.get("main") is True), None)
@@ -141,13 +143,17 @@ def _events_data_flow(events: object, strip_prefix: str | None) -> DataFlow | No
     sink = _event_point(main, strip_prefix)
     if sink is None:
         return None
+    main_set = _as_int(main.get("eventSet"))
+
+    def on_path(event: Mapping[str, object]) -> bool:
+        if event is main or event.get("remediation") is True:
+            return False
+        event_set = _as_int(event.get("eventSet"))
+        return main_set is None or event_set is None or event_set == main_set
+
     points = [
         point
-        for point in (
-            _event_point(event, strip_prefix)
-            for event in flat
-            if event is not main and event.get("remediation") is not True
-        )
+        for point in (_event_point(event, strip_prefix) for event in flat if on_path(event))
         if point is not None
     ]
     return build_data_flow([*points, sink], origin="coverity_event", has_source=False)

@@ -185,6 +185,7 @@ MAX_FLOW_STEPS = 32
 _FLOW_HEAD = 16
 _FLOW_TAIL = MAX_FLOW_STEPS - _FLOW_HEAD
 MAX_FLOW_SYMBOL_LENGTH = 64
+_MAX_FLOW_POSITION = 2**31 - 1
 _PLAIN_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:(?:\.|->|::)[A-Za-z_][A-Za-z0-9_]*)*")
 
 
@@ -221,6 +222,15 @@ class FlowStep(BaseModel):
     tool_kind: str | None = None
     # sarif_code_flow, checkmarx_path, coverity_event or cppcheck_location.
     origin: str
+
+    @field_validator("start_line", "column")
+    @classmethod
+    def _position_in_range(cls, v: int | None) -> int | None:
+        """Lines and columns are 1-based; 0 (cppcheck, SARIF: unknown), negative
+        values and values above a signed 32-bit integer become None."""
+        if v is None or not 1 <= v <= _MAX_FLOW_POSITION:
+            return None
+        return v
 
     @field_validator("symbol")
     @classmethod
