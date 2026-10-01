@@ -709,3 +709,48 @@ class TestSarifCodeFlows:
             "source",
             "source",
         )
+
+
+_MALFORMED_CODE_FLOWS: dict[str, object] = {
+    "code_flows_not_a_list": {"threadFlows": []},
+    "code_flow_not_a_dict": ["not a codeFlow"],
+    "thread_flows_missing": [{}],
+    "thread_flows_not_a_list": [{"threadFlows": "x"}],
+    "thread_flows_empty": [{"threadFlows": []}],
+    "thread_flow_not_a_dict": [{"threadFlows": ["x"]}],
+    "locations_missing": [{"threadFlows": [{}]}],
+    "locations_not_a_list": [{"threadFlows": [{"locations": {"index": 0}}]}],
+    "locations_empty": [{"threadFlows": [{"locations": []}]}],
+}
+
+
+@pytest.mark.unit
+class TestSarifCodeFlowEdgeCases:
+    @pytest.mark.parametrize(
+        "code_flows", list(_MALFORMED_CODE_FLOWS.values()), ids=list(_MALFORMED_CODE_FLOWS)
+    )
+    def test_malformed_code_flows_give_no_data_flows(
+        self, tmp_path: Path, code_flows: object
+    ) -> None:
+        result = _result_at({"uri": "app/views.py"}, line=9)
+        result["codeFlows"] = code_flows
+        p = _write_sarif(tmp_path, {"results": [result]})
+
+        [f] = SarifIngestor().ingest(p)
+
+        assert f.data_flows == []
+        assert f.source_code_refs == [SourceCodeRef(file_path="app/views.py", start_line=9)]
+
+    def test_step_line_and_column_below_1_become_none(self, tmp_path: Path) -> None:
+        loc = {"uri": "app/views.py"}
+        unknown = _thread_flow_location(loc, 0)
+        unknown["location"]["physicalLocation"]["region"]["startColumn"] = -4
+        result = _result_at(loc, line=9)
+        result["codeFlows"] = [_code_flow(unknown, _thread_flow_location(loc, 9))]
+        p = _write_sarif(tmp_path, {"results": [result]})
+
+        [f] = SarifIngestor().ingest(p)
+
+        assert _flow_shape(f) == [
+            [("app/views.py", None, None, "source"), ("app/views.py", 9, 2, "sink")]
+        ]

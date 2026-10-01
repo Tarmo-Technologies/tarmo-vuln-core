@@ -92,6 +92,21 @@ class TestFlowStep:
     def test_identifier_symbol_accepted(self) -> None:
         assert _step(1, symbol="req.args").symbol == "req.args"
 
+    @pytest.mark.parametrize("value", [0, -1, 2**31])
+    def test_line_or_column_outside_1_to_int32_max_becomes_none(self, value: int) -> None:
+        """Scanners write ``line="0"`` (cppcheck) or ``startLine: 0`` for "unknown"; a
+        consumer reading ``lines[line - 1]`` would silently read the last line."""
+        step = FlowStep(
+            file_path="a.c", start_line=value, column=value, role="sink", origin="cppcheck_location"
+        )
+        assert (step.start_line, step.column) == (None, None)
+
+    def test_line_and_column_from_1_to_int32_max_kept(self) -> None:
+        step = _step(1, column=2**31 - 1)
+        assert (step.start_line, step.column) == (1, 2**31 - 1)
+        again = FlowStep.model_validate(step.model_dump(mode="json"))
+        assert (again.start_line, again.column) == (1, 2**31 - 1)
+
 
 @pytest.mark.unit
 class TestDataFlow:

@@ -500,3 +500,27 @@ class TestCppcheckDataFlows:
         assert f.extra_fields["cppcheck_locations"] == [
             {"file": "src/a.c", "line": 10, "column": 7, "info": "here"}
         ]
+
+    def test_line_0_location_is_a_step_without_a_line(self, tmp_path: Path) -> None:
+        """cppcheck writes ``line="0"`` (and ``column="0"``) when it has no position."""
+        report = """<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+  <cppcheck version="2.13.0"/>
+  <errors>
+    <error id="ctunullpointer" severity="error" msg="Null pointer dereference: p">
+      <location file="src/use.c" line="3" column="6" info="Dereferencing argument p"/>
+      <location file="src/caller.c" line="0" column="0" info="Calling function f"/>
+    </error>
+  </errors>
+</results>
+"""
+        path = tmp_path / "line0.xml"
+        path.write_text(report, encoding="utf-8")
+
+        [f] = CppcheckIngestor().ingest(path)
+
+        [flow] = f.data_flows
+        assert [(s.file_path, s.start_line, s.column, s.role) for s in flow.steps] == [
+            ("src/caller.c", None, None, "step"),
+            ("src/use.c", 3, 6, "sink"),
+        ]

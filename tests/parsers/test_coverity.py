@@ -302,3 +302,27 @@ class TestCoverityDataFlows:
             (21, "alias", "step"),
             (31, "sink", "sink"),
         ]
+
+    def test_events_of_another_event_set_are_not_steps(self, tmp_path: Path) -> None:
+        """Checkers such as COPY_PASTE_ERROR report a second ``eventSet`` (the
+        original code, an example) that is not the defect's path."""
+        events = [
+            _event(10, "assignment"),
+            _event(20, "alias"),
+            _event(40, "original"),
+            _event(31, "sink", main=True),
+        ]
+        events[0]["eventSet"] = 0
+        # events[1] has no eventSet: kept.
+        events[2]["eventSet"] = 1
+        events[3]["eventSet"] = 0
+
+        [f] = self.ingestor.ingest(_write_issue(tmp_path, events))
+
+        assert [(s.start_line, s.tool_kind, s.role) for s in f.data_flows[0].steps] == [
+            (10, "assignment", "step"),
+            (20, "alias", "step"),
+            (31, "sink", "sink"),
+        ]
+        # event_trace keeps every event, as today.
+        assert [e["lineNumber"] for e in f.extra_fields["event_trace"]] == [10, 20, 40, 31]

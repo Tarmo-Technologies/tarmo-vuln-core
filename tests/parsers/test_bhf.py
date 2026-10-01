@@ -517,6 +517,57 @@ class TestBhfStaticIngestor:
         # the BHF static keys are still there
         assert f.extra_fields["bhf_rule_id"] == "BHF-401"
 
+    def test_code_flow_steps_are_remapped_like_the_refs(self, tmp_path: Path) -> None:
+        """BHF writes ``codeFlows`` for every finding with a taint trace
+        (``sarif_code_flows`` in ``crates/static_analysis/src/lib.rs``). Without a
+        source root, ``sarif_artifact_location`` writes absolute paths as
+        ``file:///target/...`` URIs, for the steps as for the result location."""
+        doc = json.loads(STATIC_SARIF.read_text())
+        result = doc["runs"][0]["results"][0]
+        result["locations"][0]["physicalLocation"]["artifactLocation"] = {
+            "uri": "file:///target/src/cmd.c"
+        }
+
+        def step(uri: str, line: int, message: str) -> dict:
+            return {
+                "location": {
+                    "physicalLocation": {
+                        "artifactLocation": {"uri": uri},
+                        "region": {"startLine": line, "snippet": {"text": "x"}},
+                    },
+                    "message": {"text": message},
+                }
+            }
+
+        result["codeFlows"] = [
+            {
+                "message": {"text": "Tainted dataflow to BHF-401"},
+                "threadFlows": [
+                    {
+                        "locations": [
+                            step("file:///target/src/main.c", 20, "source in main"),
+                            step("file:///usr/include/string.h", 61, "call: main → copy_name"),
+                            step("file:///target/src/cmd.c", 9, "sink: copy_name → strcpy"),
+                        ]
+                    }
+                ],
+            }
+        ]
+        path = tmp_path / "static-report.sarif"
+        path.write_text(json.dumps(doc))
+
+        (f,) = BhfStaticIngestor().ingest(path)
+
+        assert [(r.file_path, r.start_line) for r in f.source_code_refs] == [("src/cmd.c", 9)]
+        [flow] = f.data_flows
+        assert [(s.file_path, s.start_line, s.role) for s in flow.steps] == [
+            ("src/main.c", 20, "source"),
+            # Not a project file: kept as is, like a ref's path.
+            ("/usr/include/string.h", 61, "step"),
+            ("src/cmd.c", 9, "sink"),
+        ]
+        assert flow.steps[-1].file_path == f.source_code_refs[0].file_path
+
     def test_generic_sarif_unaffected(self) -> None:
         findings = SarifIngestor().ingest(STATIC_SARIF)
         assert len(findings) == 1
