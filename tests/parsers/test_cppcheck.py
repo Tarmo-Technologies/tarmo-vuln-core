@@ -306,9 +306,7 @@ class TestCppcheckMultiLocation:
 
     def test_primary_location_is_the_only_ref(self) -> None:
         f = self._one("arrayIndexOutOfBoundsCond")
-        assert f.source_code_refs == [
-            SourceCodeRef(file_path="src/redundant.c", start_line=17, column=19)
-        ]
+        assert f.source_code_refs == [SourceCodeRef(file_path="src/redundant.c", start_line=17)]
         assert f.source_code_refs[0].is_sink is True
         assert f.affected_hosts == ["src/redundant.c"]
         # CData (126) wins over the error's own cwe="788" attribute.
@@ -328,7 +326,7 @@ class TestCppcheckMultiLocation:
     def test_ctu_null_pointer_ref_is_the_dereference_not_the_call(self) -> None:
         f = self._one("ctunullpointer")
         assert [(r.file_path, r.start_line, r.column) for r in f.source_code_refs] == [
-            ("src/nullarg.c", 3, 6)
+            ("src/nullarg.c", 3, None)
         ]
         assert f.extra_fields["cppcheck_locations"] == [
             {
@@ -343,16 +341,32 @@ class TestCppcheckMultiLocation:
     def test_redundant_check_ref_is_the_dereference_not_the_condition(self) -> None:
         f = self._one("nullPointerRedundantCheck")
         assert [(r.file_path, r.start_line, r.column) for r in f.source_code_refs] == [
-            ("src/redundant.c", 5, 14)
+            ("src/redundant.c", 5, None)
         ]
         assert [loc["line"] for loc in f.extra_fields["cppcheck_locations"]] == [6]
 
     def test_single_location_error_has_no_cppcheck_locations(self) -> None:
         f = self._one("uninitvar")
         assert [(r.file_path, r.start_line, r.column) for r in f.source_code_refs] == [
-            ("src/redundant.c", 25, 12)
+            ("src/redundant.c", 25, None)
         ]
         assert "cppcheck_locations" not in f.extra_fields
+
+    def test_sink_ref_has_file_and_line_but_no_column(self) -> None:
+        """The ref's column stays None, as before #7; the column is kept elsewhere.
+
+        cppcheck's column is the exact token (the index, the variable), while
+        Semgrep and CodeQL report where the call or expression starts. A
+        column on the ref would fail the downstream cross-tool column check
+        and re-key every cppcheck finding. The column stays in
+        ``cppcheck_locations`` and on the flow steps.
+        """
+        assert [r.column for f in self.findings for r in f.source_code_refs] == [None] * 5
+        f = self._one("ctunullpointer")
+        assert [(s.start_line, s.column, s.role) for s in f.data_flows[0].steps] == [
+            (8, 16, "step"),
+            (3, 6, "sink"),
+        ]
 
     def test_no_ref_is_a_taint_source(self) -> None:
         assert [len(f.source_code_refs) for f in self.findings] == [1, 1, 1, 1, 1]
@@ -378,7 +392,7 @@ class TestCppcheckMultiLocation:
         [f] = CppcheckIngestor().ingest(path)
 
         assert f.affected_hosts == ["src/use.c"]
-        assert f.source_code_refs == [SourceCodeRef(file_path="src/use.c", start_line=3, column=6)]
+        assert f.source_code_refs == [SourceCodeRef(file_path="src/use.c", start_line=3)]
         # "*" is skipped, "./" stripped, column 0 (cppcheck: unknown) and a missing info are None.
         assert f.extra_fields["cppcheck_locations"] == [
             {"file": "src/caller.c", "line": 8, "column": None, "info": None},
@@ -462,7 +476,7 @@ class TestCppcheckDataFlows:
             ("src/b.c", 20, "step", "Calling function c, 1st argument"),
             ("src/c.c", 30, "sink", "Dereferencing argument p"),
         ]
-        assert f.source_code_refs == [SourceCodeRef(file_path="src/c.c", start_line=30, column=3)]
+        assert f.source_code_refs == [SourceCodeRef(file_path="src/c.c", start_line=30)]
 
     def test_no_flow_without_a_primary_file(self, tmp_path: Path) -> None:
         report = """<?xml version="1.0" encoding="UTF-8"?>
