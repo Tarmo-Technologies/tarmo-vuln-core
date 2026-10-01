@@ -146,16 +146,19 @@ class CppcheckIngestor(BaseIngestor):
                 primary_file = _location_file(primary)
                 if primary_file:
                     hosts.append(primary_file)
+                    # File and line only, as before: cppcheck's column is the
+                    # exact token, where other tools report the start of the
+                    # call or expression, so on the ref it would break
+                    # cross-tool matching downstream. The flow keeps it.
                     ref = SourceCodeRef(
                         file_path=primary_file,
                         start_line=_int_attr(primary.get("line")),
-                        column=_location_column(primary),
                     )
                     source_refs.append(ref)
                     sink_point = FlowPoint(
                         file_path=ref.file_path,
                         start_line=ref.start_line,
-                        column=ref.column,
+                        column=_location_column(primary),
                         message=primary.get("info") or "",
                     )
 

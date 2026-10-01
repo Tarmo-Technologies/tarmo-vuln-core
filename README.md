@@ -47,7 +47,7 @@ The two are independently importable. The Python package loads without the Rust 
 | BloodHound CE | JSON | AD attack-path findings; domain-aware impact |
 | HackerOne | JSON | Bug bounty reports; CVSS from relationships |
 | Bandit | JSON | Python SAST; one finding per result with file/line |
-| Cppcheck | XML | C/C++ static analysis; one finding per `<error>`, primary location as the sink ref, other locations in `extra_fields["cppcheck_locations"]` and as `data_flows` steps |
+| Cppcheck | XML | C/C++ static analysis; one finding per `<error>`, primary location as the sink ref (file and line; its column only on the flow), other locations in `extra_fields["cppcheck_locations"]` and as `data_flows` steps |
 | SARIF 2.1.0 | JSON/SARIF | Generic SARIF import; CWE from relationships; `codeFlows` as `data_flows` |
 | Gitleaks | JSON | Secret scanning; groups by RuleID; populates `source_code_refs` |
 | TruffleHog | JSON-lines | Secret scanning; verified=CRITICAL; uses only redacted values |
